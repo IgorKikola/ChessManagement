@@ -1,0 +1,26 @@
+ <html>
+    <head>
+        <title>Chess Club</title>
+    </head>
+    <body>
+    <h1>Chess System Profile</h1>
+        <p>Welcome to the Chess System Profile</p>
+        <p><a href={% url 'home' %}>Home</a></p>
+    <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.email }}" class="rounded-circle profile-image" >
+    <div class="profile-text">
+      <h3 class="profile-username">{{ user.full_name}}</h3>
+      <p class="profile-username">{{ user.email }}</p>
+    </div>
+    <h3>bio:</h3>
+    <p class="profile-bio">{{ user.bio }}</p>
+    <h3>personal statement:</h3>
+    <p class="profile-bio">{{ user.personal_statement }}</p>
+    <h3>Chess Level:</h3>
+    <p class="profile-bio">{{ user.experience}}</p>
+
+    <p><a href="{% url 'log_out' %}">Log Out</a></p>
+    <p><a href="{% url 'change_password' user.id %}">Change Password</a></p>
+    <p><a href="{% url 'change_profile' user.id %}">Change Profile</a></p>
+
+    </body>
+ </html>

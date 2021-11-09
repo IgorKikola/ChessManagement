@@ -1,0 +1,15 @@
+ <html>
+    <head>
+        <title>Chess Club</title>
+    </head>
+    <body>
+    <h1>Chess System: Sign Up</h1>
+        <p>Welcome to the Chess System Sign Up Page</p>
+        <p><a href={% url 'home' %}>Home</a></p>
+    <form action="{% url 'sign_up' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Sign up">
+    </form>
+    </body>
+ </html>

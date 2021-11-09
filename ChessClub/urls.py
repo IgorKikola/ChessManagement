@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from chessManagement import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home, name='home'),
+    path('sign_up/',views.sign_up, name='sign_up'),
+    path('log_in/',views.log_in, name='log_in'),
+    path('profile/<int:user_id>',views.profile, name='profile'),
+    path('change_password/<int:user_id>',views.change_password, name='change_password'),
+    path('change_profile/<int:user_id>',views.change_profile, name='change_profile'),
+    path('log_out/', views.log_out, name='log_out'),
 ]
