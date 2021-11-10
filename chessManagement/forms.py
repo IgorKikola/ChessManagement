@@ -74,14 +74,35 @@ class changePassword(forms.ModelForm):
     )
 
 
-class changeProfile(forms.ModelForm):
+class changeProfile(forms.Form):
     """Form enabling unregistered users to sign up."""
+    first_name = forms.CharField(
+        label=("First name"),
+        strip=False,
+        required=False
+    )
+    last_name = forms.CharField(
+        label=("Last Name"),
+        strip=False,
+        required=False
+    )
+    email = forms.EmailField(
+        label=("Email"),
+        required=False
+    )
     experience = forms.ChoiceField(
+        required=False,
         choices=User.CHESS_CHOICES
     )
-    class Meta:
-        """Form options."""
-        model = User
-        fields = ['first_name', 'last_name', 'email', 'experience','bio','personal_statement']
-        widgets = {'bio': forms.Textarea(), 'personal_statement': forms.Textarea}
-
+    bio = forms.CharField(
+        label=("bio"),
+        strip=False,
+        widget=forms.Textarea(),
+        required=False
+        )
+    personal_statement = forms.CharField(
+        label=("personal statement"),
+        strip=False,
+        widget=forms.Textarea(),
+        required=False
+        )

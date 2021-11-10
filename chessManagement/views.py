@@ -24,10 +24,13 @@ def change_profile(request,user_id):
     if request.method == 'POST':
         form = changeProfile(request.POST)
         if form.is_valid():
-            user.first_name= form.cleaned_data.get('first_name')
-            user.last_name = form.cleaned_data.get('last_name')
-            user.email = form.cleaned_data.get('email')
-            user.username = form.cleaned_data.get('email')
+            if (form.data['first_name']):
+                user.first_name = form.cleaned_data.get('first_name')
+            if (form.data['last_name']):
+                user.last_name = form.cleaned_data.get('last_name')
+            if (form.data['email']):
+                user.email = form.cleaned_data.get('email')
+                user.username = form.cleaned_data.get('email')
             user.bio = form.cleaned_data.get('bio')
             user.personal_statement = form.cleaned_data.get('personal_statement')
             user.experience = form.cleaned_data.get('experience')

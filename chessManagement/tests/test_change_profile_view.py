@@ -10,17 +10,17 @@ class changeProfileTest(TestCase):
             last_name='Doe',
             email='johndoe@example.org',
             experience='Beginner',
-            personal_statement='Hi I would like to apply ',
-            bio='Hello, I am John Doe.',
+            personal_statement='Hi I would like to apply',
+            bio='Hello, I am John Doe',
             password='Password123',
         )
         self.form_input = {
-            'first_name': '',
-            'last_name': '',
-            'email': '',
-            'experience': '',
-            'bio': '',
-            'personal_statement': '',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'johndoe@example.org',
+            'experience': 'Beginner',
+            'bio': 'Hi I would like to apply',
+            'personal_statement': 'Hello, I am John Doe.',
         }
         self.url = reverse('change_profile', kwargs={'user_id': self.user.id})
 
