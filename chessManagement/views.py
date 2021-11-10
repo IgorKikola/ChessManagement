@@ -30,6 +30,7 @@ def change_profile(request,user_id):
                 user.last_name = form.cleaned_data.get('last_name')
             if (form.data['email']):
                 user.email = form.cleaned_data.get('email')
+                user.username = form.cleaned_data.get('email')
             if (form.data['bio']):
                 user.bio = form.cleaned_data.get('bio')
             if (form.data['personal_statement']):
