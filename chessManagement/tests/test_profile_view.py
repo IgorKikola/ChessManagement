@@ -25,7 +25,7 @@ class ProfileTest(TestCase):
         self.assertContains(response, "John Doe")
         self.assertContains(response, "johndoe@example.org")
 
-    # def test_get_show_user_with_invalid_id(self):
+    # def test_get_profile_with_invalid_id(self):
     #     url = reverse('profile', kwargs={'user_id': self.user.id+1})
     #     response = self.client.get(url, follow=True)
     #     response_url = reverse('user_list')
