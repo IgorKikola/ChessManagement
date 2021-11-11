@@ -36,8 +36,6 @@ class ChangePasswordTestCase(TestCase):
             'last_name': '',
             'email': '',
             'experience': '',
-            'bio': '',
-            'personal_statement': '',
         }
         form = changeProfile(data=self.form_input)
         self.assertTrue(form.is_valid())

@@ -36,7 +36,7 @@ def change_profile(request,user_id):
             user.experience = form.cleaned_data.get('experience')
             user.save()
             return redirect('profile',user_id)
-    profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
+    profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience ,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
     return render(request, 'change_profile.html', {'form': profile, 'user' :user})
 
 
