@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from .models import User
@@ -77,5 +78,17 @@ def profile(request, user_id):
     else:
         return render(request, 'profile.html', {'user': user})
 
+@login_required
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'user_list.html', {'users': users})
+
+def show_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return redirect('user_list')
+    else:
+        return render(request, 'show_user.html', {'user': user})
 
 # Create your views here.
