@@ -77,6 +77,7 @@ def profile(request, user_id):
         return redirect('home')
     else:
         return render(request, 'profile.html', {'user': user})
+
 @login_required
 def user_list(request):
     users = User.objects.all()

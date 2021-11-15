@@ -1,17 +1,17 @@
 [
-+   {
-+     "model": "chessManagement.user",
-+     "pk": 1,
-+     "fields": {
-+       "first_name": "John",
-+       "last_name": "Doe",
-+       "username": "John",
-+       "email": "johndoe@example.org",
-+       "bio": "Hello, I'm John Doe.",
-        "experience": "beginner",
-        "personal_statement": "statement",
-+       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-+       "is_active": true
-+     }
-+   }
-+ ]
+   {
+     "model": "chessManagement.user",
+     "pk": 1,
+     "fields": {
+     "first_name": "John",
+     "last_name": "Doe",
+     "username": "John",
+     "email": "johndoe@example.org",
+     "bio": "Hello, I'm John Doe.",
+     "experience": "beginner",
+     "personal_statement": "statement",
+     "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+     "is_active": true
+     }
+   }
+ ]
