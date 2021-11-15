@@ -77,5 +77,9 @@ def profile(request, user_id):
     else:
         return render(request, 'profile.html', {'user': user})
 
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'user_list.html', {'users': users})
 
+    
 # Create your views here.
