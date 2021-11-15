@@ -81,5 +81,12 @@ def user_list(request):
     users = User.objects.all()
     return render(request, 'user_list.html', {'users': users})
 
-    
+def show_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return redirect('user_list')
+    else:
+        return render(request, 'show_user.html', {'user': user})
+
 # Create your views here.
