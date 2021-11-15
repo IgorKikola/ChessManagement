@@ -45,7 +45,7 @@ class SignUpForm(forms.ModelForm):
 
         super().save(commit=False)
         user = User.objects.create_user(
-            username=self.cleaned_data.get('email'),
+            username=self.cleaned_data.get('first_name'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             bio=self.cleaned_data.get('bio'),
