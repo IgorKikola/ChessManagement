@@ -44,13 +44,21 @@ def change_profile(request,user_id):
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
+        #if form.is_valid():
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('profile', user.id)
+        # # if form.is_valid():
+        # user = form.save(False)
+        # # user.user_level = APPLICANT
+        # if user.is_valid():
+        #     user.save()
+        #     login(request, user)
+        #     return redirect('profile', user.id)
     else:
         form = SignUpForm()
-    return render(request, 'sign_up.html', {'form': form})
+        return render(request, 'sign_up.html', {'form': form})
 
 def log_out(request):
     logout(request)
@@ -80,8 +88,12 @@ def profile(request, user_id):
 
 @login_required
 def user_list(request):
-    users = User.objects.all()
-    return render(request, 'user_list.html', {'users': users})
+    user = request.user
+    if user.user_level == 0:
+        return render(request, 'page_unavailable.html')
+    else:
+        users = User.objects.all()
+        return render(request, 'user_list.html', {'users': users})
 
 def show_user(request, user_id):
     try:
@@ -89,6 +101,12 @@ def show_user(request, user_id):
     except ObjectDoesNotExist:
         return redirect('user_list')
     else:
-        return render(request, 'show_user.html', {'user': user})
+        user_self = request.user
+        if user_self.user_level == 0:
+            return render(request, 'page_unavailable.html')
+        if user_self.user_level == 1:
+            return render(request, 'show_user.html', {'user': user})
+        else:
+            return render(request, 'officer_show_user.html', {'user': user})
 
 # Create your views here.

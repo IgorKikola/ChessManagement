@@ -38,6 +38,29 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    # USER_TYPE_CHOICES = (
+    #       (1, 'applicant'),
+    #       (2, 'member'),
+    #       (3, 'officer'),
+    #       (4, 'owner'),
+    # )
+    #
+    # user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES)
+
+    APPLICANT = 0
+    MEMBER = 1
+    OFFICER = 2
+    OWNER = 3
+    USER_LEVEL_CHOICES = (
+        (APPLICANT, "Applicant"),
+        (MEMBER, "Member"),
+        (OFFICER, "Officer"),
+        (OWNER, "Owner"),
+    )
+    user_level = models.CharField(max_length=50 ,blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
+
+    #lol_name = models.CharField(max_length=50 ,blank=False)
+
     CHESS_CHOICES = (
         ('Beginner', 'beginner'),
         ('Intermediate', 'intermediate'),
