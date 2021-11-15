@@ -132,3 +132,6 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'chessManagement.User'
+
+#Login url for redirects
+LOGIN_URL = 'log_in'

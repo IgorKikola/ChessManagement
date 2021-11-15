@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from .models import User
@@ -76,7 +77,7 @@ def profile(request, user_id):
         return redirect('home')
     else:
         return render(request, 'profile.html', {'user': user})
-
+@login_required
 def user_list(request):
     users = User.objects.all()
     return render(request, 'user_list.html', {'users': users})
