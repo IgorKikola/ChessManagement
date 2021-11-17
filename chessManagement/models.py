@@ -49,9 +49,7 @@ class User(AbstractUser):
         (OFFICER, "Officer"),
         (OWNER, "Owner"),
     )
-    user_level = models.CharField(max_length=50 ,blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
-
-    #lol_name = models.CharField(max_length=50 ,blank=False)
+    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
 
     CHESS_CHOICES = (
         ('Beginner', 'beginner'),

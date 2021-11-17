@@ -5,6 +5,7 @@ from chessManagement.models import User
 class ShowUserTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
+            user_level=1,
             first_name='John',
             last_name='Doe',
             email='johndoe@example.org',
@@ -17,10 +18,12 @@ class ShowUserTest(TestCase):
         self.url = reverse('show_user', kwargs={'user_id': self.user.id})
 
     def test_show_user_url(self):
-        self.assertEqual(self.url,f'/user/{self.user.id}')
+        self.assertEqual(self.url,f'/user/{self.user.id}/')
 
     def test_get_show_user_with_valid_id(self):
-        response = self.client.get(self.url)
+        self.client.login(username=self.user.email, password='Password123')
+        url = reverse('show_user', kwargs={'user_id': self.user.id})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_user.html')
         self.assertContains(response, "John Doe")

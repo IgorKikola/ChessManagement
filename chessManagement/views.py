@@ -41,25 +41,6 @@ def change_profile(request,user_id):
     return render(request, 'change_profile.html', {'form': profile, 'user' :user})
 
 
-# def sign_up(request):
-#     if request.method == 'POST':
-#         form = SignUpForm(request.POST)
-#         #if form.is_valid():
-#         if form.is_valid():
-#             user = form.save()
-#             login(request, user)
-#             return redirect('profile', user.id)
-#         # # if form.is_valid():
-#         # user = form.save(False)
-#         # # user.user_level = APPLICANT
-#         # if user.is_valid():
-#         #     user.save()
-#         #     login(request, user)
-#         #     return redirect('profile', user.id)
-#     else:
-#         form = SignUpForm()
-#         return render(request, 'sign_up.html', {'form': form})
-
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -107,14 +88,6 @@ def user_list(request):
         return render(request, 'user_list.html', {'users': users})
 
 def show_user(request, user_id):
-    # if toMember==True:
-    #     user = User.objects.get(id=uid)
-    #     user.user_level=1
-    #     user.save(update_fields=["user_level"])
-    #     # return redirect('user_list')
-    #     return render(request, 'officer_show_user.html', {'user': user})
-    #
-    # else:
     try:
         user = User.objects.get(id=user_id)
     except ObjectDoesNotExist:

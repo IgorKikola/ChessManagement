@@ -17,26 +17,28 @@ class UserListTest(TestCase):
 
     def test_get_user_list(self):
         self.client.login(username=self.user.email, password='Password123')
-        # self._create_test_users(15-1)
+        self._create_test_users()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'user_list.html')
         self.assertEqual(len(response.context['users']), 1)
-        # for user_id in range(15-1):
-        #     self.assertContains(response, f'First{user_id}')
-        #     self.assertContains(response, f'Last{user_id}')
-        #     user = User.objects.get(usernamel=f'{user_id}@example.org')
-        #     user_url = reverse('show_user', kwargs={'user_id': user.id})
-        #     self.assertContains(response, user_url)
+        for user_id in range(115-101):
+            self.assertContains(response, f'First{user_id}')
+            self.assertContains(response, f'Last{user_id}')
+            user = User.objects.get(email=f'{user_id}@example.org')
+            user_url = reverse('show_user', kwargs={'user_id': user.id})
+            self.assertContains(response, user_url)
 
     def test_get_user_list_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def _create_test_users(self, user_count=15-1):
+    def _create_test_users(self):
+        user_count=115-101
         for user_id in range(user_count):
             User.objects.create_user(
+                user_level=0,
                 email=f'user{user_id}@example.org',
                 password='Password123',
                 first_name=f'First{user_id}',
