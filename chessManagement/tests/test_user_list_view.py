@@ -21,7 +21,7 @@ class UserListTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'user_list.html')
-        self.assertEqual(len(response.context['users']), 15)
+        self.assertEqual(len(response.context['users']), 1)
         for user_id in range(15-1):
             self.assertContains(response, f'First{user_id}')
             self.assertContains(response, f'Last{user_id}')
@@ -34,10 +34,12 @@ class UserListTest(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def _create_test_users(self, user_count=10):
+    def _create_test_users(self):
+        user_count=15-1
         for user_id in range(user_count):
             User.objects.create_user(
-                email=f'user{user_id}@test.org',
+                user_level=0,
+                email=f'user{user_id}@example.org',
                 password='Password123',
                 first_name=f'First{user_id}',
                 last_name=f'Last{user_id}',

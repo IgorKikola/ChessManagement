@@ -38,6 +38,19 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+
+    APPLICANT = 0
+    MEMBER = 1
+    OFFICER = 2
+    OWNER = 3
+    USER_LEVEL_CHOICES = (
+        (APPLICANT, "Applicant"),
+        (MEMBER, "Member"),
+        (OFFICER, "Officer"),
+        (OWNER, "Owner"),
+    )
+    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
+
     CHESS_CHOICES = (
         ('Beginner', 'beginner'),
         ('Intermediate', 'intermediate'),

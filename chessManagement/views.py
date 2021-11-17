@@ -80,8 +80,12 @@ def profile(request, user_id):
 
 @login_required
 def user_list(request):
-    users = User.objects.all()
-    return render(request, 'user_list.html', {'users': users})
+    user = request.user
+    if user.user_level == 0:
+        return render(request, 'page_unavailable.html')
+    else:
+        users = User.objects.all()
+        return render(request, 'user_list.html', {'users': users})
 
 def show_user(request, user_id):
     try:
@@ -89,6 +93,27 @@ def show_user(request, user_id):
     except ObjectDoesNotExist:
         return redirect('user_list')
     else:
-        return render(request, 'show_user.html', {'user': user})
+        user_self = request.user
+        if user_self.user_level == 0:
+            return render(request, 'page_unavailable.html')
+        if user_self.user_level == 1:
+            return render(request, 'show_user.html', {'user': user})
+        if user_self.user_level == 2:
+            return render(request, 'officer_show_user.html', {'user': user})
+        if user_self.user_level == 3:
+            return render(request, 'owner_show_user.html', {'user': user})
 
+def to_member(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.user_level=1
+    user.save(update_fields=["user_level"])
+    # return redirect('user_list')
+    return redirect('show_user', user.id)
+
+def to_officer(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.user_level=2
+    user.save(update_fields=["user_level"])
+    # return redirect('user_list')
+    return redirect('show_user', user.id)
 # Create your views here.

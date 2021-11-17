@@ -5,6 +5,7 @@ from chessManagement.models import User
 class ProfileTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
+            user_level=0,
             first_name='John',
             last_name='Doe',
             email='johndoe@example.org',
@@ -16,7 +17,7 @@ class ProfileTest(TestCase):
         self.url = reverse('profile', kwargs={'user_id': self.user.id})
 
     def test_profile_url(self):
-        self.assertEqual(self.url,f'/profile/{self.user.id}')
+        self.assertEqual(self.url,f'/profile/{self.user.id}/')
 
     def test_get_profile_with_valid_id(self):
         response = self.client.get(self.url)
