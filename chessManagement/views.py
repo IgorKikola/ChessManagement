@@ -96,6 +96,14 @@ def user_list(request):
         return render(request, 'user_list.html', {'users': users})
 
 def show_user(request, user_id):
+    # if toMember==True:
+    #     user = User.objects.get(id=uid)
+    #     user.user_level=1
+    #     user.save(update_fields=["user_level"])
+    #     # return redirect('user_list')
+    #     return render(request, 'officer_show_user.html', {'user': user})
+    #
+    # else:
     try:
         user = User.objects.get(id=user_id)
     except ObjectDoesNotExist:
@@ -109,4 +117,10 @@ def show_user(request, user_id):
         else:
             return render(request, 'officer_show_user.html', {'user': user})
 
+def to_member(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.user_level=1
+    user.save(update_fields=["user_level"])
+    # return redirect('user_list')
+    return redirect('show_user', user.id)
 # Create your views here.
