@@ -38,14 +38,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # USER_TYPE_CHOICES = (
-    #       (1, 'applicant'),
-    #       (2, 'member'),
-    #       (3, 'officer'),
-    #       (4, 'owner'),
-    # )
-    #
-    # user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES)
 
     APPLICANT = 0
     MEMBER = 1
