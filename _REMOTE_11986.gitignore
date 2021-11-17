@@ -298,8 +298,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-<<<<<<< HEAD
 # End of https://www.toptal.com/developers/gitignore/api/python,django,virtualenv,linux,macos,windows
-=======
-# End of https://www.toptal.com/developers/gitignore/api/python,django,virtualenv,linux,macos,windows
->>>>>>> 1cdc9f05c3be2cf8733e4fb7d2530b688834c0ef
