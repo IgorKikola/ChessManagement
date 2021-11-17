@@ -114,12 +114,21 @@ def show_user(request, user_id):
             return render(request, 'page_unavailable.html')
         if user_self.user_level == 1:
             return render(request, 'show_user.html', {'user': user})
-        else:
+        if user_self.user_level == 2:
             return render(request, 'officer_show_user.html', {'user': user})
+        if user_self.user_level == 3:
+            return render(request, 'owner_show_user.html', {'user': user})
 
 def to_member(request, user_id):
     user = User.objects.get(id=user_id)
     user.user_level=1
+    user.save(update_fields=["user_level"])
+    # return redirect('user_list')
+    return redirect('show_user', user.id)
+
+def to_officer(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.user_level=2
     user.save(update_fields=["user_level"])
     # return redirect('user_list')
     return redirect('show_user', user.id)

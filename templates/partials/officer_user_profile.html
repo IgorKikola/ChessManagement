@@ -16,7 +16,7 @@
         <h1>Rank:</h1>
         <p class="profile-bio">{{ user.get_user_level_display }}</p>
       </div>
-      <div class="col-3">
+      <div class="col-3" align="center">
         {% if user.user_level == 0 %}
           <a href='{% url 'to_member' user.id %}' class="btn btn-lg btn-secondary">
             Approve

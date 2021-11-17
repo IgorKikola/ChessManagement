@@ -57,7 +57,7 @@ class User(AbstractUser):
         (OFFICER, "Officer"),
         (OWNER, "Owner"),
     )
-    user_level = models.CharField(max_length=50 ,blank=False, choices=USER_LEVEL_CHOICES, default=OFFICER)
+    user_level = models.CharField(max_length=50 ,blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
 
     #lol_name = models.CharField(max_length=50 ,blank=False)
 
