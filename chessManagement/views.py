@@ -106,16 +106,18 @@ def show_user(request, user_id):
 
 @login_required
 def to_member(request, user_id):
+    officer = request.user
     user = User.objects.get(id=user_id)
-    user.user_level=1
-    user.save(update_fields=["user_level"])
-    # return redirect('user_list')
+    if officer.user_level > 1:
+        user.user_level=1
+        user.save(update_fields=["user_level"])
     return redirect('show_user', user.id)
 
 @login_required
 def to_officer(request, user_id):
+    officer = request.user
     user = User.objects.get(id=user_id)
-    user.user_level=2
-    user.save(update_fields=["user_level"])
-    # return redirect('user_list')
+    if officer.user_level > 1:
+        user.user_level=2
+        user.save(update_fields=["user_level"])
     return redirect('show_user', user.id)
