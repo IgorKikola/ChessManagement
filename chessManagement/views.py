@@ -110,8 +110,7 @@ def show_user(request, user_id):
 def to_member(request, user_id):
     officer = request.user
     user = User.objects.get(id=user_id)
-    if (officer.user_level > 1 and user.user_level is 0)    # officer approves applicant
-    or officer.user_level is 3:    # club owner demotes officer
+    if (officer.user_level > 1 and user.user_level is 0) or officer.user_level is 3:
         user.user_level=1
         user.save(update_fields=["user_level"])
     return redirect('show_user', user.id)
@@ -120,7 +119,7 @@ def to_member(request, user_id):
 def to_officer(request, user_id):
     owner = request.user
     user = User.objects.get(id=user_id)
-    if officer.user_level is 3:    # club owner promotes user to officer
+    if officer.user_level is 3:
         user.user_level=2
         user.save(update_fields=["user_level"])
     return redirect('show_user', user.id)
