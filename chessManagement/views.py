@@ -9,19 +9,22 @@ from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 def home(request):
     return render(request, 'home.html')
 
-def change_password(request,user_id):
-    user = User.objects.get(id = user_id)
+@login_required
+def change_password(request):
+    user = request.user
     if request.method == 'POST':
         form = changePassword(request.POST)
         if form.is_valid():
             user.set_password(form.cleaned_data.get('new_password'))
             user.save()
+            login(request, user)
             return redirect('profile')
     password = changePassword()
     return render(request, 'change_password.html', {'form': password, 'user' :user})
 
-def change_profile(request,user_id):
-    user = User.objects.get(id = user_id)
+@login_required
+def change_profile(request):
+    user = request.user
     if request.method == 'POST':
         form = changeProfile(request.POST)
         if form.is_valid():

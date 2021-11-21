@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-12">
       <h1>Update details</h1>
-      <form action="{% url 'change_profile' user.pk %}" method="post">
+      <form action="{% url 'change_profile' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
         <input type="submit" value="Update" class="btn btn-primary">
