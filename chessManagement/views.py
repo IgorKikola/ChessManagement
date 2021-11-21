@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from .models import User
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 
-
+@login_prohibited
 def home(request):
     return render(request, 'home.html')
 
@@ -43,7 +43,7 @@ def change_profile(request):
     profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience ,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
     return render(request, 'change_profile.html', {'form': profile, 'user' :user})
 
-
+@login_prohibited
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -60,7 +60,7 @@ def log_out(request):
     logout(request)
     return redirect('home')
 
-
+@login_prohibited
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
