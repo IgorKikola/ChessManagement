@@ -55,6 +55,7 @@ def sign_up(request):
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
 
+
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -103,6 +104,7 @@ def show_user(request, user_id):
         if user_self.user_level == 3:
             return render(request, 'owner_show_user.html', {'user': user})
 
+@login_required
 def to_member(request, user_id):
     user = User.objects.get(id=user_id)
     user.user_level=1
@@ -110,10 +112,10 @@ def to_member(request, user_id):
     # return redirect('user_list')
     return redirect('show_user', user.id)
 
+@login_required
 def to_officer(request, user_id):
     user = User.objects.get(id=user_id)
     user.user_level=2
     user.save(update_fields=["user_level"])
     # return redirect('user_list')
     return redirect('show_user', user.id)
-# Create your views here.
