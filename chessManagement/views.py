@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from .models import User
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
+from .helpers import login_prohibited
 
 @login_prohibited
 def home(request):

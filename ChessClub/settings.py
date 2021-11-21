@@ -135,3 +135,5 @@ AUTH_USER_MODEL = 'chessManagement.User'
 
 #Login url for redirects
 LOGIN_URL = 'log_in'
+
+REDIRECT_URL_WHEN_LOGGED_IN = 'user_list'
