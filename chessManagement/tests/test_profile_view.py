@@ -14,10 +14,11 @@ class ProfileTest(TestCase):
             bio='Hello, I am John Doe.',
             password='Password123',
         )
-        self.url = reverse('profile', kwargs={'user_id': self.user.id})
+        self.url = reverse('profile')
+        self.client.login(username='johndoe@example.org', password='Password123')
 
     def test_profile_url(self):
-        self.assertEqual(self.url,f'/profile/{self.user.id}/')
+        self.assertEqual(self.url,'/profile/')
 
     def test_get_profile_with_valid_id(self):
         response = self.client.get(self.url)

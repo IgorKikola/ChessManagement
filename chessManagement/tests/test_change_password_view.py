@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import check_password
 from chessManagement.forms import changePassword
 from chessManagement.models import User
+from django.contrib.auth import login
 
 class changePasswordTest(TestCase):
     def setUp(self):
@@ -16,10 +17,11 @@ class changePasswordTest(TestCase):
             password='Password123',
         )
         self.form_input = {'new_password': 'Wellthen123'}
-        self.url = reverse('change_password', kwargs={'user_id': self.user.id})
+        self.url = reverse('change_password')
+        self.client.login(username='johndoe@example.org', password='Password123')
 
     def test_change_password_url(self):
-        self.assertEqual(self.url,f'/change_password/{self.user.id}')
+        self.assertEqual(self.url,'/change_password/')
 
     def test_get_change_password(self):
         response = self.client.get(self.url)
@@ -42,7 +44,7 @@ class changePasswordTest(TestCase):
 
     def test_successful_change_password(self):
         response = self.client.post(self.url, self.form_input, follow=True)
-        response_url = reverse('profile', kwargs={'user_id': self.user.id})
+        response_url = reverse('profile')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile.html')
         self.user.is_active = False
