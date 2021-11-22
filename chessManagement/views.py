@@ -100,8 +100,9 @@ def applicant_list(request):
 
 @login_required
 def show_user(request, user_id):
+    user = request.user
     try:
-        user = User.objects.get(id=user_id)
+        shown_user = User.objects.get(id=user_id)
     except ObjectDoesNotExist:
         return redirect('user_list')
     else:
@@ -109,11 +110,11 @@ def show_user(request, user_id):
         if user_self.user_level == 0:
             return render(request, 'page_unavailable.html')
         if user_self.user_level == 1:
-            return render(request, 'show_user.html', {'user': user})
+            return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
         if user_self.user_level == 2:
-            return render(request, 'officer_show_user.html', {'user': user})
+            return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
         if user_self.user_level == 3:
-            return render(request, 'owner_show_user.html', {'user': user})
+            return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
 
 @login_required
 def to_member(request, user_id):
