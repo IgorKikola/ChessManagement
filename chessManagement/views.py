@@ -86,7 +86,7 @@ def user_list(request):
     if user.user_level == 0:
         return render(request, 'page_unavailable.html')
     else:
-        users = User.objects.all()
+        users = User.objects.filter(user_level__in=[1,2,3])
         return render(request, 'user_list.html', {'users': users})
 
 @login_required
