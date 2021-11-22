@@ -6,7 +6,7 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'user_list'%}">User list</a>
     </li>
-    {% if user.user_level == 2 %}
+    {% if user.user_level > 1 %}
     <li class="nav-item">
       <a class="nav-link" href="{% url 'applicant_list'%}">Applicant list</a>
     </li>
