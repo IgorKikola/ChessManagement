@@ -39,18 +39,6 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
 
-    APPLICANT = 0
-    MEMBER = 1
-    OFFICER = 2
-    OWNER = 3
-    USER_LEVEL_CHOICES = (
-        (APPLICANT, "Applicant"),
-        (MEMBER, "Member"),
-        (OFFICER, "Officer"),
-        (OWNER, "Owner"),
-    )
-    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=OWNER)
-
     CHESS_CHOICES = (
         ('Beginner', 'beginner'),
         ('Intermediate', 'intermediate'),
@@ -80,3 +68,46 @@ class User(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
+
+
+class Club(models.Model):
+
+    name = models.CharField(max_length=50, blank=False, primary_key=True)
+    location = models.CharField(max_length=50, blank=False)
+    description = models.CharField(max_length=520, blank=True)
+
+    def owner(self):
+        return UserInClub.objects.filter(club=self, user_level=3).first().user
+
+    def gravatar(self, size=120):
+        """Return a URL to the user's gravatar."""
+        club_owner = self.owner()
+        gravatar_object = Gravatar(club_owner.email)
+        gravatar_url = gravatar_object.get_image(size=size, default='mp')
+        return gravatar_url
+
+    def mini_gravatar(self):
+        """Return a URL to a miniature version of the user's gravatar."""
+        return self.gravatar(size=60)
+
+
+class UserInClub(models.Model):
+
+    class Meta:
+        unique_together = ("user", "club")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+
+    APPLICANT = 0
+    MEMBER = 1
+    OFFICER = 2
+    OWNER = 3
+    USER_LEVEL_CHOICES = (
+        (APPLICANT, "Applicant"),
+        (MEMBER, "Member"),
+        (OFFICER, "Officer"),
+        (OWNER, "Owner"),
+    )
+    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
+
+    club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)

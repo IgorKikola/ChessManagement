@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from .models import User
+from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 from .helpers import login_prohibited
 
@@ -81,66 +81,71 @@ def profile(request):
     return render(request, 'profile.html', {'user': user})
 
 @login_required
-def user_list(request):
-    user = request.user
-    if user.user_level == 0:
-        return render(request, 'page_unavailable.html')
-    else:
-        users = User.objects.filter(user_level__in=[1,2,3])
-        return render(request, 'user_list.html', {'users': users})
+def club_list(request):
+    clubs = Club.objects.all()
+    return render(request, 'club_list.html', {'clubs': clubs})
 
-@login_required
-def applicant_list(request):
-    user = request.user
-    if user.user_level == 0 or user.user_level == 1:
-        return render(request, 'page_unavailable.html')
-    else:
-        users = User.objects.all()
-        return render(request, 'applicant_list.html', {'users': users})
+# @login_required
+# def user_list(request):
+#     user = request.user
+#     if user.user_level == 0:
+#         return render(request, 'page_unavailable.html')
+#     else:
+#         users = User.objects.filter(user_level__in=[1,2,3])
+#         return render(request, 'user_list.html', {'users': users})
 
-@login_required
-def show_user(request, user_id):
-    user = request.user
-    try:
-        shown_user = User.objects.get(id=user_id)
-    except ObjectDoesNotExist:
-        return redirect('user_list')
-    else:
-        user_self = request.user
-        if user_self.user_level == 0:
-            return render(request, 'page_unavailable.html')
-        if user_self.user_level == 1:
-            return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
-        if user_self.user_level == 2:
-            return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
-        if user_self.user_level == 3:
-            return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
+# @login_required
+# def applicant_list(request):
+#     user = request.user
+#     if user.user_level == 0 or user.user_level == 1:
+#         return render(request, 'page_unavailable.html')
+#     else:
+#         users = User.objects.all()
+#         return render(request, 'applicant_list.html', {'users': users})
 
-@login_required
-def to_member(request, user_id):
-    officer = request.user
-    user = User.objects.get(id=user_id)
-    if (officer.user_level > 1 and user.user_level == 0) or officer.user_level == 3:
-        user.user_level=1
-        user.save(update_fields=["user_level"])
-    return redirect('show_user', user.id)
+# @login_required
+# def show_user(request, user_id):
+#     user = request.user
+#     try:
+#         shown_user = User.objects.get(id=user_id)
+#     except ObjectDoesNotExist:
+#         return redirect('user_list')
+#     else:
+#         user_self = request.user
+#         if user_self.user_level == 0:
+#             return render(request, 'page_unavailable.html')
+#         if user_self.user_level == 1:
+#             return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
+#         if user_self.user_level == 2:
+#             return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
+#         if user_self.user_level == 3:
+#             return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
 
-@login_required
-def to_officer(request, user_id):
-    owner = request.user
-    user = User.objects.get(id=user_id)
-    if user.user_level == 1:
-        user.user_level=2
-        user.save(update_fields=["user_level"])
-    return redirect('show_user', user.id)
+# @login_required
+# def to_member(request, user_id):
+#     officer = request.user
+#     user = User.objects.get(id=user_id)
+#     if (officer.user_level > 1 and user.user_level == 0) or officer.user_level == 3:
+#         user.user_level=1
+#         user.save(update_fields=["user_level"])
+#     return redirect('show_user', user.id)
 
-@login_required
-def transfer_ownership(request, user_id):
-    owner = request.user
-    user = User.objects.get(id=user_id)
-    if owner.user_level == 3 and user.user_level == 2:
-        user.user_level=3
-        owner.user_level=2
-        user.save(update_fields=["user_level"])
-        owner.save(update_fields=["user_level"])
-    return redirect('show_user', user.id)
+# @login_required
+# def to_officer(request, user_id):
+#     owner = request.user
+#     user = User.objects.get(id=user_id)
+#     if user.user_level == 1:
+#         user.user_level=2
+#         user.save(update_fields=["user_level"])
+#     return redirect('show_user', user.id)
+
+# @login_required
+# def transfer_ownership(request, user_id):
+#     owner = request.user
+#     user = User.objects.get(id=user_id)
+#     if owner.user_level == 3 and user.user_level == 2:
+#         user.user_level=3
+#         owner.user_level=2
+#         user.save(update_fields=["user_level"])
+#         owner.save(update_fields=["user_level"])
+#     return redirect('show_user', user.id)
