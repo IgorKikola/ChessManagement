@@ -31,4 +31,5 @@ urlpatterns = [
     path('applicants/', views.applicant_list, name='applicant_list'),
     path('user/<int:user_id>/to_member/', views.to_member, name='to_member'),
     path('user/<int:user_id>/to_officer/', views.to_officer, name='to_officer'),
+    path('user/<int:user_id>/transfer_ownership/', views.transfer_ownership, name='transfer_ownership'),
 ]

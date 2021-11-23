@@ -16,6 +16,9 @@
             <a href='{% url 'to_member' shown_user.id %}' class="btn btn-lg btn-secondary">
               Demote to Member
             </a>
+            <a href='{% url 'transfer_ownership' shown_user.id %}' class="btn btn-lg btn-secondary">
+              Transfer Ownership
+            </a>
           {% endif %}
         </div>
       </div>

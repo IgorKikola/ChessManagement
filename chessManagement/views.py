@@ -138,7 +138,9 @@ def to_officer(request, user_id):
 def transfer_ownership(request, user_id):
     owner = request.user
     user = User.objects.get(id=user_id)
-    if officer.user_level == 3:
-        user.user_level=2
+    if owner.user_level == 3 and user.user_level == 2:
+        user.user_level=3
+        owner.user_level=2
         user.save(update_fields=["user_level"])
+        owner.save(update_fields=["user_level"])
     return redirect('show_user', user.id)
