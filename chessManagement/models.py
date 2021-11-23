@@ -49,7 +49,7 @@ class User(AbstractUser):
         (OFFICER, "Officer"),
         (OWNER, "Owner"),
     )
-    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=OWNER)
+    user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
 
     CHESS_CHOICES = (
         ('Beginner', 'beginner'),

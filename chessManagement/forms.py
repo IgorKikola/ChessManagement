@@ -63,7 +63,7 @@ class changePassword(forms.ModelForm):
 
         model = User
         fields = []
-    new_password = forms.CharField(
+        new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
