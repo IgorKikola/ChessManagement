@@ -85,6 +85,16 @@ def club_list(request):
     clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
+@login_required
+def show_club(request, club_id):
+    try:
+        club = Club.objects.get(id=club_id)
+        usersInClub = club.users()
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        return render(request, 'show_club.html',{'club': club, 'users': usersInClubs})
+
 # @login_required
 # def user_list(request):
 #     user = request.user

@@ -27,6 +27,7 @@ urlpatterns = [
     path('change_profile/',views.change_profile, name='change_profile'),
     path('log_out/', views.log_out, name='log_out'),
     path('clubs/', views.club_list, name='club_list'),
+    path('club/<int:club_id>/', views.show_club, name='show_club'),
     # path('user/<int:user_id>/', views.show_user, name='show_user'),
     # path('users/', views.user_list, name='user_list'),
     # path('applicants/', views.applicant_list, name='applicant_list'),
