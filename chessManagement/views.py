@@ -6,8 +6,10 @@ from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 from .helpers import login_prohibited
 
-@login_prohibited
-def home(request):
+club_session =""
+def home(request,club_name):
+    global club_session
+    club_session = club_name
     return render(request, 'home.html')
 
 @login_required
@@ -59,7 +61,7 @@ def sign_up(request):
 
 def log_out(request):
     logout(request)
-    return redirect('home')
+    return redirect('home',club_session)
 
 @login_prohibited
 def log_in(request):
@@ -77,7 +79,13 @@ def log_in(request):
 
 @login_required
 def profile(request):
+    global club_session
     user = request.user
+    club = Club.objects.get(name=club_session)
+    man = UserInClub.objects.filter(club=club)
+    if (len(man) != 0):
+        rank = man.get(user=user)
+        return render(request, 'profile.html', {'user': user,'rank':rank})
     return render(request, 'profile.html', {'user': user})
 
 @login_required
@@ -85,14 +93,23 @@ def club_list(request):
     clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
-# @login_required
-# def user_list(request):
-#     user = request.user
-#     if user.user_level == 0:
-#         return render(request, 'page_unavailable.html')
-#     else:
-#         users = User.objects.filter(user_level__in=[1,2,3])
-#         return render(request, 'user_list.html', {'users': users})
+def club_list_home(request):
+    clubs = Club.objects.all()
+    return render(request, 'club_list_home.html', {'clubs': clubs})
+
+@login_required
+def user_list(request):
+    global club_session
+    user = request.user
+    club = Club.objects.get(name=club_session)
+    man = UserInClub.objects.filter(club=club)
+    if (len(man) != 0):
+        rank = man.get(user=user)
+        if rank.user_level == 0:
+            return render(request, 'page_unavailable.html')
+        else:
+            users = UserInClub.objects.filter(user_level__in=[1,2,3],club=club)
+            return render(request, 'user_list.html', {'users': users})
 
 # @login_required
 # def applicant_list(request):

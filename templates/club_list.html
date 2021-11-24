@@ -10,7 +10,7 @@
             <td>
               <img src="{{ club.mini_gravatar }}" alt="Gravatar of {{ club.name }}" class="rounded-circle" >
             </td>
-            <td><a href="#">{{ club.name }}</a></td>
+            <td><a href="{% url 'home' club.name %}">{{ club.name }}</a></td>
             <td>{{ club.owner.full_name }}</td>
           </tr>
         {% endfor %}

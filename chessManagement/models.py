@@ -37,6 +37,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
+
 class User(AbstractUser):
 
     CHESS_CHOICES = (
@@ -50,6 +51,8 @@ class User(AbstractUser):
     bio = models.CharField(max_length=520 ,blank=True)
     experience = models.CharField(max_length=300,choices=CHESS_CHOICES)
     personal_statement = models.CharField(max_length=500 ,blank=True)
+
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -69,9 +72,7 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
-
 class Club(models.Model):
-
     name = models.CharField(max_length=50, blank=False, primary_key=True)
     location = models.CharField(max_length=50, blank=False)
     description = models.CharField(max_length=520, blank=True)
@@ -89,7 +90,6 @@ class Club(models.Model):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
-
 
 class UserInClub(models.Model):
 
