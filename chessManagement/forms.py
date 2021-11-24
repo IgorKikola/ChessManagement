@@ -63,8 +63,8 @@ class changePassword(forms.ModelForm):
 
         model = User
         fields = []
-        new_password = forms.CharField(
-        label='Password',
+    new_password = forms.CharField(
+        label='New Password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
@@ -72,7 +72,18 @@ class changePassword(forms.ModelForm):
                     'character and a number'
         )]
     )
+    new_password_confirmation = forms.CharField(
+        label='New Password Confirmation',
+        widget=forms.PasswordInput()
+    )
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
 
+        super().clean()
+        new_password = self.cleaned_data.get('new_password')
+        new_password_confirmation = self.cleaned_data.get('new_password_confirmation')
+        if new_password != new_password_confirmation:
+            self.add_error('new_password_confirmation', 'Confirmation does not match password.')
 
 class changeProfile(forms.Form):
     """Form enabling unregistered users to sign up."""
