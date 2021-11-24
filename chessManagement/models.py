@@ -69,12 +69,48 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
+    def clubs(self):
+        club_names = UserInClub.objects.filter(user=self).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
+    def clubsAppliedTo(self):
+        club_names = UserInClub.objects.filter(user=self, user_level=0).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
+    def clubsMemberOf(self):
+        club_names = UserInClub.objects.filter(user=self, user_level__in=[1,2,3]).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
+    def isApplicantIn(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level=1).count() == 1
+
+    def isMemberOf(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level__in=[1,2,3]).count() == 1
+
+    def isOfficerOf(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level__in=[2,3]).count() == 1
 
 class Club(models.Model):
 
     name = models.CharField(max_length=50, blank=False, primary_key=True)
     location = models.CharField(max_length=50, blank=False)
     description = models.CharField(max_length=520, blank=True)
+
+    def users(self):
+        user_ids = UserInClub.objects.filter(club=self).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def applicants(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def members(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level__in=[1,2,3]).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def officers(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level__in=[2,3]).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
 
     def owner(self):
         return UserInClub.objects.filter(club=self, user_level=3).first().user
@@ -111,3 +147,15 @@ class UserInClub(models.Model):
     user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
 
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
+
+    def isApplicant(self):
+        return user_level == 0
+
+    def isMember(self):
+        return user_level > 0
+
+    def isOfficer(self):
+        return user_level > 1
+
+    def isOwner(self):
+        return user_level == 3
