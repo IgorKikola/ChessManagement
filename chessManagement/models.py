@@ -82,13 +82,16 @@ class User(AbstractUser):
         return Club.objects.filter(name__in=club_names)
 
     def isApplicantIn(self, club):
-        return UserInClub.objects.filter(user=self, club=club, user_level=1).count() == 1
+        return UserInClub.objects.filter(user=self, club=club, user_level=0).count() == 1
 
     def isMemberOf(self, club):
-        return UserInClub.objects.filter(user=self, club=club, user_level__in=[1,2,3]).count() == 1
+        return UserInClub.objects.filter(user=self, club=club, user_level=1).count() == 1
 
     def isOfficerOf(self, club):
-        return UserInClub.objects.filter(user=self, club=club, user_level__in=[2,3]).count() == 1
+        return UserInClub.objects.filter(user=self, club=club, user_level=2).count() == 1
+
+    def isOwnerOf(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level=3).count() == 1
 
 class Club(models.Model):
 
@@ -100,11 +103,6 @@ class Club(models.Model):
         user_ids = UserInClub.objects.filter(club=self).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
 
-    def numberOfUsers(self):
-        user_ids = UserInClub.objects.filter(club=self).values_list('user', flat=True)
-        allUsers = User.objects.filter(id__in=user_ids)
-        return allUsers.count()
-
     def applicants(self):
         user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
@@ -112,6 +110,11 @@ class Club(models.Model):
     def members(self):
         user_ids = UserInClub.objects.filter(club=self,user_level__in=[1,2,3]).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
+
+    def numberOfMembers(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level__in=[1,2,3]).values_list('user', flat=True)
+        allUsers = User.objects.filter(id__in=user_ids)
+        return allUsers.count()
 
     def officers(self):
         user_ids = UserInClub.objects.filter(club=self,user_level__in=[2,3]).values_list('user', flat=True)

@@ -87,29 +87,16 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
 
 @login_required
-def show_club(request, pk=None):
+def show_club_and_user_list(request, pk=None):
     try:
-        club = Club.objects.get(pk=pk)
         global club_pk
         club_pk=pk
-        usersInClub = club.users()
+        club = Club.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
+        usersInClub = club.members
         return render(request, 'show_club.html',{'club': club, 'users': usersInClub})
-
-@login_required
-def user_list(request):
-    try:
-        global club_pk
-        club = Club.objects.get(pk=club_pk)
-        users = club.users()
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    if request.user.isApplicantIn(club_pk):
-        return render(request, 'page_unavailable.html')
-    else:
-        return render(request, 'user_list.html', {'users': users})
 
 # @login_required
 # def applicant_list(request):
@@ -122,24 +109,23 @@ def user_list(request):
 
 @login_required
 def show_user(request, user_id):
-    user = request.user
+    user_self = request.user
     try:
         global club_pk
         club = Club.objects.get(pk=club_pk)
         users = club.users()
-        shown_user = users.get(id=user_id)
-        user_self = UserInClub.objects.get(user=user,club=club)
     except ObjectDoesNotExist:
-        return redirect('user_list')
+        return redirect('club_list')
     else:
-        if user_self.user_level == 0:
+        shown_user = users.get(id=user_id)
+        if user_self.isApplicantIn(club):
             return render(request, 'page_unavailable.html')
-        if user_self.user_level == 1:
-            return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
-        if user_self.user_level == 2:
-            return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
-        if user_self.user_level == 3:
-            return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
+        if user_self.isMemberOf(club):
+            return render(request, 'show_user.html', {'user': user_self, 'shown_user': shown_user})
+        if user_self.isOfficerOf(club):
+            return render(request, 'officer_show_user.html', {'user': user_self, 'shown_user': shown_user})
+        if user_self.isOwnerOf(club):
+            return render(request, 'owner_show_user.html', {'user': user_self, 'shown_user': shown_user})
 
 # @login_required
 # def to_member(request, user_id):
