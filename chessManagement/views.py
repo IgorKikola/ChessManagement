@@ -134,14 +134,18 @@ def officer_manage_show_club_and_user_list(request, pk=None):
     else:
         usersInClub = club.members
         return render(request, 'officer_manage_show_club_and_user_list.html',{'club': club, 'users': usersInClub})
-# @login_required
-# def applicant_list(request):
-#     user = request.user
-#     if user.user_level == 0 or user.user_level == 1:
-#         return render(request, 'page_unavailable.html')
-#     else:
-#         users = User.objects.all()
-#         return render(request, 'applicant_list.html', {'users': users})
+
+@login_required
+def applicant_list(request):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        allUsers = club.users()
+    except ObjectDoesNotExist:
+        return redirect('profile')  #just make it easy
+    else:
+        users = allUsers.isApplicantIn(club)
+        return render(request, 'applicant_list.html', {'users': users})
 
 @login_required
 def show_user(request, user_id):

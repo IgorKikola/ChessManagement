@@ -6,7 +6,6 @@
       <h1>Applicants</h1>
       <table class="table">
         {% for user in users %}
-        {% if user.user_level == 0 %}
           <tr>
             <td>
               <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
