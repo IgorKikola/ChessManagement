@@ -144,7 +144,10 @@ def applicant_list(request):
     except ObjectDoesNotExist:
         return redirect('profile')  #just make it easy
     else:
-        users = allUsers.isApplicantIn(club)
+        users = list(allUsers)
+        for user in allUsers:
+            if not user.isApplicantIn(club):
+                users.remove(user)
         return render(request, 'applicant_list.html', {'users': users})
 
 @login_required

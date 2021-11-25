@@ -5,16 +5,19 @@
     <div class="col-12">
       <h1>Applicants</h1>
       <table class="table">
-        {% for user in users %}
-          <tr>
-            <td>
-              <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
-            </td>
-            <td>{{ user.full_name }}</td>
-            <td><a href="{% url 'show_user' user.id %}">{{ user.full_name }}</a></td>
-          </tr>
+        {% if users %}
+          {% for user in users %}
+            <tr>
+              <td>
+                <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
+              </td>
+              <td>{{ user.full_name }}</td>
+              <td><a href="{% url 'show_user' user.id %}">{{ user.full_name }}</a></td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <h5>There is no applicant yet.</h5>
         {% endif %}
-        {% endfor %}
       </table>
     </div>
   </div>
