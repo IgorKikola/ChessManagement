@@ -103,13 +103,13 @@ def show_club_and_user_list(request, pk=None):
 def manage_clubs_as_owner(request):
     user = request.user
     ownClubs = user.ownClubs
-    return render(request, 'manage_clubs_as_owner.html', {'ownClubs': ownClubs})
+    return render(request, 'manage_clubs_as_owner.html', {'clubs': ownClubs})
 
 @login_required
 def manage_clubs_as_officer(request):
     user = request.user
     officerClubs = user.OfficerOfClubs
-    return render(request, 'manage_clubs_as_officer.html', {'officerClubs': officerClubs})
+    return render(request, 'manage_clubs_as_officer.html', {'clubs': officerClubs})
 
 # @login_required
 # def applicant_list(request):
