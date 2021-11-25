@@ -93,6 +93,9 @@ class User(AbstractUser):
     def isOwnerOf(self, club):
         return UserInClub.objects.filter(user=self, club=club, user_level=3).count() == 1
 
+    def getRank(self, club):
+        return UserInClub.objects.get(user=self, club=club).get_user_level_display
+
 class Club(models.Model):
 
     name = models.CharField(max_length=50, blank=False, primary_key=True)

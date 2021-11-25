@@ -13,8 +13,8 @@
         <p class="profile-bio">{{ user.personal_statement }}</p>
         <h1>Chess Level:</h1>
         <p class="profile-bio">{{ user.experience }}</p>
-        <h1>Rank:</h1>
-        <p class="profile-bio">{{ user.get_user_level_display }}</p>
+        <h1>Rank in {{ club.name }}:</h1>
+        <p class="profile-bio">{{ rank }}</p>
       </div>
       <div class="col-3" align="center">
         {% if user.user_level == 0 %}

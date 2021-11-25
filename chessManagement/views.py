@@ -118,16 +118,18 @@ def show_user(request, user_id):
         return redirect('club_list')
     else:
         shown_user = users.get(id=user_id)
+        rank = shown_user.getRank(club)
+        args = {'user': user_self, 'shown_user': shown_user, 'club': club, 'rank': rank}
         if shown_user==user_self:
-            return render(request, 'owner_show_user.html', {'user': user_self, 'shown_user': shown_user})
+            return render(request, 'owner_show_user.html', args)
         if user_self.isApplicantIn(club):
             return render(request, 'page_unavailable.html')
         if user_self.isMemberOf(club):
-            return render(request, 'show_user.html', {'user': user_self, 'shown_user': shown_user})
+            return render(request, 'show_user.html', args)
         if user_self.isOfficerOf(club):
-            return render(request, 'officer_show_user.html', {'user': user_self, 'shown_user': shown_user})
+            return render(request, 'officer_show_user.html', args)
         if user_self.isOwnerOf(club):
-            return render(request, 'owner_show_user.html', {'user': user_self, 'shown_user': shown_user})
+            return render(request, 'owner_show_user.html', args)
 
 # @login_required
 # def to_member(request, user_id):
