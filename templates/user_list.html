@@ -3,18 +3,12 @@
   <div class="row">
     <div class="col-12">
       <h1>{{ club.name }}<h1>
-      <h5>Location: {{ club.location }}<p>
-      <h5>Description: {{ club.description }}<p>
-      <h5>Number Of Mumbers: {{ club.numberOfMembers }}<h5>
-      <h2>Owner<h2>
-      <tr>
-        <td>
-          <img src="{{ club.owner.mini_gravatar }}" alt="Gravatar of {{ club.owner.username }}" class="rounded-circle" >
-        </td>
-        <td>{{ club.owner.full_name }}</td>
-        <td><a href="{% url 'show_user' club.owner.id %}">{{ club.owner.full_name }}</a></td>
-      </tr>
-      <tr> {{ club.owner.bio }}<tr>
+      <h5>Location: {{ club.location }}</h5>
+      <h5>Description: {{ club.description }}</h5>
+      <h5>Number Of Mumbers: {{ club.numberOfMembers }}</h5>
+      <img src="{{ club.owner.gravatar }}" alt="Gravatar of {{ club.owner.username }}" class="rounded-circle" >
+      <h2>Owner: <a href="{% url 'show_user' club.owner.id %}">{{ club.owner.full_name }}</a> <h2>
+      <h5>{{ club.owner.bio }}</h5>
       <h2>Users</h2>
       <table class="table">
         {% for user in users %}

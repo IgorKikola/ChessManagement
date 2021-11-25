@@ -118,6 +118,8 @@ def show_user(request, user_id):
         return redirect('club_list')
     else:
         shown_user = users.get(id=user_id)
+        if shown_user==user_self:
+            return render(request, 'owner_show_user.html', {'user': user_self, 'shown_user': shown_user})
         if user_self.isApplicantIn(club):
             return render(request, 'page_unavailable.html')
         if user_self.isMemberOf(club):
