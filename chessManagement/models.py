@@ -73,6 +73,14 @@ class User(AbstractUser):
         club_names = UserInClub.objects.filter(user=self).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
+    def ownClubs(self):
+        club_names = UserInClub.objects.filter(user=self, user_level=3).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
+    def OfficerOfClubs(self):
+        club_names = UserInClub.objects.filter(user=self, user_level=2).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
     def clubsAppliedTo(self):
         club_names = UserInClub.objects.filter(user=self, user_level=0).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)

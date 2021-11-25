@@ -99,6 +99,13 @@ def show_club_and_user_list(request, pk=None):
         usersInClub = club.members
         return render(request, 'show_club.html',{'club': club, 'users': usersInClub})
 
+@login_required
+def manage_clubs(request):
+    user = request.user
+    ownClubs = user.ownClubs
+    officerClubs = user.OfficerOfClubs
+    return render(request, 'manage_club_list.html', {'ownClubs': ownClubs, 'officerClubs': officerClubs})
+
 # @login_required
 # def applicant_list(request):
 #     user = request.user
@@ -122,7 +129,7 @@ def show_user(request, user_id):
         rank = shown_user.getRank(club)
         args = {'user': user_self, 'shown_user': shown_user, 'club': club, 'rank': rank}
         if shown_user==user_self:
-            return render(request, 'owner_show_user.html', args)
+            return render(request, 'officer_show_user.html', args)
         if user_self.isApplicantIn(club):
             return render(request, 'page_unavailable.html')
         if user_self.isMemberOf(club):

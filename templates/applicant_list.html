@@ -3,7 +3,7 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-      <h1>Users</h1>
+      <h1>Applicants</h1>
       <table class="table">
         {% for user in users %}
         {% if user.user_level == 0 %}
@@ -14,7 +14,7 @@
             <td>{{ user.full_name }}</td>
             <td><a href="{% url 'show_user' user.id %}">{{ user.full_name }}</a></td>
           </tr>
-        {% endif %}        
+        {% endif %}
         {% endfor %}
       </table>
     </div>

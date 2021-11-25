@@ -1,0 +1,38 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Manage Your Clubs</h1>
+      {% if ownClubs %}
+        <h5>You are the owner of the club(s):<h5>
+        <table class="table">
+          {% for club in ownClubs %}
+            <tr>
+              <td>
+                <img src="{{ club.mini_gravatar }}" alt="Gravatar of {{ club.name }}" class="rounded-circle" >
+              </td>
+              <td><a href="{% url 'show_club_and_user_list' pk=club.pk %}">{{ club.name }}</a></td>
+              <td>{{ club.owner.full_name }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+      {% if officerClubs %}
+        <h5>You are the officer of the club(s):</h5>
+        <table class="table">
+          {% for club in officerClubs %}
+            <tr>
+              <td>
+                <img src="{{ club.mini_gravatar }}" alt="Gravatar of {{ club.name }}" class="rounded-circle" >
+              </td>
+              <td><a href="{% url 'show_club_and_user_list' pk=club.pk %}">{{ club.name }}</a></td>
+              <td>{{ club.owner.full_name }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
