@@ -106,11 +106,34 @@ def manage_clubs_as_owner(request):
     return render(request, 'manage_clubs_as_owner.html', {'clubs': ownClubs})
 
 @login_required
+def owner_manage_show_club_and_user_list(request, pk=None):
+    try:
+        global club_pk
+        club_pk=pk
+        club = Club.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return redirect('manage_clubs_as_owner.html')
+    else:
+        usersInClub = club.members
+        return render(request, 'owner_manage_show_club_and_user_list.html',{'club': club, 'users': usersInClub})
+
+@login_required
 def manage_clubs_as_officer(request):
     user = request.user
     officerClubs = user.OfficerOfClubs
     return render(request, 'manage_clubs_as_officer.html', {'clubs': officerClubs})
 
+@login_required
+def officer_manage_show_club_and_user_list(request, pk=None):
+    try:
+        global club_pk
+        club_pk=pk
+        club = Club.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return redirect('manage_clubs_as_officer.html')
+    else:
+        usersInClub = club.members
+        return render(request, 'officer_manage_show_club_and_user_list.html',{'club': club, 'users': usersInClub})
 # @login_required
 # def applicant_list(request):
 #     user = request.user
