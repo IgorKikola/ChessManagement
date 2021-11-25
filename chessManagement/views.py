@@ -130,14 +130,14 @@ def show_user(request, user_id):
         args = {'user': user_self, 'shown_user': shown_user, 'club': club, 'rank': rank}
         if shown_user==user_self:
             return render(request, 'officer_show_user.html', args)
-        if user_self.isApplicantIn(club):
-            return render(request, 'page_unavailable.html')
         if user_self.isMemberOf(club):
             return render(request, 'show_user.html', args)
         if user_self.isOfficerOf(club):
             return render(request, 'officer_show_user.html', args)
         if user_self.isOwnerOf(club):
             return render(request, 'owner_show_user.html', args)
+        else:
+            return render(request, 'page_unavailable.html')
 
 # @login_required
 # def to_member(request, user_id):
