@@ -86,23 +86,23 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
 
 @login_required
-def show_club(request, club_id):
+def show_club(request, pk=None):
     try:
-        club = Club.objects.get(id=club_id)
+        club = Club.objects.get(pk=pk)
         usersInClub = club.users()
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        return render(request, 'show_club.html',{'club': club, 'users': usersInClubs})
+        return render(request, 'show_club.html',{'club': club, 'users': usersInClub})
 
-# @login_required
-# def user_list(request):
-#     user = request.user
-#     if user.user_level == 0:
-#         return render(request, 'page_unavailable.html')
-#     else:
-#         users = User.objects.filter(user_level__in=[1,2,3])
-#         return render(request, 'user_list.html', {'users': users})
+@login_required
+def user_list(request):
+    user = request.user
+    if user.user_level == 0:
+        return render(request, 'page_unavailable.html')
+    else:
+        users = User.objects.filter(user_level__in=[1,2,3])
+        return render(request, 'user_list.html', {'users': users})
 
 # @login_required
 # def applicant_list(request):
@@ -113,23 +113,23 @@ def show_club(request, club_id):
 #         users = User.objects.all()
 #         return render(request, 'applicant_list.html', {'users': users})
 
-# @login_required
-# def show_user(request, user_id):
-#     user = request.user
-#     try:
-#         shown_user = User.objects.get(id=user_id)
-#     except ObjectDoesNotExist:
-#         return redirect('user_list')
-#     else:
-#         user_self = request.user
-#         if user_self.user_level == 0:
-#             return render(request, 'page_unavailable.html')
-#         if user_self.user_level == 1:
-#             return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
-#         if user_self.user_level == 2:
-#             return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
-#         if user_self.user_level == 3:
-#             return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
+@login_required
+def show_user(request, user_id):
+    user = request.user
+    try:
+        shown_user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return redirect('user_list')
+    else:
+        user_self = request.user
+        if user_self.user_level == 0:
+            return render(request, 'page_unavailable.html')
+        if user_self.user_level == 1:
+            return render(request, 'show_user.html', {'user': user, 'shown_user': shown_user})
+        if user_self.user_level == 2:
+            return render(request, 'officer_show_user.html', {'user': user, 'shown_user': shown_user})
+        if user_self.user_level == 3:
+            return render(request, 'owner_show_user.html', {'user': user, 'shown_user': shown_user})
 
 # @login_required
 # def to_member(request, user_id):
