@@ -6,16 +6,20 @@ from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 from .helpers import login_prohibited
 
-club_session =""
-def getInCLub():
+club_session = ""
+
+
+def getClubAccount(user, club_name):
     global club_session
-    club = Club.objects.get(name=club_session)
-    man = UserInClub.objects.filter(club=club)
-    if (len(man) != 0):
-        rank = man.get(user=user)
+    club = Club.objects.get(name=club_name)
+    accounts = UserInClub.objects.filter(club=club)
+    if (len(accounts) != 0):
+        account = accounts.get(user=user,club=club)
+        return account
 
 def home(request):
     return render(request, 'home.html')
+
 
 @login_required
 def change_password(request):
@@ -28,7 +32,8 @@ def change_password(request):
             login(request, user)
             return redirect('profile')
     password = changePassword()
-    return render(request, 'change_password.html', {'form': password, 'user' :user})
+    return render(request, 'change_password.html', {'form': password, 'user': user})
+
 
 @login_required
 def change_profile(request):
@@ -48,8 +53,11 @@ def change_profile(request):
             user.experience = form.cleaned_data.get('experience')
             user.save()
             return redirect('profile')
-    profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience ,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
-    return render(request, 'change_profile.html', {'form': profile, 'user' :user})
+    profile = changeProfile(
+        initial={'first_name': user.first_name, 'last_name': user.last_name, 'experience': user.experience,
+                 'email': user.email, 'bio': user.bio, 'personal_statement': user.personal_statement})
+    return render(request, 'change_profile.html', {'form': profile, 'user': user})
+
 
 @login_prohibited
 def sign_up(request):
@@ -68,6 +76,7 @@ def log_out(request):
     logout(request)
     return redirect('home')
 
+
 @login_prohibited
 def log_in(request):
     if request.method == 'POST':
@@ -82,179 +91,161 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
+
 @login_required
 def profile(request):
     user = request.user
     try:
-        # global club_session
-        # club = Club.objects.get(name=club_session)
-        # man = UserInClub.objects.filter(club=club)
-        # if (len(man) != 0):
-        #     rank = man.get(user=user)
-            return render(request, 'profile.html', {'user': user,'shown_user':rank,'current_user':rank})
+        rank = getClubAccount(user, club_session)
+        return render(request, 'profile.html', {'user': user, 'shown_user': rank, 'current_user': rank})
     except ObjectDoesNotExist:
         return render(request, 'profile.html', {'user': user})
 
-def club_profile(request,club_name):
+
+def club_profile(request, club_name):
     global club_session
-    if("club_home" in request.META['HTTP_REFERER']):
+    if "club_home" in request.META['HTTP_REFERER']:
         club_session = club_name
     try:
         club = Club.objects.get(name=club_name)
-        man = UserInClub.objects.filter(club=club,user=request.user)
-        if (len(man) != 0):
-            rank = man.get(user=request.user,club=club_session)
-            return render(request, 'club_profile.html', {'clubs': club, 'user': club.owner(), 'current_user': rank, 'applied':True})
+        accounts = UserInClub.objects.filter(club=club, user=request.user)
+        if len(accounts) != 0:
+            if club_session == club.name:
+                club_account = accounts.get(user=request.user, club=club_name)
+                return render(request, 'club_profile.html',
+                              {'clubs': club, 'user': club.owner(), 'current_user': club_account, 'applied': True})
+            club_account2 = UserInClub.objects.get(user=request.user, club=club_session)
+            return render(request, 'club_profile.html',
+                          {'clubs': club, 'user': club.owner(), 'applied': True, 'current_user': club_account2})
     except ObjectDoesNotExist:
-        club = Club.objects.get(name=club_name)
-        return render(request, 'club_profile.html',{'clubs': club, 'user': club.owner(), 'applied': True})
+        pass
     club = Club.objects.get(name=club_name)
-    return render(request, 'club_profile.html', {'clubs': club,'user':club.owner(), 'applied':False,'current':request.user})
+    return render(request, 'club_profile.html',
+                  {'clubs': club, 'user': club.owner(), 'applied': False, 'current': request.user})
+
 
 @login_required
 def club_list(request):
     try:
-        club = Club.objects.get(name=club_session)
-        man = UserInClub.objects.filter(club=club,user=request.user)
-        if (len(man) != 0):
-            rank = man.get(user=request.user,club=club)
-            clubs = Club.objects.all()
-            return render(request, 'club_list.html', {'clubs': clubs,'current_user': rank})
+        club_account = getClubAccount(request.user, club_session)
+        clubs = Club.objects.all()
+        return render(request, 'club_list.html', {'clubs': clubs, 'current_user': club_account})
     except ObjectDoesNotExist:
         pass
     clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
+
 def club_list_home(request):
     clubs = Club.objects.all()
     return render(request, 'club_list_home.html', {'clubs': clubs})
+
 
 @login_required
 def user_list(request):
     global club_session
     user = request.user
-    club = Club.objects.get(name=club_session)
-    man = UserInClub.objects.filter(club=club)
-    if (len(man) != 0):
-        rank = man.get(user=user)
-        if rank.user_level == 0:
-            return render(request, 'page_unavailable.html')
-        else:
-            users = UserInClub.objects.filter(user_level__in=[1,2,3],club=club)
-            return render(request, 'user_list.html', {'users': users,'current_user':rank})
+    club_account = getClubAccount(user, club_session)
+    if club_account.user_level == 0:
+        return render(request, 'page_unavailable.html')
+    else:
+        users = UserInClub.objects.filter(user_level__in=[1, 2, 3], club=club_account.club)
+        return render(request, 'user_list.html', {'users': users, 'current_user': club_account.club})
+
 
 @login_required
 def applicant_list(request):
     global club_session
     user = request.user
-    club = Club.objects.get(name=club_session)
-    man = UserInClub.objects.filter(club=club)
-    if (len(man) != 0):
-        rank = man.get(user=user)
-        if rank.user_level == 0 or rank.user_level == 1:
-            return render(request, 'page_unavailable.html')
-        else:
-            users = UserInClub.objects.filter(club=club)
-            return render(request, 'applicant_list.html', {'users': users,'current_user':rank})
+    club_account = getClubAccount(user, club_session)
+    if club_account.user_level == 0 or club_account.user_level == 1:
+        return render(request, 'page_unavailable.html')
+    else:
+        users = UserInClub.objects.filter(club=club_account.club)
+        return render(request, 'applicant_list.html', {'users': users, 'current_user': club_account})
+
 
 @login_required
 def show_user(request, user_id):
     global club_session
-    user = request.user
-    club = Club.objects.get(name=club_session)
-    man = UserInClub.objects.filter(club=club)
-    if (len(man) != 0):
-        rank = man.get(user=user)
-        try:
-            shown_user = User.objects.get(id=user_id)
-            club = Club.objects.get(name=club_session)
-            man2 = UserInClub.objects.filter(club=club)
-            if (len(man2) != 0):
-                rank2 = man2.get(user=shown_user)
-                if rank.user_level == 0:
-                    return render(request, 'page_unavailable.html')
-                if rank.user_level == 1:
-                    return render(request, 'show_user.html', {'shown_user': rank2, 'current_user': rank})
-                if rank.user_level == 2:
-                    return render(request, 'officer_show_user.html', {'shown_user': rank2, 'current_user': rank})
-                if rank.user_level == 3:
-                    return render(request, 'owner_show_user.html', {'shown_user': rank2, 'current_user': rank})
-        except ObjectDoesNotExist:
-         return redirect('user_list')
+    try:
+        user = request.user
+        club_account = getClubAccount(user, club_session)
+        shown_user = User.objects.get(id=user_id)
+        club_account2 = getClubAccount(shown_user, club_session)
+        if club_account.user_level == 0:
+            return render(request, 'page_unavailable.html')
+        if club_account.user_level == 1:
+            return render(request, 'show_user.html', {'shown_user': club_account2, 'current_user': club_account})
+        if club_account.user_level == 2:
+            return render(request, 'officer_show_user.html',
+                          {'shown_user': club_account2, 'current_user': club_account})
+        if club_account.user_level == 3:
+            return render(request, 'owner_show_user.html', {'shown_user': club_account2, 'current_user': club_account})
+    except ObjectDoesNotExist:
+        return redirect('user_list')
 
 
 @login_required
 def to_member(request, user_id):
+    global club_session
     try:
-        officer = request.user
-        club = Club.objects.get(name=club_session)
-        man2 = UserInClub.objects.filter(club=club)
-        if (len(man2) != 0):
-            rank2 = man2.get(user=officer)
-            user = User.objects.get(id=user_id)
-            club1 = Club.objects.get(name=club_session)
-            man1 = UserInClub.objects.filter(club=club1)
-            if (len(man1) != 0):
-                rank = man1.get(user=user)
-                if (rank2.user_level > 1 and rank.user_level == 0) or rank2.user_level == 3:
-                    rank.user_level = 1
-                    rank.save(update_fields=["user_level"])
-                return redirect('show_user', user.id)
+        user = request.user
+        club_account = getClubAccount(user, club_session)
+        shown_user = User.objects.get(id=user_id)
+        club_account2 = getClubAccount(shown_user, club_session)
+        if (club_account.user_level > 1 and club_account2.user_level == 0) or club_account.user_level == 3:
+            club_account2.user_level = 1
+            club_account2.save(update_fields=["user_level"])
+            return redirect('profile')
     except ObjectDoesNotExist:
-        return redirect('user_list')
+        return redirect('applicant_list')
+
 
 @login_required
 def to_officer(request, user_id):
+    global club_session
     try:
-        officer = request.user
-        club = Club.objects.get(name=club_session)
-        man2 = UserInClub.objects.filter(club=club)
-        if (len(man2) != 0):
-            rank2 = man2.get(user=officer)
-            user = User.objects.get(id=user_id)
-            club1 = Club.objects.get(name=club_session)
-            man1 = UserInClub.objects.filter(club=club1)
-            if (len(man1) != 0):
-                rank = man1.get(user=user)
-                if (rank.user_level == 1):
-                    rank.user_level = 2
-                    rank.save(update_fields=["user_level"])
-                return redirect('show_user', user.id)
+        user = request.user
+        club_account = getClubAccount(user, club_session)
+        shown_user = User.objects.get(id=user_id)
+        club_account2 = getClubAccount(shown_user, club_session)
+        if (club_account2.user_level == 1):
+            club_account2.user_level = 2
+            club_account2.save(update_fields=["user_level"])
+        return redirect('user_list')
     except ObjectDoesNotExist:
         return redirect('user_list')
 
+
 @login_required
 def transfer_ownership(request, user_id):
+    global club_session
     try:
-        officer = request.user
-        club = Club.objects.get(name=club_session)
-        man2 = UserInClub.objects.filter(club=club)
-        if (len(man2) != 0):
-            rank2 = man2.get(user=officer)
-            user = User.objects.get(id=user_id)
-            club1 = Club.objects.get(name=club_session)
-            man1 = UserInClub.objects.filter(club=club1)
-            if (len(man1) != 0):
-                rank = man1.get(user=user)
-                if (rank.user_level == 2 and rank2.user_level == 3):
-                    rank.user_level = 3
-                    rank2.user_level= 2
-                    rank.save(update_fields=["user_level"])
-                    rank2.save(update_fields=["user_level"])
-                return redirect('show_user', user.id)
+        user = request.user
+        club_account = getClubAccount(user, club_session)
+        shown_user = User.objects.get(id=user_id)
+        club_account2 = getClubAccount(shown_user, club_session)
+        if (club_account2.user_level == 2 and club_account.user_level == 3):
+            club_account2.user_level = 3
+            club_account.user_level = 2
+            club_account2.save(update_fields=["user_level"])
+            club_account.save(update_fields=["user_level"])
+        return redirect('user_list')
     except ObjectDoesNotExist:
         return redirect('user_list')
+
 
 @login_required
 def club_Application(request, user_id,club_name):
     try:
         user = User.objects.get(id=user_id)
-        club1 = Club.objects.get(name=club_name)
-        man1 = UserInClub.objects.filter(club=club1,user=user)
-        if (len(man1) ==0):
-            new_applicant=UserInClub.objects.create(
-                user = user,
-                club=club1,
+        club = Club.objects.get(name=club_name)
+        accounts = UserInClub.objects.filter(club=club, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInClub.objects.create(
+                user=user,
+                club=club,
                 user_level=0
             )
             new_applicant.save()
