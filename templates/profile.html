@@ -15,8 +15,8 @@
       <h1>Chess Level:</h1>
       <p class="profile-bio">{{ user.experience }}</p>
       <h1>Rank:</h1>
-      <p class="profile-bio">{{ rank.get_user_level_display }}</p>
-        <p class="profile-bio">{{ rank.club.name}}</p>
+      <p class="profile-bio">{{ shown_user.get_user_level_display }}</p>
+        <p class="profile-bio">{{ shown_user.club.name}}</p>
     </div>
     <div class="col-3">
       <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.email }}" class="profile-image" style="width: 100%;" >

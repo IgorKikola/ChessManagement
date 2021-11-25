@@ -3,7 +3,7 @@
 <div class="container">
   <div class="row content">
     <div class="col-xs-12 col-lg-6 col-xl-8">
-      {% include 'partials/officer_user_profile.html' with user=shown_user %}
+      {% include 'partials/officer_user_profile.html' with user=shown_user.user shown_user=shown_user %}
     </div>
   </div>
 </div>

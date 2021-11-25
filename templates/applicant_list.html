@@ -9,10 +9,10 @@
         {% if user.user_level == 0 %}
           <tr>
             <td>
-              <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
+              <img src="{{ user.user.mini_gravatar }}" alt="Gravatar of {{ user.user.username }}" class="rounded-circle" >
             </td>
-            <td>{{ user.full_name }}</td>
-            <td><a href="{% url 'show_user' user.id %}">{{ user.full_name }}</a></td>
+            <td>{{ user.user.full_name }}</td>
+            <td><a href="{% url 'show_user' user.user.id %}">{{ user.user.full_name }}</a></td>
           </tr>
         {% endif %}        
         {% endfor %}
