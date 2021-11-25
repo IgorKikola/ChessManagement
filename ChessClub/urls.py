@@ -19,8 +19,8 @@ from chessManagement import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.club_list_home, name="club_list_home"),
-    path('home/<club_name>/', views.home, name='home'),
+    path('club_home', views.club_list_home, name="club_list_home"),
+    path('', views.home, name='home'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('log_in/', views.log_in, name='log_in'),
     path('profile/', views.profile, name='profile'),
@@ -31,7 +31,9 @@ urlpatterns = [
     path('user/<int:user_id>/', views.show_user, name='show_user'),
     path('users/', views.user_list, name='user_list'),
     path('applicants/', views.applicant_list, name='applicant_list'),
-    # path('user/<int:user_id>/to_member/', views.to_member, name='to_member'),
-    # path('user/<int:user_id>/to_officer/', views.to_officer, name='to_officer'),
-    # path('user/<int:user_id>/transfer_ownership/', views.transfer_ownership, name='transfer_ownership'),
+    path('club/<club_name>/', views.club_profile, name='club_profile'),
+    path('user/<int:user_id>/to_member/', views.to_member, name='to_member'),
+    path('user/<int:user_id>/to_officer/', views.to_officer, name='to_officer'),
+    path('user/<int:user_id>/transfer_ownership/', views.transfer_ownership, name='transfer_ownership'),
+    path('clubs/<club_name>/<int:user_id>/apply', views.club_Application, name='club_Application'),
 ]

@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row content">
+    <div class="col-xs-12 col-lg-6 col-xl-8">
+        <h1>Club Owner:</h1>
+      {% include 'partials/user_profile.html' with user=user %}
+    </div>
+       <div class="row content">
+      <div class="col-12">
+        <h1>Club Name:</h1>
+        <p class="profile-bio">{{ clubs.name }}</p>
+        <h1>Location:</h1>
+        <p class="profile-bio">{{ clubs.location}}</p>
+        <h1>Description:</h1>
+        <p class="profile-bio">{{ clubs.description }}</p>
+      </div>
+           {% if applied == False %}
+            <a href='{% url 'club_Application' clubs.name current.id %}' class="btn btn-lg btn-secondary">
+              Apply
+            </a>
+           {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}
