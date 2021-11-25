@@ -6,6 +6,7 @@ from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile
 from .helpers import login_prohibited
 
+club_pk = ""
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
@@ -89,6 +90,8 @@ def club_list(request):
 def show_club(request, pk=None):
     try:
         club = Club.objects.get(pk=pk)
+        global club_pk
+        club_pk=pk
         usersInClub = club.users()
     except ObjectDoesNotExist:
         return redirect('club_list')
@@ -97,11 +100,15 @@ def show_club(request, pk=None):
 
 @login_required
 def user_list(request):
-    user = request.user
-    if user.user_level == 0:
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        users = club.users()
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    if request.user.isApplicantIn(club_pk):
         return render(request, 'page_unavailable.html')
     else:
-        users = User.objects.filter(user_level__in=[1,2,3])
         return render(request, 'user_list.html', {'users': users})
 
 # @login_required
@@ -117,11 +124,14 @@ def user_list(request):
 def show_user(request, user_id):
     user = request.user
     try:
-        shown_user = User.objects.get(id=user_id)
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        users = club.users()
+        shown_user = users.get(id=user_id)
+        user_self = UserInClub.objects.get(user=user,club=club)
     except ObjectDoesNotExist:
         return redirect('user_list')
     else:
-        user_self = request.user
         if user_self.user_level == 0:
             return render(request, 'page_unavailable.html')
         if user_self.user_level == 1:
