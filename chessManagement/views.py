@@ -191,6 +191,33 @@ def applicant_show_user(request, user_id):
         return render(request, 'applicant_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank})
 
 @login_required
+def manage_owner_show_user(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        users = club.members()
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        shown_user = users.get(id=user_id)
+        rank = shown_user.getRank(club)
+        return render(request, 'manage_owner_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank})
+
+@login_required
+def manage_officer_show_user(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        users = club.members()
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        shown_user = users.get(id=user_id)
+        rank = shown_user.getRank(club)
+        user_self = request.user
+        return render(request, 'manage_officer_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank, 'user_self':user_self})
+
+@login_required
 def to_member(request, user_id):
     try:
         global club_pk
@@ -204,22 +231,36 @@ def to_member(request, user_id):
         userInClub.save(update_fields=["user_level"])
         return render(request, 'success.html')
 
-# @login_required
-# def to_officer(request, user_id):
-#     owner = request.user
-#     user = User.objects.get(id=user_id)
-#     if user.user_level == 1:
-#         user.user_level=2
-#         user.save(update_fields=["user_level"])
-#     return redirect('show_user', user.id)
+@login_required
+def to_officer(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        user = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        if userInClub.user_level==1:
+            userInClub.user_level=2
+        userInClub.save(update_fields=["user_level"])
+        return render(request, 'success.html')
 
-# @login_required
-# def transfer_ownership(request, user_id):
-#     owner = request.user
-#     user = User.objects.get(id=user_id)
-#     if owner.user_level == 3 and user.user_level == 2:
-#         user.user_level=3
-#         owner.user_level=2
-#         user.save(update_fields=["user_level"])
-#         owner.save(update_fields=["user_level"])
-#     return redirect('show_user', user.id)
+@login_required
+def transfer_ownership(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        user = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        owner = request.user
+        ownerInClub = club.getUserInClub(owner)
+        if userInClub.user_level==2:
+            userInClub.user_level=3
+            ownerInClub.user_level=2
+            userInClub.save(update_fields=["user_level"])
+            ownerInClub.save(update_fields=["user_level"])
+        return render(request, 'success.html')

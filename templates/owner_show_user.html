@@ -5,24 +5,6 @@
     <div class="col-xs-12 col-lg-6 col-xl-8">
       {% include 'partials/officer_user_profile.html' with user=shown_user %}
     </div>
-    <div class="col-12">
-      <div class="col-12">
-        <div class="col-6" align="center">
-          {% if shown_user.user_level == 1 %}
-            <a href='{% url 'to_officer' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Promote to Officer
-            </a>
-          {% elif shown_user.user_level == 2 %}
-            <a href='{% url 'to_member' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Demote to Member
-            </a>
-            <a href='{% url 'transfer_ownership' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Transfer Ownership
-            </a>
-          {% endif %}
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 {% endblock %}
