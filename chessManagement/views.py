@@ -202,7 +202,7 @@ def to_member(request, user_id):
     else:
         userInClub.user_level=1
         userInClub.save(update_fields=["user_level"])
-        return redirect('applicant_show_user.html', user.id)
+        return render(request, 'success.html')
 
 # @login_required
 # def to_officer(request, user_id):

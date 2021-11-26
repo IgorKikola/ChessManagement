@@ -35,7 +35,7 @@ urlpatterns = [
     path('officer_manage_club_list/', views.officer_manage_club_list, name='officer_manage_club_list'),
     path('applicants/', views.applicant_list, name='applicant_list'),
     path('applicant_show_user/<int:user_id>/', views.applicant_show_user, name='applicant_show_user'),
-    path('applicant_show_user/<int:user_id>/to_member/', views.to_member, name='to_member'),
+    path('to_member/<int:user_id>/', views.to_member, name='to_member'),
     # path('user/<int:user_id>/to_officer/', views.to_officer, name='to_officer'),
     # path('user/<int:user_id>/transfer_ownership/', views.transfer_ownership, name='transfer_ownership'),
 ]
