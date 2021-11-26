@@ -134,6 +134,9 @@ class Club(models.Model):
     def owner(self):
         return UserInClub.objects.filter(club=self, user_level=3).first().user
 
+    def getUserInClub(self, user):
+        return UserInClub.objects.filter(club=self, user=user, user_level__in=[1,2,3]).first().user
+
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
         club_owner = self.owner()

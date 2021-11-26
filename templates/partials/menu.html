@@ -6,16 +6,6 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'club_list' %}">Clubs</a>
     </li>
-    {% if user.user_level > 0 %}
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'user_list'%}">Member list</a>
-      </li>
-      {% if user.user_level > 1 %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'applicant_list'%}">Applicant list</a>
-        </li>
-      {% endif %}
-    {% endif %}
   </ul>
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
     <li class="nav-item dropdown">

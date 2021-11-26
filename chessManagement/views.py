@@ -177,14 +177,32 @@ def show_user(request, user_id):
         else:
             return render(request, 'page_unavailable.html')
 
-# @login_required
-# def to_member(request, user_id):
-#     officer = request.user
-#     user = User.objects.get(id=user_id)
-#     if (officer.user_level > 1 and user.user_level == 0) or officer.user_level == 3:
-#         user.user_level=1
-#         user.save(update_fields=["user_level"])
-#     return redirect('show_user', user.id)
+@login_required
+def applicant_show_user(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        users = club.applicants()
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        shown_user = users.get(id=user_id)
+        rank = shown_user.getRank(club)
+        return render(request, 'applicant_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank})
+
+@login_required
+def to_member(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        user = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        userInClub.user_level=1
+        userInClub.save(update_fields=["user_level"])
+        return redirect('applicant_show_user.html', user.id)
 
 # @login_required
 # def to_officer(request, user_id):
