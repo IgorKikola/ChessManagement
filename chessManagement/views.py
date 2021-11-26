@@ -204,20 +204,6 @@ def manage_owner_show_user(request, user_id):
         return render(request, 'manage_owner_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank})
 
 @login_required
-def manage_officer_show_user(request, user_id):
-    try:
-        global club_pk
-        club = Club.objects.get(pk=club_pk)
-        users = club.members()
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    else:
-        shown_user = users.get(id=user_id)
-        rank = shown_user.getRank(club)
-        user_self = request.user
-        return render(request, 'manage_officer_show_user.html', {'shown_user': shown_user, 'club': club, 'rank': rank, 'user_self':user_self})
-
-@login_required
 def to_member(request, user_id):
     try:
         global club_pk

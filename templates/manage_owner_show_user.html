@@ -9,16 +9,38 @@
       <div class="col-12">
         <div class="col-6" align="center">
           {% if rank == "Member" %}
-            <a href='{% url 'to_officer' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Promote to Officer
-            </a>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card" style="width: 30rem.">
+                <div class="card-body">
+                  <h5 class="card-title">Promote</h5>
+                  <p class="card-text">Promote the member to a officer.</p>
+                  <a href='{% url 'to_officer' shown_user.id %}' class="btn btn-primary">Click to Promote</a>
+                </div>
+              </div>
+            </div>
+          </div>
           {% elif rank == "Officer" %}
-            <a href='{% url 'to_member' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Demote to Member
-            </a>
-            <a href='{% url 'transfer_ownership' shown_user.id %}' class="btn btn-lg btn-secondary">
-              Transfer Ownership
-            </a>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="card" style="width: 30rem.">
+                  <div class="card-body">
+                    <h5 class="card-title">Demote</h5>
+                    <p class="card-text">Demote the officer to a member.</p>
+                    <a href='{% url 'to_member' shown_user.id %}' class="btn btn-primary">Click to Demote</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="card" style="width: 30rem.">
+                  <div class="card-body">
+                    <h5 class="card-title">Transfer Ownership</h5>
+                    <p class="card-text">Transfer your ownership to this officer, And you will be an officer in this club.</p>
+                    <a href='{% url 'transfer_ownership' shown_user.id %}' class="btn btn-primary">Click to Transfer</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endif %}
         </div>
       </div>
