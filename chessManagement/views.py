@@ -89,6 +89,7 @@ def club_list(request):
 
 @login_required
 def show_club_and_user_list(request, pk=None):
+    flag_applicants = 0
     try:
         global club_pk
         club_pk=pk
@@ -97,43 +98,45 @@ def show_club_and_user_list(request, pk=None):
         return redirect('club_list')
     else:
         usersInClub = club.members
-        return render(request, 'show_club.html',{'club': club, 'users': usersInClub})
+        return render(request, 'show_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants})
 
 @login_required
-def manage_clubs_as_owner(request):
+def owner_manage_club_list(request):
     user = request.user
     ownClubs = user.ownClubs
-    return render(request, 'manage_clubs_as_owner.html', {'clubs': ownClubs})
+    return render(request, 'owner_manage_club_list.html', {'clubs': ownClubs})
 
 @login_required
-def owner_manage_show_club_and_user_list(request, pk=None):
+def owner_manage_club(request, pk=None):
+    flag_applicants = 1
     try:
         global club_pk
         club_pk=pk
         club = Club.objects.get(pk=pk)
     except ObjectDoesNotExist:
-        return redirect('manage_clubs_as_owner.html')
+        return redirect('owner_manage_club_list.html')
     else:
         usersInClub = club.members
-        return render(request, 'owner_manage_show_club_and_user_list.html',{'club': club, 'users': usersInClub})
+        return render(request, 'owner_manage_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants})
 
 @login_required
-def manage_clubs_as_officer(request):
+def officer_manage_club_list(request):
     user = request.user
     officerClubs = user.OfficerOfClubs
-    return render(request, 'manage_clubs_as_officer.html', {'clubs': officerClubs})
+    return render(request, 'officer_manage_club_list.html', {'clubs': officerClubs})
 
 @login_required
-def officer_manage_show_club_and_user_list(request, pk=None):
+def officer_manage_club(request, pk=None):
+    flag_applicants = 1
     try:
         global club_pk
         club_pk=pk
         club = Club.objects.get(pk=pk)
     except ObjectDoesNotExist:
-        return redirect('manage_clubs_as_officer.html')
+        return redirect('officer_manage_club_list.html')
     else:
         usersInClub = club.members
-        return render(request, 'officer_manage_show_club_and_user_list.html',{'club': club, 'users': usersInClub})
+        return render(request, 'officer_manage_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants})
 
 @login_required
 def applicant_list(request):
