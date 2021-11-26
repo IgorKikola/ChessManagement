@@ -135,7 +135,7 @@ class Club(models.Model):
         return UserInClub.objects.filter(club=self, user_level=3).first().user
 
     def getUserInClub(self, user):
-        return UserInClub.objects.filter(club=self, user=user, user_level__in=[1,2,3]).first().user
+        return UserInClub.objects.get(club=self, user=user, user_level__in=[0,1,2,3])
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
