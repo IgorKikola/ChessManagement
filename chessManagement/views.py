@@ -102,15 +102,39 @@ def club_list(request):
 @login_required
 def show_club_and_user_list(request, pk=None):
     flag_applicants = 0
+    applied = False
     try:
         global club_pk
         club_pk=pk
         club = Club.objects.get(pk=pk)
+        account = UserInClub.objects.filter(club=club, user=request.user)
+        if len(account) != 0:
+            applied = True
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
         usersInClub = club.members
-        return render(request, 'show_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants})
+        return render(request, 'show_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants,'applied':applied})
+
+@login_required
+def apply_Club(request,pk=None):
+    global club_pk
+    try:
+        global club_pk
+        club_pk = pk
+        user = request.user
+        club = Club.objects.get(pk=pk)
+        accounts = UserInClub.objects.filter(club=club, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInClub.objects.create(
+                user=user,
+                club=club,
+                user_level=0
+            )
+            new_applicant.save()
+        return redirect('profile')
+    except ObjectDoesNotExist:
+        return redirect('profile')
 
 @login_required
 def owner_manage_club_list(request):
