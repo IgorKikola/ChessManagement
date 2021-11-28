@@ -14,8 +14,14 @@
       <p class="profile-bio">{{ user.personal_statement }}</p>
       <h1>Chess Level:</h1>
       <p class="profile-bio">{{ user.experience }}</p>
-      <h1>Rank:</h1>
-      <p class="profile-bio">{{ user.get_user_level_display }}</p>
+      {% if clubs %}
+        <h1>Joining Club(s):</h1>
+        {% for club in clubs%}
+          <p class="profile-bio">{{ club.name }}</p>
+        {% endfor %}
+      {% else %}
+        <h5>You have not joined a club yet. You can choose to apply a club or create your own club</h5>
+      {% endif %}
     </div>
     <div class="col-3">
       <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.email }}" class="profile-image" style="width: 100%;" >

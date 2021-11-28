@@ -1,0 +1,50 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row content">
+    <div class="col-xs-12 col-lg-6 col-xl-8">
+      {% include 'partials/officer_user_profile.html' with user=shown_user %}
+    </div>
+    <div class="col-12">
+      <div class="col-12">
+        <div class="col-6" align="center">
+          {% if rank == "Member" %}
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card" style="width: 30rem.">
+                <div class="card-body">
+                  <h5 class="card-title">Promote</h5>
+                  <p class="card-text">Promote the member to a officer.</p>
+                  <a href='{% url 'to_officer' shown_user.id %}' class="btn btn-primary">Click to Promote</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% elif rank == "Officer" %}
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="card" style="width: 30rem.">
+                  <div class="card-body">
+                    <h5 class="card-title">Demote</h5>
+                    <p class="card-text">Demote the officer to a member.</p>
+                    <a href='{% url 'to_member' shown_user.id %}' class="btn btn-primary">Click to Demote</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="card" style="width: 30rem.">
+                  <div class="card-body">
+                    <h5 class="card-title">Transfer Ownership</h5>
+                    <p class="card-text">Transfer your ownership to this officer, And you will be an officer in this club.</p>
+                    <a href='{% url 'transfer_ownership' shown_user.id %}' class="btn btn-primary">Click to Transfer</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

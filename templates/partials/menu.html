@@ -3,18 +3,25 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'profile' %}">Profile</a>
     </li>
-    {% if user.user_level > 0 %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'club_list' %}">Clubs</a>
+    </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'user_list'%}">Member list</a>
-      </li>
-      {% if user.user_level > 1 %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'applicant_list'%}">Applicant list</a>
-        </li>
-      {% endif %}
-    {% endif %}
+      <a class="nav-link" href="{% url 'create_club' %}">Create a Club</a>
+    </li>
   </ul>
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="manage-clubs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Manage Clubs
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="manage-clubs">
+        <li><a class="dropdown-item" href="{% url 'owner_manage_club_list' %}">As Owner</a></li>
+        <li><a class="dropdown-item" href="{% url 'officer_manage_club_list' %}">As Officer</a></li>
+        <li><a class="dropdown-item" href="{% url 'member_manage_club_list' %}">As Member</a></li>
+        <li><a class="dropdown-item" href="{% url 'applicant_manage_club_list' %}">As Applicant</a></li>           
+      </ul>
+    </li>
     <li class="nav-item dropdown">
       <a class="nav-link" style="font-size: 1.5rem" href="#" id="user-account-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="bi-person-circle"></span>

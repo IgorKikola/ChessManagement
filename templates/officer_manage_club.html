@@ -1,3 +1,4 @@
+{% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
   <div class="row">
@@ -21,6 +22,17 @@
           </tr>
         {% endfor %}
       </table>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12 offset-md-1 col-md-5">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Applicant List</h5>
+        <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
+        <a href="{% url 'applicant_list' %}" class="btn btn-primary">Go and Check</a>
+      </div>
     </div>
   </div>
 </div>
