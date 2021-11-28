@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from .models import User, Club, UserInClub
-from .forms import SignUpForm, LogInForm, changePassword, changeProfile
+from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm
 from .helpers import login_prohibited
 
 club_pk = ""
@@ -81,6 +81,18 @@ def profile(request):
     user = request.user
     clubs = user.clubs
     return render(request, 'profile.html', {'user': user, 'clubs': clubs})
+
+
+@login_required
+def create_club(request):
+    if request.method == 'POST':
+        form = createClubForm(request.POST)
+        if form.is_valid():
+            club = form.save(request.user)
+            return redirect('profile')
+    else:
+        form = createClubForm()
+    return render(request,'create_club.html',{'form':form})
 
 @login_required
 def club_list(request):

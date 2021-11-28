@@ -39,4 +39,5 @@ urlpatterns = [
     path('to_member/<int:user_id>/', views.to_member, name='to_member'),
     path('to_officer/<int:user_id>/', views.to_officer, name='to_officer'),
     path('transfer_ownership/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
+    path('create_club/',views.create_club, name='create_club'),
 ]

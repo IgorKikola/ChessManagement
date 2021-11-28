@@ -1,7 +1,8 @@
 """Forms for the microblogs app."""
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User, Club, UserInClub
+
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -106,3 +107,30 @@ class changeProfile(forms.Form):
         widget=forms.Textarea(),
         required=False
         )
+
+
+class createClubForm(forms.ModelForm):
+    """Form enabling unregistered users to sign up."""
+
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['name','location','description']
+        widgets = { 'description': forms.Textarea()}
+
+    def save(self,user):
+        """Create a new user."""
+
+        super().save(commit=False)
+        club = Club.objects.create(
+            name=self.cleaned_data.get('name'),
+            location=self.cleaned_data.get('location'),
+            description=self.cleaned_data.get('description')
+        )
+        UserInClub.objects.create(
+            user=user,
+            user_level=3,
+            club=club
+        )
+        return club

@@ -171,13 +171,13 @@ class UserInClub(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
 
     def isApplicant(self):
-        return user_level == 0
+        return self.user_level == 0
 
     def isMember(self):
-        return user_level > 0
+        return self.user_level > 0
 
     def isOfficer(self):
-        return user_level > 1
+        return self.user_level > 1
 
     def isOwner(self):
-        return user_level == 3
+        return self.user_level == 3
