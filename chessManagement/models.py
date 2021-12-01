@@ -94,6 +94,11 @@ class User(AbstractUser):
         club_names = UserInClub.objects.filter(user=self, user_level=1).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
+    def clubsIn(self):
+        """Return all clubs the user is a member/officer/owner of"""
+        club_names = UserInClub.objects.filter(user=self, user_level__in=[1,2,3]).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
     def isApplicantIn(self, club):
         return UserInClub.objects.filter(user=self, club=club, user_level=0).count() == 1
 

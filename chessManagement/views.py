@@ -79,8 +79,9 @@ def log_in(request):
 @login_required
 def profile(request):
     user = request.user
-    clubs = user.clubs
-    return render(request, 'profile.html', {'user': user, 'clubs': clubs})
+    clubsIn = user.clubsIn
+    clubsAppliedTo = user.clubsAppliedTo
+    return render(request, 'profile.html', {'user': user, 'clubsIn': clubsIn, 'clubsAppliedTo': clubsAppliedTo})
 
 
 @login_required
