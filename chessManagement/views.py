@@ -288,9 +288,13 @@ def to_member(request, user_id):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
+        previous_rank = userInClub.user_level
         userInClub.user_level=1
         userInClub.save(update_fields=["user_level"])
-        return render(request, 'success.html')
+        if previous_rank == 2:
+            return redirect('show_user', user_id)
+        else:
+            return redirect('applicant_list')
 
 @login_required
 def to_officer(request, user_id):
@@ -305,7 +309,7 @@ def to_officer(request, user_id):
         if userInClub.user_level==1:
             userInClub.user_level=2
         userInClub.save(update_fields=["user_level"])
-        return render(request, 'success.html')
+        return redirect('show_user', user_id)
 
 @login_required
 def transfer_ownership(request, user_id):
@@ -324,4 +328,4 @@ def transfer_ownership(request, user_id):
             ownerInClub.user_level=2
             userInClub.save(update_fields=["user_level"])
             ownerInClub.save(update_fields=["user_level"])
-        return render(request, 'success.html')
+        return redirect('show_user', user_id)
