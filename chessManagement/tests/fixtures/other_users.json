@@ -1,15 +1,14 @@
 [
-   {
-     "model": "chessManagement.user",
-     "pk": 2,
-     "fields": {
+ {
+   "model": "chessManagement.user",
+   "pk": 2,
+   "fields": {
      "first_name": "Jane",
      "last_name": "Doe",
      "email": "janedoe@example.org",
      "bio": "Hello, I'm Jane Doe.",
      "experience": "Intermediate",
      "personal_statement": "statement",
-     "user_level": 1,
      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
      "is_active": true
      }
