@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from chessManagement.forms import LogInForm
 from chessManagement.models import User
-from .helpers import LogInTester
+from chessManagement.tests.helpers import LogInTester
 
 class LogInViewTestCase(TestCase, LogInTester):
     """Tests of the log in view."""
