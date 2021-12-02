@@ -118,7 +118,6 @@ class UserModelTestCase(TestCase):
 
     def _create_second_user(self):
         user = User.objects.create_user(
-            user_level=0,
             first_name='Jane',
             last_name='Doe',
             email='janedoe@example.org',

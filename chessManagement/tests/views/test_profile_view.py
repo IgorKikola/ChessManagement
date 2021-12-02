@@ -5,7 +5,6 @@ from chessManagement.models import User
 class ProfileTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            user_level=0,
             first_name='John',
             last_name='Doe',
             email='johndoe@example.org',
