@@ -5,7 +5,6 @@ from chessManagement.models import User
 class ShowUserTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            user_level=1,
             first_name='John',
             last_name='Doe',
             email='johndoe@example.org',
@@ -15,24 +14,32 @@ class ShowUserTest(TestCase):
             password='Password123',
             is_active=True,
         )
-        self.url = reverse('show_user', kwargs={'user_id': self.user.id})
+        self.target_user = User.objects.create_user(
+            username = 'janedoe@example.org',
+            first_name='Jane',
+            last_name='Doe',
+            email='janedoe@example.org',
+            experience='Beginner',
+            personal_statement='Hi I would like to apply ',
+            bio='Hello, I am Jane Doe.',
+            password='Password123',
+        )
+        self.url = reverse('show_user', kwargs={'user_id': self.target_user.id})
 
     def test_show_user_url(self):
-        self.assertEqual(self.url,f'/user/{self.user.id}/')
+        self.assertEqual(self.url,f'/user/{self.target_user.id}/')
 
-    def test_get_show_user_with_valid_id(self):
+    def test_get_show_user_which_is_not_in_the_club_and_with_valid_id(self):
         self.client.login(username=self.user.email, password='Password123')
-        url = reverse('show_user', kwargs={'user_id': self.user.id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'show_user.html')
-        self.assertContains(response, "John Doe")
-
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse('club_list')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'club_list.html')
 
     def test_get_show_user_with_invalid_id(self):
         self.client.login(username=self.user.email, password='Password123')
-        url = reverse('show_user', kwargs={'user_id': self.user.id+1})
+        url = reverse('show_user', kwargs={'user_id': self.user.id+9999})
         response = self.client.get(url, follow=True)
-        response_url = reverse('user_list')
+        response_url = reverse('club_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'club_list.html')
