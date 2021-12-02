@@ -7,7 +7,7 @@ from chessManagement.forms import changePassword
 class ChangeProfileTestCase(TestCase):
     """Unit tests of the log in form."""
     def setUp(self):
-        self.form_input = {'new_password': "Password123"}
+        self.form_input = {'new_password': "Password123", 'new_password_confirmation': 'Password123'}
 
     def test_form_contains_required_fields(self):
         form = changePassword()

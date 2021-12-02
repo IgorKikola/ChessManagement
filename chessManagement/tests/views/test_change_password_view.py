@@ -16,7 +16,7 @@ class changePasswordTest(TestCase):
             bio='Hello, I am John Doe.',
             password='Password123',
         )
-        self.form_input = {'new_password': 'Wellthen123'}
+        self.form_input = {'new_password': 'Wellthen123', 'new_password_confirmation': 'Wellthen123'}
         self.url = reverse('change_password')
         self.client.login(username='johndoe@example.org', password='Password123')
 
