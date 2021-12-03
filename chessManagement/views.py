@@ -122,7 +122,10 @@ def show_club(request, pk=None):
             2: 'show_club/for_officer.html',
             3: 'show_club/for_owner.html',
         }
-        template = templates[account.first().user_level]
+        if applied:
+            template = templates[account.first().user_level]
+        else:
+            template = templates[0]
 
         return render(request, template, {'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants,'applied':applied})
 
@@ -142,7 +145,7 @@ def apply_Club(request,pk=None):
                 user_level=0
             )
             new_applicant.save()
-        return redirect('profile')
+        return redirect('show_club', pk=pk)
     except ObjectDoesNotExist:
         return redirect('profile')
 
@@ -351,6 +354,6 @@ def change_club_details(request, pk):
                 club.location = form.cleaned_data.get('location')
                 club.description = form.cleaned_data.get('description')
                 club.save()
-                return redirect('owner_manage_club', pk=pk)
+                return redirect('show_club', pk=pk)
         clubDetails = changeClubDetails(initial={'location': club.location, 'description': club.description})
         return render(request, 'change_club_details.html', {'form': clubDetails, 'club': club})

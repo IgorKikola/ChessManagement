@@ -7,9 +7,16 @@
       {% include 'partials/club_profile.html' %}
     </div>
     <div class="col-4">
-      <div class="card">
+      <div class="card m-2">
         <div class="card-body">
-            <p class="card-text">You are an officer of this club.</p>
+            <h5 class="card-text">You are an officer of this club.</h5>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Applicant List</h5>
+          <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
+          <a href="{% url 'applicant_list' %}" class="btn btn-primary">Go and Check</a>
         </div>
       </div>
     </div>
