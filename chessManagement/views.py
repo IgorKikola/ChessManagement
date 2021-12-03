@@ -101,7 +101,7 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
 
 @login_required
-def show_club_and_user_list(request, pk=None):
+def show_club(request, pk=None):
     flag_applicants = 0
     applied = False
     try:
@@ -115,7 +115,16 @@ def show_club_and_user_list(request, pk=None):
         return redirect('club_list')
     else:
         usersInClub = club.members
-        return render(request, 'show_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants,'applied':applied})
+
+        templates = {
+            0: 'show_club/for_applicant.html',
+            1: 'show_club/for_member.html',
+            2: 'show_club/for_officer.html',
+            3: 'show_club/for_owner.html',
+        }
+        template = templates[account.first().user_level]
+
+        return render(request, template, {'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants,'applied':applied})
 
 @login_required
 def apply_Club(request,pk=None):
@@ -334,7 +343,7 @@ def transfer_ownership(request, user_id):
 def change_club_details(request, pk):
     club = Club.objects.get(pk=pk)
     if request.user != club.owner():
-        return redirect('show_club_and_user_list', pk=pk)
+        return redirect('show_club', pk=pk)
     else:
         if request.method == 'POST':
             form = changeClubDetails(request.POST)

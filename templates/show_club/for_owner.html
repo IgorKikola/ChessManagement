@@ -1,0 +1,19 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/club_profile.html' %}
+    </div>
+    <div class="col-4">
+      <div class="card">
+        <div class="card-body">
+            <p class="card-text">You are the owner of this club.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
