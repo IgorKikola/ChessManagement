@@ -1,0 +1,36 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/officer_user_profile.html' with user=shown_user rank=user_rank %}
+    </div>
+    <div class="col-4">
+      {% if user_rank == "Officer" %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Demote Officer</h5>
+            <p class="card-text">As the club owner, you can demote this officer to the rank of member.</p>
+            <a href="{% url 'to_member' club.pk shown_user.id %}" class="btn btn-primary">Demote</a>
+          </div>
+        </div>
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Transfer Ownership</h5>
+            <p class="card-text">As the club owner, you can transfer your ownership of the club to this officer. They will become the new owner, and you'll be demoted to officer.</p>
+            <a href="{% url 'transfer_ownership' club.pk shown_user.id %}" class="btn btn-primary">Transfer Ownership</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Promote Member</h5>
+            <p class="card-text">As the club owner, you can promote this member to the rank of officer.</p>
+            <a href="{% url 'to_officer' club.pk shown_user.id %}" class="btn btn-primary">Promote</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

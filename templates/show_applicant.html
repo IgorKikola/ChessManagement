@@ -1,0 +1,19 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/officer_user_profile.html' with user=shown_user rank=user_rank %}
+    </div>
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Approve application</h5>
+          <p class="card-text">As an officer, you can approve this user's application to become a member of the club.</p>
+          <a href="{% url 'to_member' club.pk shown_user.id %}" class="btn btn-primary">Approve</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

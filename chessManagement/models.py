@@ -180,6 +180,16 @@ class UserInClub(models.Model):
 
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
 
+    def rankToString(self):
+        if self.user_level == 0:
+            return "Applicant"
+        if self.user_level == 1:
+            return "Member"
+        if self.user_level == 2:
+            return "Officer"
+        if self.user_level == 3:
+            return "Owner"
+
     def isApplicant(self):
         return self.user_level == 0
 

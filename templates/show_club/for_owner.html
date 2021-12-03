@@ -16,14 +16,14 @@
         <div class="card-body">
           <h5 class="card-title">Applicant List</h5>
           <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
-          <a href="{% url 'applicant_list' %}" class="btn btn-primary">Go and Check</a>
+          <a href="{% url 'applicants' club.pk %}" class="btn btn-primary">Go and Check</a>
         </div>
       </div>
       <div class="card m-2">
         <div class="card-body">
           <h5 class="card-title">Update club details</h5>
           <p class="card-text">As the club owner, you can change the description and location of the club.</p>
-          <a href="{% url 'change_club_details' club.name %}" class="btn btn-primary">Update club details</a>
+          <a href="{% url 'change_club_details' club.pk %}" class="btn btn-primary">Update club details</a>
         </div>
       </div>
     </div>
