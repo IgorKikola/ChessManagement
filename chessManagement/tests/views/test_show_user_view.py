@@ -43,3 +43,6 @@ class ShowUserTest(TestCase):
         response_url = reverse('club_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'club_list.html')
+
+    """Should write tests for test_get_show_user_with_own_id"""
+    """Need to create clubInUser and club in this tests"""

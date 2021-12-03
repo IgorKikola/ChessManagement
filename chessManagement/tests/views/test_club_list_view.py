@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate,login
 from chessManagement.models import User
 from chessManagement.tests.helpers import reverse_with_next
 
-class UserListTest(TestCase):
+class ClubListTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -19,10 +19,10 @@ class UserListTest(TestCase):
         )
         self.url = reverse('club_list')
 
-    def test_user_list_url(self):
+    def test_club_list_url(self):
         self.assertEqual(self.url,'/clubs/')
 
-    # def test_get_user_list(self):
+    # def test_get_club_list(self):
     #     self.client.login(username=self.user.email, password='Password123')
     #     self._create_test_users(15-1)
     #     response = self.client.get(self.url)
@@ -35,12 +35,12 @@ class UserListTest(TestCase):
     #         user = User.objects.get(username=f'user{user_id}@example.org')
     #         user_url = reverse('show_user', kwargs={'user_id': user.id})
     #         self.assertContains(response, user_url)
-
+    #
     # def test_get_user_list_redirects_when_not_logged_in(self):
     #     redirect_url = reverse_with_next('log_in', self.url)
     #     response = self.client.get(self.url)
     #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-
+    #
     # def _create_test_users(self, user_count):
     #     for user_id in range(user_count):
     #         User.objects.create_user(
