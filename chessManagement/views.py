@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from .models import User, Club, UserInClub
-from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm
+from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails
 from .helpers import login_prohibited
 
 club_pk = ""
@@ -329,3 +329,19 @@ def transfer_ownership(request, user_id):
             userInClub.save(update_fields=["user_level"])
             ownerInClub.save(update_fields=["user_level"])
         return redirect('show_user', user_id)
+
+
+def change_club_details(request, pk):
+    club = Club.objects.get(pk=pk)
+    if request.user != club.owner():
+        return redirect('show_club_and_user_list', pk=pk)
+    else:
+        if request.method == 'POST':
+            form = changeClubDetails(request.POST)
+            if form.is_valid():
+                club.location = form.cleaned_data.get('location')
+                club.description = form.cleaned_data.get('description')
+                club.save()
+                return redirect('owner_manage_club', pk=pk)
+        clubDetails = changeClubDetails(initial={'location': club.location, 'description': club.description})
+        return render(request, 'change_club_details.html', {'form': clubDetails, 'club': club})
