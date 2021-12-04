@@ -45,4 +45,4 @@ class ShowUserTest(TestCase):
         self.assertTemplateUsed(response, 'club_list.html')
 
     """Should write tests for test_get_show_user_with_own_id"""
-    """Need to create clubInUser and club in this tests"""
+    """Need to create Club and UserInClub in these tests"""
