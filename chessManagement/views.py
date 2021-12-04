@@ -6,7 +6,6 @@ from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails
 from .helpers import login_prohibited
 
-club_pk = ""
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
@@ -98,15 +97,24 @@ def create_club(request):
 @login_required
 def club_list(request):
     clubs = Club.objects.all()
-    return render(request, 'club_list.html', {'clubs': clubs})
+    return render(request, 'club_list/all.html', {'clubs': clubs})
 
 @login_required
-def show_club(request, pk=None):
-    flag_applicants = 0
+def clubs_applied_to_list(request):
+    user = request.user
+    clubs = user.clubsAppliedTo()
+    return render(request, 'club_list/applied_to.html', {'clubs': clubs})
+
+@login_required
+def clubs_joined_list(request):
+    user = request.user
+    clubs = user.clubsIn()
+    return render(request, 'club_list/joined.html', {'clubs': clubs})
+
+@login_required
+def show_club(request, club_pk):
     applied = False
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         account = UserInClub.objects.filter(club=club, user=request.user)
         if len(account) != 0:
@@ -127,16 +135,13 @@ def show_club(request, pk=None):
         else:
             template = templates[0]
 
-        return render(request, template, {'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants,'applied':applied})
+        return render(request, template, {'club': club, 'users': usersInClub,'applied':applied})
 
 @login_required
-def apply_Club(request,pk=None):
-    global club_pk
+def apply_Club(request, club_pk):
     try:
-        global club_pk
-        club_pk = pk
         user = request.user
-        club = Club.objects.get(pk=pk)
+        club = Club.objects.get(pk=club_pk)
         accounts = UserInClub.objects.filter(club=club, user=user)
         if len(accounts) == 0:
             new_applicant = UserInClub.objects.create(
@@ -145,16 +150,14 @@ def apply_Club(request,pk=None):
                 user_level=0
             )
             new_applicant.save()
-        return redirect('show_club', pk=club_pk)
+        return redirect('show_club', club_pk)
     except ObjectDoesNotExist:
         return redirect('profile')
 
 
 @login_required
-def applicant_list(request, pk=None):
+def applicant_list(request, club_pk):
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         allUsers = club.users()
     except ObjectDoesNotExist:
@@ -167,11 +170,9 @@ def applicant_list(request, pk=None):
         return render(request, 'applicant_list.html', {'users': users, 'club': club})
 
 @login_required
-def show_user(request, user_id, pk=None):
+def show_user(request, user_id, club_pk):
     session_user = request.user
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         shown_user_in_club = club.getUserInClub(user_id)
         session_user_in_club = club.getUserInClub(session_user)
@@ -179,7 +180,7 @@ def show_user(request, user_id, pk=None):
         return redirect('club_list')
     else:
         if shown_user_in_club == None or session_user_in_club.isApplicant():
-            return redirect('show_club', pk=club_pk)
+            return redirect('show_club', club_pk)
         elif shown_user_in_club.isApplicant() and session_user_in_club.isOfficer():
             return render(request, 'show_applicant.html', {'user': session_user, 'shown_user': shown_user_in_club.user, 'club': club, 'user_rank': "Applicant"})
         elif shown_user_in_club.isMember() and session_user_in_club.isMember():
@@ -199,13 +200,11 @@ def show_user(request, user_id, pk=None):
 
             return render(request, template, {'user': session_user, 'shown_user': shown_user_in_club.user, 'club': club, 'user_rank': shown_user_in_club.rankToString()})
         else:
-            return redirect('show_club', pk=club_pk)
+            return redirect('show_club', club_pk)
 
 @login_required
-def to_member(request, user_id, pk=None):
+def to_member(request, user_id, club_pk):
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         user = User.objects.get(id=user_id)
         userInClub = club.getUserInClub(user)
@@ -221,10 +220,8 @@ def to_member(request, user_id, pk=None):
             return redirect('applicants', club_pk)
 
 @login_required
-def to_officer(request, user_id, pk=None):
+def to_officer(request, user_id, club_pk):
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         user = User.objects.get(id=user_id)
         userInClub = club.getUserInClub(user)
@@ -237,10 +234,8 @@ def to_officer(request, user_id, pk=None):
         return redirect('show_user', club_pk, user_id)
 
 @login_required
-def transfer_ownership(request, user_id, pk=None):
+def transfer_ownership(request, user_id, club_pk):
     try:
-        global club_pk
-        club_pk=pk
         club = Club.objects.get(pk=club_pk)
         user = User.objects.get(id=user_id)
         userInClub = club.getUserInClub(user)
@@ -257,10 +252,10 @@ def transfer_ownership(request, user_id, pk=None):
         return redirect('show_user', club_pk, user_id)
 
 @login_required
-def change_club_details(request, pk):
-    club = Club.objects.get(pk=pk)
+def change_club_details(request, club_pk):
+    club = Club.objects.get(pk=club_pk)
     if request.user != club.owner():
-        return redirect('show_club', pk=pk)
+        return redirect('show_club', club_pk)
     else:
         if request.method == 'POST':
             form = changeClubDetails(request.POST)
@@ -268,6 +263,6 @@ def change_club_details(request, pk):
                 club.location = form.cleaned_data.get('location')
                 club.description = form.cleaned_data.get('description')
                 club.save()
-                return redirect('show_club', pk=pk)
+                return redirect('show_club', club_pk)
         clubDetails = changeClubDetails(initial={'location': club.location, 'description': club.description})
         return render(request, 'change_club_details.html', {'form': clubDetails, 'club': club})
