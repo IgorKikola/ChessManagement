@@ -210,7 +210,8 @@ def applicant_manage_club(request, pk=None):
         return redirect('applicant_manage_club_list.html')
     else:
         usersInClub = club.members
-        return render(request, 'applicant_manage_club.html',{'club': club, 'users': usersInClub, 'flag_applicants':flag_applicants})
+        user = request.user
+        return render(request, 'applicant_manage_club.html',{'club': club, 'users': usersInClub, 'user': user, 'flag_applicants':flag_applicants})
 
 @login_required
 def applicant_list(request):
@@ -323,4 +324,41 @@ def transfer_ownership(request, user_id):
             ownerInClub.user_level=2
             userInClub.save(update_fields=["user_level"])
             ownerInClub.save(update_fields=["user_level"])
+        return render(request, 'success.html')
+
+@login_required
+def leave_club(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        user = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        userInClub.delete()
+        return render(request, 'success.html')
+
+@login_required
+def delete_club(request):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        club.delete()
+        return render(request, 'success.html')
+
+@login_required
+def remove_user(request, user_id):
+    try:
+        global club_pk
+        club = Club.objects.get(pk=club_pk)
+        user = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        userInClub.delete()
         return render(request, 'success.html')

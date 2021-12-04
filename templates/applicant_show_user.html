@@ -18,4 +18,15 @@
     </div>
   </div>
 </div>
+<div class="row">
+  <div class="col-sm-12 offset-md-1 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Deny</h5>
+        <p class="card-text">Deny this applicants membership.</p>
+        <a href="{% url 'remove_user' shown_user.id %}" class="btn btn-primary">Click to Deny</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
