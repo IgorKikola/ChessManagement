@@ -6,17 +6,10 @@ from chessManagement.models import User
 class UserModelTestCase(TestCase):
     """Unit tests for the User model."""
 
+    fixtures = ['chessManagement/tests/fixtures/default_user.json']
+
     def setUp(self):
-        self.user = User.objects.create_user(
-            username = 'johndoe@example.org',
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            experience='Beginner',
-            personal_statement='Hi I would like to apply ',
-            bio='Hello, I am John Doe.',
-            password='Password123',
-        )
+        self.user = User.objects.get(username='johndoe@example.org')
 
     def test_valid_user(self):
         self._assert_user_is_valid()

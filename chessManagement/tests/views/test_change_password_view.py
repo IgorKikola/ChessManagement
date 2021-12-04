@@ -7,16 +7,10 @@ from django.contrib.auth import login
 
 class changePasswordTest(TestCase):
 
+    fixtures = ['chessManagement/tests/fixtures/default_user.json']
+
     def setUp(self):
-        self.user = User.objects.create_user(
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            experience='Beginner',
-            bio='My bio',
-            personal_statement='my statement',
-            password='Password123'
-        )
+        self.user = User.objects.get(username='johndoe@example.org')
         self.form_input = {'new_password': 'Wellthen123', 'new_password_confirmation': 'Wellthen123'}
         self.url = reverse('change_password')
         self.client.login(username='johndoe@example.org', password='Password123')

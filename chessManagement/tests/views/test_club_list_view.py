@@ -7,17 +7,10 @@ from chessManagement.forms import createClubForm
 
 class ClubListTest(TestCase):
 
+    fixtures = ['chessManagement/tests/fixtures/default_user.json']
+
     def setUp(self):
-        self.user = User.objects.create_user(
-            username = 'janedoe@example.org',
-            first_name='Jane',
-            last_name='Doe',
-            email='janedoe@example.org',
-            experience='Beginner',
-            personal_statement='Hi I would like to apply ',
-            bio='Hello, I am Jane Doe.',
-            password='Password123',
-        )
+        self.user = User.objects.get(username='johndoe@example.org')
         self.url = reverse('club_list')
 
     def test_club_list_url(self):
