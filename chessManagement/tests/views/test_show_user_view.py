@@ -3,27 +3,36 @@ from django.urls import reverse
 from chessManagement.models import User
 
 class ShowUserTest(TestCase):
+
+    fixtures = [
+        'chessManagement/tests/fixtures/default_user.json',
+        'chessManagement/tests/fixtures/other_users.json'
+    ]
+
     def setUp(self):
-        self.user = User.objects.create_user(
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            experience = 'Beginner',
-            personal_statement = 'Hi I would like to apply ',
-            bio='Hello, I am John Doe.',
-            password='Password123',
-            is_active=True,
-        )
-        self.target_user = User.objects.create_user(
-            username = 'janedoe@example.org',
-            first_name='Jane',
-            last_name='Doe',
-            email='janedoe@example.org',
-            experience='Beginner',
-            personal_statement='Hi I would like to apply ',
-            bio='Hello, I am Jane Doe.',
-            password='Password123',
-        )
+        self.user = User.objects.get(username='johndoe@example.org')
+        self.target_user = User.objects.get(username='janedoe@example.org')
+
+        # self.user = User.objects.create_user(
+        #     first_name='John',
+        #     last_name='Doe',
+        #     email='johndoe@example.org',
+        #     experience = 'Beginner',
+        #     personal_statement = 'Hi I would like to apply ',
+        #     bio='Hello, I am John Doe.',
+        #     password='Password123',
+        #     is_active=True,
+        # )
+        # self.target_user = User.objects.create_user(
+        #     username = 'janedoe@example.org',
+        #     first_name='Jane',
+        #     last_name='Doe',
+        #     email='janedoe@example.org',
+        #     experience='Beginner',
+        #     personal_statement='Hi I would like to apply ',
+        #     bio='Hello, I am Jane Doe.',
+        #     password='Password123',
+        # )
         self.url = reverse('show_user', kwargs={'user_id': self.target_user.id})
 
     def test_show_user_url(self):

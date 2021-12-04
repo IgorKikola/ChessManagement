@@ -13,7 +13,7 @@ class LogInViewTestCase(TestCase, LogInTester):
 
     def setUp(self):
         self.url = reverse('log_in')
-        self.user = User.objects.get(email='johndoe@example.org')
+        self.user = User.objects.get(username='johndoe@example.org')
 
     def test_log_in_url(self):
         self.assertEqual(self.url,'/log_in/')

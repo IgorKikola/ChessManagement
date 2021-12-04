@@ -5,6 +5,7 @@
    "fields": {
      "first_name": "John",
      "last_name": "Doe",
+     "username": "johndoe@example.org",
      "email": "johndoe@example.org",
      "bio": "Hello, I'm John Doe.",
      "experience": "Beginner",
