@@ -12,6 +12,13 @@
             <h5 class="card-text">You are a member of this club.</h5>
         </div>
       </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Leave Club</h5>
+          <p class="card-text">If you don't like this club, you can leave it. If you want to rejoin, you will have to apply again.</p>
+          <a href="{% url 'leave_club' club.pk %}" class="btn btn-primary">Leave</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -135,7 +135,7 @@ def show_club(request, club_pk):
         else:
             template = templates[0]
 
-        return render(request, template, {'club': club, 'users': usersInClub,'applied':applied})
+        return render(request, template, {'club': club, 'users': usersInClub, 'applied': applied})
 
 @login_required
 def apply_Club(request, club_pk):
@@ -266,3 +266,46 @@ def change_club_details(request, club_pk):
                 return redirect('show_club', club_pk)
         clubDetails = changeClubDetails(initial={'location': club.location, 'description': club.description})
         return render(request, 'change_club_details.html', {'form': clubDetails, 'club': club})
+
+
+@login_required
+def leave_club(request, club_pk):
+    try:
+        club = Club.objects.get(pk=club_pk)
+        user = request.user
+        userInClub = club.getUserInClub(user)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        userInClub.delete()
+        usersInClub = club.members
+        return redirect('show_club', club_pk)
+
+@login_required
+def delete_club(request, club_pk):
+    try:
+        club = Club.objects.get(pk=club_pk)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        if request.user.isOwnerOf(club):
+            club.delete()
+            return redirect('club_list')
+        return redirect('show_club', club_pk)
+
+@login_required
+def remove_user(request, user_id, club_pk):
+    try:
+        club = Club.objects.get(pk=club_pk)
+        user_to_remove = User.objects.get(id=user_id)
+        userInClub = club.getUserInClub(user_to_remove)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    else:
+        user = request.user
+        user_to_remove_rank = userInClub.user_level
+        if user.isOfficerOf(club) or user.isOwnerOf(club):
+            userInClub.delete()
+            if user_to_remove_rank == 0:
+                return redirect('applicants', club_pk)
+        return redirect('show_club', club_pk)

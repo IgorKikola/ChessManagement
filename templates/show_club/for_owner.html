@@ -26,6 +26,14 @@
           <a href="{% url 'change_club_details' club.pk %}" class="btn btn-primary">Update club details</a>
         </div>
       </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Delete Club</h5>
+          <p class="card-text">As the club owner, you can delete this club.</p>
+          <b><p class="card-text">Be warned: Deletion is permanent!</p></b>
+          <a href="{% url 'delete_club' club.pk %}" class="btn btn-primary">Delete</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

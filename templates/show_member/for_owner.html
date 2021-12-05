@@ -30,6 +30,13 @@
           </div>
         </div>
       {% endif %}
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Remove Member</h5>
+          <p class="card-text">As the club owner, you can remove this member from the club.</p>
+          <a href="{% url 'remove_user' club.pk shown_user.id %}" class="btn btn-primary">Remove</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

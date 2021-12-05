@@ -13,6 +13,13 @@
           <a href="{% url 'to_member' club.pk shown_user.id %}" class="btn btn-primary">Approve</a>
         </div>
       </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Deny Application</h5>
+          <p class="card-text">As an officer, you can deny this user's application to become a member of the club.</p>
+          <a href="{% url 'remove_user' club.pk shown_user.id %}" class="btn btn-primary">Deny</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

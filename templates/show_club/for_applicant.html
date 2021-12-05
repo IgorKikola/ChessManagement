@@ -7,18 +7,29 @@
       {% include 'partials/club_profile.html' %}
     </div>
     <div class="col-4">
-      <div class="card m-2">
-        <div class="card-body">
-          {% if applied == False %}
+      {% if applied == False %}
+        <div class="card m-2">
+          <div class="card-body">
             <p class="card-text">Here is information about this club.</p>
             <p class="card-text">If you want to join, apply here:</p>
-            <a href='{% url 'apply_Club' club.name %}' class="btn btn-primary">Apply</a>
-          {% else %}
+            <a href='{% url 'apply_Club' club.pk %}' class="btn btn-primary">Apply</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="card m-2">
+          <div class="card-body">
             <p class="card-text">You have applied to this club!</p>
             <p class="card-text">An officer will have to look at your application to approve it.</p>
-          {% endif %}
+          </div>
         </div>
-      </div>
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Cancel Application</h5>
+            <p class="card-text">If you've changed your mind, you can cancel your application.</p>
+            <a href="{% url 'leave_club' club.pk %}" class="btn btn-primary">Cancel</a>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>

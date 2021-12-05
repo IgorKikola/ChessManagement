@@ -2,8 +2,19 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-12">
+    <div class="col-8">
       {% include 'partials/officer_user_profile.html' with user=shown_user rank=user_rank %}
+    </div>
+    <div class="col-4">
+      {% if user_rank == "Member" %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Remove Member</h5>
+            <p class="card-text">As an officer, you can remove this member from the club.</p>
+            <a href="{% url 'remove_user' club.pk shown_user.id %}" class="btn btn-primary">Remove</a>
+          </div>
+        </div>
+      {% else %}
     </div>
   </div>
 </div>
