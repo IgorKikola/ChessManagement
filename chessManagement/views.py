@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from .models import User, Club, UserInClub, Tournament
+from .models import User, Club, UserInClub, Tournament, UserInTournament
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, \
     createTournamentForm
 from .helpers import login_prohibited
@@ -31,30 +31,61 @@ def tournament_list(request,club_pk):
     return render(request, 'tournament_list.html', {'tournaments': tournament})
 
 @login_required
+def sign_up_tournament(request, tournament_pk):
+    try:
+        user = request.user
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInTournament.objects.create(
+                user=user,
+                tournament=tournament,
+                is_organiser=False
+            )
+            new_applicant.save()
+        return redirect('show_tournament', tournament.club.pk, tournament.pk)
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+@login_required
+def cancel_sign_up_tournament(request, tournament_pk):
+    try:
+        user = request.user
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) != 0:
+            UserInTournament.objects.get(tournament=tournament,user=user).delete()
+        return redirect('show_tournament', tournament.club.pk, tournament.pk)
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+@login_required
 def show_tournament(request,club_pk,tournament_pk):
     applied = False
     try:
         tournament = Tournament.objects.get(pk=tournament_pk)
-        # account = UserInClub.objects.filter(club=club, user=request.user)
-        # if len(account) != 0:
-        #     applied = True
+        account = UserInTournament.objects.filter(tournament=tournament, user=request.user)
+        if len(account) != 0:
+            user = UserInTournament.objects.get(tournament=tournament, user=request.user)
+            applied = True
     except ObjectDoesNotExist:
+        pass
         return redirect('tournament_list', club_pk)
     else:
         usersIntournament = tournament.users()
 
-        # templates = {
-        #     0: 'show_club/for_applicant.html',
-        #     1: 'show_club/for_member.html',
-        #     2: 'show_club/for_officer.html',
-        #     3: 'show_club/for_owner.html',
-        # }
-        # if applied:
-        #     template = templates[account.first().user_level]
-        # else:
-        #     template = templates[0]
+        templates = {
+            0: 'show_tournament/for_organiser.html',
+            1: 'show_tournament/for_members.html',
+        }
+        if applied:
+            template = templates[1]
+            if user.is_organiser:
+                template = templates[0]
+        else:
+            template = templates[1]
 
-        return render(request, 'show_tournament/for_officer.html', {'tournament': tournament, 'users': usersIntournament, 'applied': applied})
+        return render(request, template, {'tournament': tournament, 'users': usersIntournament, 'applied': applied})
 
 @login_required
 def change_password(request):
@@ -173,7 +204,7 @@ def show_club(request, club_pk):
         templates = {
             0: 'show_club/for_applicant.html',
             1: 'show_club/for_member.html',
-            2: 'show_club/for_officer.html',
+            2: 'show_club/for_organiser.html',
             3: 'show_club/for_owner.html',
         }
         if applied:
@@ -239,7 +270,7 @@ def show_user(request, user_id, club_pk):
 
             templates = {
                 1: 'show_member/for_member.html',
-                2: 'show_member/for_officer.html',
+                2: 'show_member/for_organiser.html',
                 3: 'show_member/for_owner.html',
             }
             template = templates[session_user_rank]

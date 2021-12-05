@@ -16,10 +16,7 @@
         Organiser name
       </th>
         <th>
-        Start date
-      </th>
-        <th>
-        End date
+        Deadline for sign up
       </th>
     </tr>
   {% for tournament in tournaments %}
@@ -29,8 +26,7 @@
       </td>
       <td><a href="{% url 'show_tournament' tournament.club.pk tournament.pk  %}">{{ tournament.name }}</a></td>
       <td>{{ tournament.organiser.full_name }}</td>
-    <td>{{ tournament.start_date }}</td>
-    <td>{{ tournament.end_date }}</td>
+    <td>{{ tournament.deadline }}</td>
     </tr>
   {% endfor %}
 </table>

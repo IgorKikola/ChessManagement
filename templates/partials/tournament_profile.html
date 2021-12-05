@@ -2,6 +2,7 @@
   <h1>{{ tournament.name }}</h1>
   <h5>Description: {{ tournament.description }}</h5>
   <h5>Number Of Members: {{ tournament.numberOfMembers }}</h5>
+    <h5>Max Number Of Members: {{ tournament.max_players }}</h5>
   <img src="{{ tournament.organiser.gravatar }}" alt="Gravatar of {{ tournament.organiser.username }}" class="rounded-circle" >
   <h2>Owner: <a href="{% url 'show_user' tournament.club.pk tournament.organiser.id %}">{{ tournament.organiser.full_name }}</a> </h2>
   <h5>Bio: {{ tournament.organiser.bio }}</h5>

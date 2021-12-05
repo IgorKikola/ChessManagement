@@ -39,5 +39,5 @@ class TournamentAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for UserInClub objects."""
 
     list_display = [
-        'name', 'description', 'club','organiser','max_players','start_date','end_date','finished',
+        'name', 'description', 'club','organiser','max_players','deadline','finished'
     ]

@@ -1,0 +1,44 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/tournament_profile.html' %}
+    </div>
+    <div class="col-4">
+      {% if applied == False %}
+        <div class="card m-2">
+          <div class="card-body">
+            <p class="card-text">Here is information about this tournament.</p>
+            <p class="card-text">If you want to join, apply here:</p>
+            <a href='{% url 'sign_up_tournament' tournament.pk %}' class="btn btn-primary">Apply</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="card m-2">
+          <div class="card-body">
+            <p class="card-text">You have applied to this tournament!</p>
+            <p class="card-text">Get ready for the tournament soon</p>
+          </div>
+        </div>
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Cancel Sign up</h5>
+            <p class="card-text">If you've changed your mind, you can cancel your sign-up.</p>
+            <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn btn-primary">Cancel</a>
+          </div>
+        </div>
+      {% endif %}
+                    <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">tournament list</h5>
+          <p class="card-text">tournament list</p>
+          <a href="{% url 'tournament_list' tournament.club.pk %}" class="btn btn-primary">tournament list</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

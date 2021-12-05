@@ -206,8 +206,7 @@ class Tournament(models.Model):
     description = models.CharField(max_length=520, blank=True)
     organiser = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     max_players = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(96)])
-    start_date = models.DateField()
-    end_date = models.DateField()
+    deadline = models.DateField()
     finished = models.BooleanField()
 
     def users(self):
