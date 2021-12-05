@@ -12,11 +12,25 @@
             <h5 class="card-text">You are the organiser of this tournament.</h5>
         </div>
       </div>
-                <div class="card m-2">
+        <div class="card m-2">
         <div class="card-body">
           <h5 class="card-title">tournament list</h5>
           <p class="card-text">tournament list</p>
           <a href="{% url 'tournament_list' tournament.club.pk %}" class="btn btn-primary">tournament list</a>
+        </div>
+      </div>
+        <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Officer list</h5>
+          <p class="card-text">Officer List</p>
+          <a href="{% url 'officer_list' tournament.pk %}" class="btn btn-primary">Officer list</a>
+        </div>
+      </div>
+        <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Co-Organiser list</h5>
+          <p class="card-text">Co-Organiser List</p>
+          <a href="#" class="btn btn-primary">Co-Organiser list</a>
         </div>
       </div>
     </div>

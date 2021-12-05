@@ -1,0 +1,36 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Officer list </h1>
+<table class="table">
+    <tr>
+      <th>
+          Officer gravatar
+      </th>
+        <th>
+        Officer name
+      </th>
+      <th>
+        Officer bio
+      </th>
+              <th>
+        Allow to be co-organiser
+      </th>
+    </tr>
+  {% for officer in officers %}
+    <tr>
+      <td>
+        <img src="{{ officer.user.mini_gravatar }}" alt="Gravatar of {{ officer.user.full_name }}" class="rounded-circle" >
+      </td>
+      <td><a href="{% url 'show_user' officer.club.pk officer.user.pk %}">{{ officer.user.full_name }}</a></td>
+    <td>{{ officer.user.bio }}</td>
+        <td><a href="#" class="btn btn-primary" onauxclick="" href='#'>Allow</a></td>
+    </tr>
+  {% endfor %}
+</table>
+    </div>
+  </div>
+</div>
+{% endblock %}

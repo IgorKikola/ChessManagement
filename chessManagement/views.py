@@ -33,6 +33,12 @@ def tournament_list(request,club_pk):
     return render(request, 'tournament_list.html', {'tournaments': tournament})
 
 @login_required
+def officer_list(request,tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    officers = UserInClub.objects.all().filter(club=tournament.club,user_level=2)
+    return render(request, 'tournament_users/officer_list.html', {'officers': officers})
+
+@login_required
 def sign_up_tournament(request, tournament_pk):
     try:
         user = request.user
@@ -44,7 +50,8 @@ def sign_up_tournament(request, tournament_pk):
                 new_applicant = UserInTournament.objects.create(
                     user=user,
                     tournament=tournament,
-                    is_organiser=False
+                    is_organiser=False,
+                    is_co_organiser=False
                 )
                 new_applicant.save()
         return redirect('show_tournament', tournament.club.pk, tournament.pk)
@@ -87,7 +94,7 @@ def show_tournament(request,club_pk,tournament_pk):
         }
         if applied:
             template = templates[1]
-            if user.is_organiser:
+            if user.is_organiser or user.is_co_organiser:
                 template = templates[0]
         else:
             template = templates[1]

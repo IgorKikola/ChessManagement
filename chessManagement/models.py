@@ -223,6 +223,7 @@ class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
     is_organiser = models.BooleanField()
+    is_co_organiser = models.BooleanField(default=False)
 
 
 

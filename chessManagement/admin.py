@@ -32,7 +32,7 @@ class UserInTournamentAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for UserInClub objects."""
 
     list_display = [
-        'user', 'tournament','is_organiser'
+        'user', 'tournament','is_organiser','is_co_organiser'
     ]
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
