@@ -1,7 +1,7 @@
 """Forms for the microblogs app."""
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, UserInClub
+from .models import User, Club, UserInClub, Tournament, UserInTournament
 
 
 class LogInForm(forms.Form):
@@ -159,3 +159,43 @@ class changeClubDetails(forms.Form):
         widget=forms.Textarea(),
         required=False
     )
+
+class createTournamentForm(forms.ModelForm):
+
+    class Meta:
+        """Form options."""
+
+        class DateInput(forms.DateInput):
+            input_type = 'date'
+
+        model = Tournament
+        fields = ['name','description','start_date','end_date','max_players']
+        widgets = { 'description': forms.Textarea(),'start_date':DateInput(),'end_date':DateInput()}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if end_date < start_date:
+            self.add_error('end_date',"End date should be greater than start date.")
+
+    def save(self,user,club):
+        """Create a new club."""
+
+        super().save(commit=False)
+        tournament = Tournament.objects.create(
+            name=self.cleaned_data.get('name'),
+            start_date=self.cleaned_data.get('start_date'),
+            description=self.cleaned_data.get('description'),
+            end_date=self.cleaned_data.get('end_date'),
+            max_players=self.cleaned_data.get('max_players'),
+            finished=False,
+            organiser=user
+        )
+        UserInTournament.objects.create(
+            user=user,
+            club=club,
+            tournament=tournament,
+            is_organiser=True
+        )
+        return club

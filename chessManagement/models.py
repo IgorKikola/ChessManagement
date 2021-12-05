@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -198,3 +199,34 @@ class UserInClub(models.Model):
 
     def isOwner(self):
         return self.user_level == 3
+
+class Tournament(models.Model):
+    name = models.CharField(max_length=120)
+    description = models.CharField(max_length=520, blank=True)
+    organiser = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+    max_players = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(96)])
+    start_date = models.DateField()
+    end_date = models.DateField()
+    finished = models.BooleanField()
+
+
+class UserInTournament(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+    is_organiser = models.BooleanField()
+
+
+class Game(models.Model):
+    PLAYER1 = 1
+    PLAYER2 = 2
+    WINNER_CHOICES = (
+        (PLAYER1, "Player 1"),
+        (PLAYER2, "Player 2"),
+    )
+    player1 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_1')
+    player2 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_2')
+    finished = models.BooleanField()
+    winner = models.CharField(blank=True, max_length=8,null=True, choices=WINNER_CHOICES, default=None)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)

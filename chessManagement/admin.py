@@ -1,7 +1,7 @@
 from django.core.validators import RegexValidator
 """Configuration of the admin interface for microblogs."""
 from django.contrib import admin
-from .models import User, Club, UserInClub
+from .models import User, Club, UserInClub, Tournament, UserInTournament
 
 
 @admin.register(User)
@@ -26,4 +26,19 @@ class UserInClubAdmin(admin.ModelAdmin):
 
     list_display = [
         'user', 'user_level', 'club'
+    ]
+
+@admin.register(UserInTournament)
+class UserInTournamentAdmin(admin.ModelAdmin):
+    """Configuration of the admin interface for UserInClub objects."""
+
+    list_display = [
+        'user', 'club', 'tournament','is_organiser'
+    ]
+@admin.register(Tournament)
+class TournamentAdmin(admin.ModelAdmin):
+    """Configuration of the admin interface for UserInClub objects."""
+
+    list_display = [
+        'name', 'description', 'organiser','max_players','start_date','end_date','finished'
     ]
