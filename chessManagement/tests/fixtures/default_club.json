@@ -1,0 +1,11 @@
+[
+  {
+   "model": "chessManagement.club",
+   "pk": "KCL Chess Society",
+   "fields": {
+     "name": "KCL-Chess-Society",
+     "location": "London",
+     "description": "The official KCL Chess Society."
+    }
+  }
+ ]

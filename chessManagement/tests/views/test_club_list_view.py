@@ -26,11 +26,11 @@ class ClubListTest(TestCase):
         self._create_test_clubs(15)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'club_list.html')
+        self.assertTemplateUsed(response, 'club_list/all.html')
         self.assertEqual(len(response.context['clubs']), 15)
         for i in range(15):
             club = Club.objects.get(name=f'Club{i}')
-            club_url = reverse('show_club_and_user_list', kwargs={'pk': club.pk})
+            club_url = reverse('show_club', kwargs={'club_pk': club.pk})
             self.assertContains(response, club_url)
 
     def _create_test_clubs(self, club_count):

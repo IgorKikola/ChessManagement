@@ -13,5 +13,21 @@
      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
      "is_active": true
      }
-   }
+   },
+
+   {
+     "model": "chessManagement.user",
+     "pk": 3,
+     "fields": {
+       "first_name": "Peter",
+       "last_name": "Pickles",
+       "username": "peterpickles@example.org",
+       "email": "peterpickles@example.org",
+       "bio": "Hello, I'm Peter Pickles .",
+       "experience": "Intermediate",
+       "personal_statement": "statement",
+       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+       "is_active": true
+       }
+     }
  ]
