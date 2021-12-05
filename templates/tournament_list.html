@@ -27,7 +27,7 @@
       <td>
         <img src="{{ tournament.organiser.mini_gravatar }}" alt="Gravatar of {{ tournament.name }}" class="rounded-circle" >
       </td>
-      <td><a href="#">{{ tournament.name }}</a></td>
+      <td><a href="{% url 'show_tournament' tournament.club.pk tournament.pk  %}">{{ tournament.name }}</a></td>
       <td>{{ tournament.organiser.full_name }}</td>
     <td>{{ tournament.start_date }}</td>
     <td>{{ tournament.end_date }}</td>

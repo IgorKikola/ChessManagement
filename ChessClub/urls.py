@@ -32,6 +32,7 @@ urlpatterns = [
     path('clubs/', views.club_list, name='club_list'),
     path('clubs/applied/', views.clubs_applied_to_list, name='clubs_applied_to_list'),
     path('clubs/joined/', views.clubs_joined_list, name='clubs_joined_list'),
+    path('club/<str:club_pk>/<str:tournament_pk>', views.show_tournament, name='show_tournament'),
     path('club/<str:club_pk>/', views.show_club, name='show_club'),
     path('club/<str:club_pk>/apply/', views.apply_Club, name='apply_Club'),
     path('club/<str:club_pk>/leave/', views.leave_club, name='leave_club'),

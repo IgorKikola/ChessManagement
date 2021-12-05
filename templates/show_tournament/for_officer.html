@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/tournament_profile.html' %}
+    </div>
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+            <h5 class="card-text">You are an officer of this club.</h5>
+        </div>
+      </div>
+                <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">tournament list</h5>
+          <p class="card-text">tournament list</p>
+          <a href="{% url 'tournament_list' tournament.club.pk %}" class="btn btn-primary">tournament list</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

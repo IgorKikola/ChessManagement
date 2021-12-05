@@ -30,6 +30,31 @@ def tournament_list(request,club_pk):
     tournament = Tournament.objects.all().filter(club=club)
     return render(request, 'tournament_list.html', {'tournaments': tournament})
 
+@login_required
+def show_tournament(request,club_pk,tournament_pk):
+    applied = False
+    try:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        # account = UserInClub.objects.filter(club=club, user=request.user)
+        # if len(account) != 0:
+        #     applied = True
+    except ObjectDoesNotExist:
+        return redirect('tournament_list', club_pk)
+    else:
+        usersIntournament = tournament.users()
+
+        # templates = {
+        #     0: 'show_club/for_applicant.html',
+        #     1: 'show_club/for_member.html',
+        #     2: 'show_club/for_officer.html',
+        #     3: 'show_club/for_owner.html',
+        # }
+        # if applied:
+        #     template = templates[account.first().user_level]
+        # else:
+        #     template = templates[0]
+
+        return render(request, 'show_tournament/for_officer.html', {'tournament': tournament, 'users': usersIntournament, 'applied': applied})
 
 @login_required
 def change_password(request):
