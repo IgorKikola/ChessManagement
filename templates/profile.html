@@ -14,12 +14,19 @@
       <p class="profile-bio">{{ user.personal_statement }}</p>
       <h1>Chess Level:</h1>
       <p class="profile-bio">{{ user.experience }}</p>
-      {% if clubs %}
-        <h1>Joining Club(s):</h1>
-        {% for club in clubs%}
+      {% if clubsIn %}
+        <h1>Member Of:</h1>
+        {% for club in clubsIn %}
           <p class="profile-bio">{{ club.name }}</p>
         {% endfor %}
-      {% else %}
+      {% endif %}
+      {% if clubsAppliedTo %}
+        <h1>Applied to:</h1>
+        {% for club in clubsAppliedTo %}
+          <p class="profile-bio">{{ club.name }}</p>
+        {% endfor %}
+      {% endif %}
+      {% if clubsAppliedTo.count == 0 and clubsIn.count == 0 %}
         <h5>You have not joined a club yet. You can choose to apply a club or create your own club</h5>
       {% endif %}
     </div>

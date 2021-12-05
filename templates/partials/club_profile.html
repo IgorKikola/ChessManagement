@@ -1,0 +1,21 @@
+<div class="col-12">
+  <h1>{{ club.name }}<h1>
+  <h5>Location: {{ club.location }}</h5>
+  <h5>Description: {{ club.description }}</h5>
+  <h5>Number Of Members: {{ club.numberOfMembers }}</h5>
+  <img src="{{ club.owner.gravatar }}" alt="Gravatar of {{ club.owner.username }}" class="rounded-circle" >
+  <h2>Owner: <a href="{% url 'show_user' club.pk club.owner.id %}">{{ club.owner.full_name }}</a> <h2>
+  <h5>Bio: {{ club.owner.bio }}</h5>
+  <h2>Users</h2>
+  <table class="table">
+    {% for user in users %}
+      <tr>
+        <td>
+          <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
+        </td>
+        <td>{{ user.full_name }}</td>
+        <td><a href="{% url 'show_user' club.pk user.id %}">{{ user.full_name }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>

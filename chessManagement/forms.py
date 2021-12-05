@@ -87,7 +87,7 @@ class changePassword(forms.ModelForm):
             self.add_error('new_password_confirmation', 'Confirmation does not match password.')
 
 class changeProfile(forms.Form):
-    """Form enabling unregistered users to sign up."""
+    """Form enabling unregistered users to change their profile."""
     first_name = forms.CharField(
         label=("First name"),
         strip=False,
@@ -121,7 +121,7 @@ class changeProfile(forms.Form):
 
 
 class createClubForm(forms.ModelForm):
-    """Form enabling unregistered users to sign up."""
+    """Form enabling users to create their own club."""
 
     class Meta:
         """Form options."""
@@ -131,7 +131,7 @@ class createClubForm(forms.ModelForm):
         widgets = { 'description': forms.Textarea()}
 
     def save(self,user):
-        """Create a new user."""
+        """Create a new club."""
 
         super().save(commit=False)
         club = Club.objects.create(
@@ -145,3 +145,17 @@ class createClubForm(forms.ModelForm):
             club=club
         )
         return club
+
+class changeClubDetails(forms.Form):
+    """Form enabling club owners to change club details."""
+    location = forms.CharField(
+        label=("Location"),
+        strip=False,
+        required=False
+    )
+    description = forms.CharField(
+        label=("New description: "),
+        strip=False,
+        widget=forms.Textarea(),
+        required=False
+    )

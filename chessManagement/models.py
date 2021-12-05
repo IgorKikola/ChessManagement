@@ -70,23 +70,33 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
     def clubs(self):
+        """Return all clubs the user is in, regardless of rank (including applicant)"""
         club_names = UserInClub.objects.filter(user=self).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
     def ownClubs(self):
+        """Return all clubs the user owns"""
         club_names = UserInClub.objects.filter(user=self, user_level=3).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
     def OfficerOfClubs(self):
+        """Return all clubs the user is an officer of, but not an owner"""
         club_names = UserInClub.objects.filter(user=self, user_level=2).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
     def clubsAppliedTo(self):
+        """Return all clubs the user has applied to and isn't a member of yet"""
         club_names = UserInClub.objects.filter(user=self, user_level=0).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
     def clubsMemberOf(self):
-        club_names = UserInClub.objects.filter(user=self, user_level__in=[1]).values_list('club', flat=True)
+        """Return all clubs the user is a member of, but not an officer/owner"""
+        club_names = UserInClub.objects.filter(user=self, user_level=1).values_list('club', flat=True)
+        return Club.objects.filter(name__in=club_names)
+
+    def clubsIn(self):
+        """Return all clubs the user is a member/officer/owner of"""
+        club_names = UserInClub.objects.filter(user=self, user_level__in=[1,2,3]).values_list('club', flat=True)
         return Club.objects.filter(name__in=club_names)
 
     def isApplicantIn(self, club):
@@ -169,6 +179,16 @@ class UserInClub(models.Model):
     user_level = models.IntegerField(blank=False, choices=USER_LEVEL_CHOICES, default=APPLICANT)
 
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
+
+    def rankToString(self):
+        if self.user_level == 0:
+            return "Applicant"
+        if self.user_level == 1:
+            return "Member"
+        if self.user_level == 2:
+            return "Officer"
+        if self.user_level == 3:
+            return "Owner"
 
     def isApplicant(self):
         return self.user_level == 0

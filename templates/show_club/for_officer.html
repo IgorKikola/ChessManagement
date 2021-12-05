@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/club_profile.html' %}
+    </div>
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+            <h5 class="card-text">You are an officer of this club.</h5>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Applicant List</h5>
+          <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
+          <a href="{% url 'applicants' club.pk %}" class="btn btn-primary">Go and Check</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
