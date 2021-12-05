@@ -4,23 +4,16 @@ from django.test import TestCase
 from django.urls import reverse
 from chessManagement.forms import LogInForm
 from chessManagement.models import User
-from .helpers import LogInTester
+from chessManagement.tests.helpers import LogInTester
 
 class LogInViewTestCase(TestCase, LogInTester):
     """Tests of the log in view."""
 
+    fixtures = ['chessManagement/tests/fixtures/default_user.json']
+
     def setUp(self):
         self.url = reverse('log_in')
-        self.user = User.objects.create_user(
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            experience = 'Beginner',
-            personal_statement = 'Hi I would like to apply ',
-            bio='Hello, I am John Doe.',
-            password='Password123',
-            is_active=True,
-        )
+        self.user = User.objects.get(username='johndoe@example.org')
 
     def test_log_in_url(self):
         self.assertEqual(self.url,'/log_in/')
