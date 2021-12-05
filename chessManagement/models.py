@@ -210,11 +210,11 @@ class Tournament(models.Model):
     finished = models.BooleanField()
 
     def users(self):
-        user_ids = UserInTournament.objects.filter(tournament=self).values_list('user', flat=True)
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
 
     def numberOfMembers(self):
-        user_ids = UserInTournament.objects.filter(tournament=self).values_list('user', flat=True)
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False).values_list('user', flat=True)
         allUsers = User.objects.filter(id__in=user_ids)
         return allUsers.count()
 
@@ -223,6 +223,7 @@ class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
     is_organiser = models.BooleanField()
+
 
 
 class Game(models.Model):

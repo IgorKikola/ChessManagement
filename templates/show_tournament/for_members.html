@@ -12,7 +12,14 @@
           <div class="card-body">
             <p class="card-text">Here is information about this tournament.</p>
             <p class="card-text">If you want to join, apply here:</p>
-            <a href='{% url 'sign_up_tournament' tournament.pk %}' class="btn btn-primary">Apply</a>
+          <b class="card-text">{{ tournament.deadline|timeuntil }} until the deadline to sign-up</b>
+              {% if expired %}
+                  <b class="card-text" style="">the deadline has passed you cannot sign up</b>
+                  <a href='{% url 'sign_up_tournament' tournament.pk %}' class="btn disabled" >Sign up</a>
+                  {% else %}
+                    <a href='{% url 'sign_up_tournament' tournament.pk %}' class="btn btn-primary" >Sign up</a>
+                  {% endif %}
+
           </div>
         </div>
       {% else %}
@@ -20,13 +27,14 @@
           <div class="card-body">
             <p class="card-text">You have applied to this tournament!</p>
             <p class="card-text">Get ready for the tournament soon</p>
+              <b class="card-text">{{ tournament.deadline|timeuntil }} until the deadline to sign-up</b>
           </div>
         </div>
         <div class="card m-2">
           <div class="card-body">
-            <h5 class="card-title">Cancel Sign up</h5>
-            <p class="card-text">If you've changed your mind, you can cancel your sign-up.</p>
-            <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn btn-primary">Cancel</a>
+            <h5 class="card-title">Withdraw Sign up</h5>
+            <p class="card-text">If you've changed your mind, you can withdraw your sign-up.</p>
+            <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn btn-primary">Withdraw</a>
           </div>
         </div>
       {% endif %}
