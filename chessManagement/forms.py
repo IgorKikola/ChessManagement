@@ -185,6 +185,7 @@ class createTournamentForm(forms.ModelForm):
         super().save(commit=False)
         tournament = Tournament.objects.create(
             name=self.cleaned_data.get('name'),
+            club=club,
             start_date=self.cleaned_data.get('start_date'),
             description=self.cleaned_data.get('description'),
             end_date=self.cleaned_data.get('end_date'),
@@ -194,7 +195,6 @@ class createTournamentForm(forms.ModelForm):
         )
         UserInTournament.objects.create(
             user=user,
-            club=club,
             tournament=tournament,
             is_organiser=True
         )

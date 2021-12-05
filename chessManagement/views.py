@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from .models import User, Club, UserInClub
+from .models import User, Club, UserInClub, Tournament
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, \
     createTournamentForm
 from .helpers import login_prohibited
@@ -23,6 +23,12 @@ def create_tournament(request,club_pk):
     else:
         form = createTournamentForm()
     return render(request,'create_tournament.html',{'form':form,'club_pk':club_pk})
+
+@login_required
+def tournament_list(request,club_pk):
+    club = Club.objects.get(pk=club_pk)
+    tournament = Tournament.objects.all().filter(club=club)
+    return render(request, 'tournament_list.html', {'tournaments': tournament})
 
 
 @login_required

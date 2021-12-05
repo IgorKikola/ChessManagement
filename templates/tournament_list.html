@@ -1,0 +1,40 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Tournaments</h1>
+<table class="table">
+    <tr>
+      <th>
+          Organiser gravatar
+      </th>
+        <th>
+        Tournament name
+      </th>
+      <th>
+        Organiser name
+      </th>
+        <th>
+        Start date
+      </th>
+        <th>
+        End date
+      </th>
+    </tr>
+  {% for tournament in tournaments %}
+    <tr>
+      <td>
+        <img src="{{ tournament.organiser.mini_gravatar }}" alt="Gravatar of {{ tournament.name }}" class="rounded-circle" >
+      </td>
+      <td><a href="#">{{ tournament.name }}</a></td>
+      <td>{{ tournament.organiser.full_name }}</td>
+    <td>{{ tournament.start_date }}</td>
+    <td>{{ tournament.end_date }}</td>
+    </tr>
+  {% endfor %}
+</table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -27,18 +27,17 @@ class UserInClubAdmin(admin.ModelAdmin):
     list_display = [
         'user', 'user_level', 'club'
     ]
-
 @admin.register(UserInTournament)
 class UserInTournamentAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for UserInClub objects."""
 
     list_display = [
-        'user', 'club', 'tournament','is_organiser'
+        'user', 'tournament','is_organiser'
     ]
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for UserInClub objects."""
 
     list_display = [
-        'name', 'description', 'organiser','max_players','start_date','end_date','finished'
+        'name', 'description', 'club','organiser','max_players','start_date','end_date','finished',
     ]

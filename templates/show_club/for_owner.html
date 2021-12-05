@@ -34,6 +34,21 @@
           <a href="{% url 'delete_club' club.pk %}" class="btn btn-primary">Delete</a>
         </div>
       </div>
+                <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">create tournament</h5>
+          <p class="card-text">create tournament</p>
+          <a href="{% url 'create_tournament' club.pk %}" class="btn btn-primary">Create a tournament</a>
+        </div>
+      </div>
+                <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">tournament list</h5>
+          <p class="card-text">tournament list</p>
+          <a href="{% url 'tournament_list' club.pk %}" class="btn btn-primary">tournament list</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

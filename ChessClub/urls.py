@@ -27,6 +27,7 @@ urlpatterns = [
     path('change_profile/',views.change_profile, name='change_profile'),
     path('log_out/', views.log_out, name='log_out'),
     path('create_tournament/<str:club_pk>/',views.create_tournament, name='create_tournament'),
+    path('tournament_list/<str:club_pk>/',views.tournament_list, name='tournament_list'),
     path('create_club/',views.create_club, name='create_club'),
     path('clubs/', views.club_list, name='club_list'),
     path('clubs/applied/', views.clubs_applied_to_list, name='clubs_applied_to_list'),
