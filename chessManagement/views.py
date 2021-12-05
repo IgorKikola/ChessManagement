@@ -283,7 +283,7 @@ def show_user(request, user_id, club_pk):
 
             templates = {
                 1: 'show_member/for_member.html',
-                2: 'show_member/for_organiser.html',
+                2: 'show_member/for_officer.html',
                 3: 'show_member/for_owner.html',
             }
             template = templates[session_user_rank]
