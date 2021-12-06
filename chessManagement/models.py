@@ -210,11 +210,11 @@ class Tournament(models.Model):
     finished = models.BooleanField()
 
     def users(self):
-        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False).values_list('user', flat=True)
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False,is_co_organiser=False).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
 
     def numberOfMembers(self):
-        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False).values_list('user', flat=True)
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False,is_co_organiser=False).values_list('user', flat=True)
         allUsers = User.objects.filter(id__in=user_ids)
         return allUsers.count()
 
