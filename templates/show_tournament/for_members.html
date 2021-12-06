@@ -34,7 +34,12 @@
           <div class="card-body">
             <h5 class="card-title">Withdraw Sign up</h5>
             <p class="card-text">If you've changed your mind, you can withdraw your sign-up.</p>
-            <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn btn-primary">Withdraw</a>
+              {% if expired %}
+                  <b class="card-text" style="">the deadline has passed you cannot withdraw</b>
+            <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn disabled" >Withdraw</a>
+                  {% else %}
+                  <a href="{% url 'cancel_sign_up_tournament' tournament.pk %}" class="btn btn-primary" >Withdraw</a>
+                  {% endif %}
           </div>
         </div>
       {% endif %}
