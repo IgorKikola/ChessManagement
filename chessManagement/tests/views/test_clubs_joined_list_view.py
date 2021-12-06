@@ -15,12 +15,12 @@ class clubsAppliedToListTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
         self.owner_user = User.objects.get(username='janedoe@example.org')
-        self.url = reverse('clubs_applied_to_list')
+        self.url = reverse('clubs_joined_list')
 
     def test_club_list_url(self):
-        self.assertEqual(self.url,'/clubs/applied/')
+        self.assertEqual(self.url,'/clubs/joined/')
 
-    def test_get_club_applied_to_list_redirects_when_not_logged_in(self):
+    def test_get_club_joined_list_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
@@ -30,9 +30,9 @@ class clubsAppliedToListTest(TestCase):
         self._create_test_clubs(15)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'club_list/applied_to.html')
-        self.assertEqual(len(response.context['clubs']), 15)
-        for i in range(15):
+        self.assertTemplateUsed(response, 'club_list/joined.html')
+        self.assertEqual(len(response.context['clubs']), 30)
+        for i in range(30):
             club = Club.objects.get(name=f'Club{i}')
             club_url = reverse('show_club', kwargs={'club_pk': club.pk})
             self.assertContains(response, club_url)
@@ -46,13 +46,32 @@ class clubsAppliedToListTest(TestCase):
             )
 
             UserInClub.objects.create(
+                user=self.owner_user,
+                club=club,
+                user_level=3
+            )
+
+            UserInClub.objects.create(
                 user=self.user,
                 club=club,
-                user_level=0
+                user_level=1
+            )
+
+        for i+club_count in range(club_count):
+            club = Club.objects.create(
+                name=f'Club{i+club_count}',
+                location=f'Location{i+club_count}',
+                description=f'Description{i+club_count}'
             )
 
             UserInClub.objects.create(
                 user=self.owner_user,
                 club=club,
                 user_level=3
+            )
+
+            UserInClub.objects.create(
+                user=self.user,
+                club=club,
+                user_level=2
             )
