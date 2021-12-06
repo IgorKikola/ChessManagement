@@ -45,6 +45,22 @@
        "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
        "is_active": true
     }
+  },
+
+  {
+     "model": "chessManagement.user",
+     "pk": 5,
+     "fields": {
+       "first_name": "Charlie",
+       "last_name": "C",
+       "username": "charliec@example.org",
+       "email": "charliec@example.org",
+       "bio": "Hello, I'm Charlie C .",
+       "experience": "Intermediate",
+       "personal_statement": "statement",
+       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+       "is_active": true
+    }
   }
 
  ]
