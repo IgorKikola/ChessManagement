@@ -26,7 +26,7 @@
       </td>
       <td><a href="{% url 'show_user' officer.club.pk officer.user.pk %}">{{ officer.user.full_name }}</a></td>
     <td>{{ officer.user.bio }}</td>
-        <td><a href="#" class="btn btn-primary" onauxclick="" href='#'>Allow</a></td>
+        <td><input type="button" class="btn btn-primary" onclick=this.disabled=true value="Allow" data-href-template="#"></td>
     </tr>
   {% endfor %}
 </table>
