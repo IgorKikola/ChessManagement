@@ -27,22 +27,32 @@ class clubsAppliedToListTest(TestCase):
 
     def test_get_clubs_applied_to_list(self):
         self.client.login(username=self.user.email, password='Password123')
-        self._create_test_clubs(15)
+        self._create_test_clubs_for_member(15)
+        self._create_test_clubs_for_officer(15)
+        self._create_test_clubs_for_own(15)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_list/joined.html')
-        self.assertEqual(len(response.context['clubs']), 30)
-        for i in range(30):
-            club = Club.objects.get(name=f'Club{i}')
-            club_url = reverse('show_club', kwargs={'club_pk': club.pk})
-            self.assertContains(response, club_url)
+        self.assertEqual(len(response.context['clubs']), 45)
+        for i in range(15):
+            clubForMember = Club.objects.get(name=f'ClubForMember{i}')
+            clubForMember_url = reverse('show_club', kwargs={'club_pk': clubForMember.pk})
+            self.assertContains(response, clubForMember_url)
 
-    def _create_test_clubs(self, club_count):
+            clubForOfficer = Club.objects.get(name=f'ClubForOfficer{i}')
+            clubForOfficer_url = reverse('show_club', kwargs={'club_pk': clubForOfficer.pk})
+            self.assertContains(response, clubForOfficer_url)
+
+            ownClub = Club.objects.get(name=f'OwnClub{i}')
+            ownClub_url = reverse('show_club', kwargs={'club_pk': ownClub.pk})
+            self.assertContains(response, ownClub_url)
+
+    def _create_test_clubs_for_member(self, club_count):
         for i in range(club_count):
             club = Club.objects.create(
-                name=f'Club{i}',
-                location=f'Location{i}',
-                description=f'Description{i}'
+                name=f'ClubForMember{i}',
+                location=f'LocationForMember{i}',
+                description=f'DescriptionForMember{i}'
             )
 
             UserInClub.objects.create(
@@ -57,11 +67,12 @@ class clubsAppliedToListTest(TestCase):
                 user_level=1
             )
 
-        for i+club_count in range(club_count):
+    def _create_test_clubs_for_officer(self, club_count):
+        for i in range(club_count):
             club = Club.objects.create(
-                name=f'Club{i+club_count}',
-                location=f'Location{i+club_count}',
-                description=f'Description{i+club_count}'
+                name=f'ClubForOfficer{i}',
+                location=f'LocationForOfficer{i}',
+                description=f'DescriptionForOfficer{i}'
             )
 
             UserInClub.objects.create(
@@ -74,4 +85,18 @@ class clubsAppliedToListTest(TestCase):
                 user=self.user,
                 club=club,
                 user_level=2
+            )
+
+    def _create_test_clubs_for_own(self, club_count):
+        for i in range(club_count):
+            club = Club.objects.create(
+                name=f'OwnClub{i}',
+                location=f'OwnLocation{i}',
+                description=f'OwnDescription{i}'
+            )
+
+            UserInClub.objects.create(
+                user=self.user,
+                club=club,
+                user_level=3
             )

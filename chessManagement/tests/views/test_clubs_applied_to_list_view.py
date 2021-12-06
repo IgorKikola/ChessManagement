@@ -9,7 +9,7 @@ class clubsAppliedToListTest(TestCase):
 
     fixtures = [
         'chessManagement/tests/fixtures/default_user.json',
-        'chessManagement/tests/fixtures/other_users.json',
+        'chessManagement/tests/fixtures/other_users.json'
     ]
 
     def setUp(self):
@@ -46,13 +46,13 @@ class clubsAppliedToListTest(TestCase):
             )
 
             UserInClub.objects.create(
-                user=self.user,
-                club=club,
-                user_level=0
-            )
-
-            UserInClub.objects.create(
                 user=self.owner_user,
                 club=club,
                 user_level=3
+            )
+
+            UserInClub.objects.create(
+                user=self.user,
+                club=club,
+                user_level=0
             )

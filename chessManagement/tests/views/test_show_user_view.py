@@ -8,7 +8,7 @@ class ShowUserTest(TestCase):
     fixtures = [
         'chessManagement/tests/fixtures/default_user.json',
         'chessManagement/tests/fixtures/other_users.json',
-        'chessManagement/tests/fixtures/default_club.json',
+        'chessManagement/tests/fixtures/default_club.json'
     ]
 
     def setUp(self):
