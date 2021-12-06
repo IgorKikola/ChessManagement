@@ -26,7 +26,11 @@
       </td>
       <td><a href="{% url 'show_user' officer.club.pk officer.user.pk %}">{{ officer.user.full_name }}</a></td>
     <td>{{ officer.user.bio }}</td>
-        <td><input type="button" class="btn btn-primary" onclick=this.disabled=true value="Allow" data-href-template="#"></td>
+        {% if request_user.is_organiser %}
+        <td><input id=button type="button" class="btn btn-primary" onclick=location.href='{% url 'allow_co_organiser' tournament_pk officer.user.id %}' value="Allow"></td>
+        {% else %}
+        <td><input id=button type="button" class="btn btn-primary" disabled=true value="Allow"></td>
+        {% endif %}
     </tr>
   {% endfor %}
 </table>

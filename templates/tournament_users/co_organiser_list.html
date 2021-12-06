@@ -1,0 +1,40 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Co-organiser list </h1>
+<table class="table">
+    <tr>
+      <th>
+          Co-organiser gravatar
+      </th>
+        <th>
+        Co-organiser name
+      </th>
+      <th>
+        Co-organiser bio
+      </th>
+              <th>
+        Remove Co-organiser
+      </th>
+    </tr>
+  {% for co_organiser in co_organisers %}
+    <tr>
+      <td>
+        <img src="{{ co_organiser.user.mini_gravatar }}" alt="Gravatar of {{ co_organiser.user.full_name }}" class="rounded-circle" >
+      </td>
+      <td><a href="{% url 'show_user' co_organiser.tournament.club.pk co_organiser.user.pk %}">{{ co_organiser.user.full_name }}</a></td>
+    <td>{{ co_organiser.user.bio }}</td>
+        {% if request_user.is_organiser %}
+        <td><input id=button type="button" class="btn btn-primary" onclick=location.href='{% url 'remove_co_organiser' tournament_pk co_organiser.user.id %}' value="Remove"></td>
+        {% else %}
+        <td><input id=button type="button" class="btn btn-primary" disabled=true value="Remove"></td>
+        {% endif %}
+    </tr>
+  {% endfor %}
+</table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .models import User, Club, UserInClub, Tournament, UserInTournament
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, \
@@ -36,7 +37,51 @@ def tournament_list(request,club_pk):
 def officer_list(request,tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     officers = UserInClub.objects.all().filter(club=tournament.club,user_level=2)
-    return render(request, 'tournament_users/officer_list.html', {'officers': officers})
+    request_user = UserInTournament.objects.get(user=request.user,tournament=tournament_pk)
+    non_co_organisers=[]
+    for officer in officers:
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=officer.user,is_co_organiser=True)
+        if len(accounts) == 0:
+            non_co_organisers.append(officer)
+    return render(request, 'tournament_users/officer_list.html', {'officers': non_co_organisers,'tournament_pk':tournament_pk,'request_user':request_user})
+
+@login_required
+def co_organiser_list(request,tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    co_organisers = UserInTournament.objects.filter(tournament=tournament,is_co_organiser=True)
+    request_user = UserInTournament.objects.get(user=request.user,tournament=tournament)
+    return render(request, 'tournament_users/co_organiser_list.html', {'co_organisers': co_organisers,'tournament_pk':tournament_pk,'request_user':request_user})
+
+@login_required
+def allow_co_organiser(request, tournament_pk,user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInTournament.objects.create(
+                user=user,
+                tournament=tournament,
+                is_organiser=False,
+                is_co_organiser=True
+            )
+            new_applicant.save()
+            return redirect(officer_list,tournament_pk)
+        return redirect(officer_list,tournament_pk)
+    except ObjectDoesNotExist:
+        return redirect(officer_list,tournament_pk)
+
+@login_required
+def remove_co_organiser(request, tournament_pk,user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) != 0:
+            UserInTournament.objects.get(tournament=tournament,user=user,is_co_organiser=True).delete()
+        return redirect(co_organiser_list,tournament_pk)
+    except ObjectDoesNotExist:
+        return redirect(co_organiser_list,tournament_pk)
 
 @login_required
 def sign_up_tournament(request, tournament_pk):
