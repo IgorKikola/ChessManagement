@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm
 from .helpers import login_prohibited
+from django.contrib import messages
 
 club_pk = ""
 @login_prohibited
@@ -20,7 +21,9 @@ def change_password(request):
             user.set_password(form.cleaned_data.get('new_password'))
             user.save()
             login(request, user)
+            messages.add_message(request, messages.SUCCESS, "Password changed!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Passwords did not match!")
     password = changePassword()
     return render(request, 'change_password.html', {'form': password, 'user' :user})
 
@@ -73,6 +76,7 @@ def log_in(request):
             if user is not None:
                 login(request, user)
                 return redirect('profile')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
