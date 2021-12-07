@@ -119,7 +119,7 @@ class ShowUserTest(TestCase):
             self.assertContains(response, f'First{user_id}')
             self.assertContains(response, f'Last{user_id}')
             user = User.objects.get(username=f'user{user_id}@test.org')
-            user_url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': self.owner_user.id})
+            user_url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
             self.assertContains(response, user_url)
 
     def _create_test_users(self, user_count=10):
