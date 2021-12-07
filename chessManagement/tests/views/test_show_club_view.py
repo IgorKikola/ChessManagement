@@ -96,6 +96,7 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_owner.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertEqual(self.club.numberOfMembers(), 3)
         self.assertContains(response, "janedoe@example.org")
         self.assertContains(response, "peterpickles@example.org")
         self.assertContains(response, "petrapickles@example.org")
@@ -105,3 +106,37 @@ class ShowUserTest(TestCase):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+    def test_get_user_list_in_this_club(self):
+        self.client.login(username=self.owner_user.username, password='Password123')
+        self._create_test_users(15-3)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'show_club/for_owner.html')
+        self.assertEqual(self.club.numberOfMembers(), 15)
+        for user_id in range(15-3):
+            self.assertContains(response, f'user{user_id}@test.org')
+            self.assertContains(response, f'First{user_id}')
+            self.assertContains(response, f'Last{user_id}')
+            user = User.objects.get(username=f'user{user_id}@test.org')
+            user_url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': self.owner_user.id})
+            self.assertContains(response, user_url)
+
+    def _create_test_users(self, user_count=10):
+        for user_id in range(user_count):
+            user = User.objects.create_user(
+                email=f'user{user_id}@test.org',
+                username=f'user{user_id}@test.org',
+                password='Password123',
+                first_name=f'First{user_id}',
+                last_name=f'Last{user_id}',
+                bio=f'Bio {user_id}',
+                experience="Beginner",
+                personal_statement="statement"
+            )
+
+            UserInClub.objects.create(
+                user=user,
+                club=self.club,
+                user_level=1
+            )
