@@ -21,7 +21,7 @@ class ApplicantListTest(TestCase):
 
 
         """This should probably be in a fixture, but it works for now."""
-        applicant_user_in_club = UserInClub.objects.create(
+        applicant_in_club = UserInClub.objects.create(
             user=self.applicant_user,
             club=self.club,
             user_level=0
