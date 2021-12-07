@@ -162,7 +162,7 @@ def applicant_list(request, club_pk):
         allUsers = club.users()
         session_user_in_club = club.getUserInClub(request.user)
     except ObjectDoesNotExist:
-        return redirect('show_club', club_pk)
+        return redirect('club_list')
     else:
         if session_user_in_club.user_level == 0 or session_user_in_club.user_level == 1:
             return redirect('show_club', club_pk)
