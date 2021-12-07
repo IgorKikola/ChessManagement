@@ -56,6 +56,9 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_applicant.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertContains(response, "janedoe@example.org")
+        self.assertContains(response, "peterpickles@example.org")
+        self.assertContains(response, "petrapickles@example.org")
 
     def test_get_show_club_by_applicant_user(self):
         self.client.login(username=self.applicant_user.email, password='Password123')
@@ -63,6 +66,9 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_applicant.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertContains(response, "janedoe@example.org")
+        self.assertContains(response, "peterpickles@example.org")
+        self.assertContains(response, "petrapickles@example.org")
 
     def test_get_show_club_by_member_user(self):
         self.client.login(username=self.member_user.email, password='Password123')
@@ -70,6 +76,9 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_member.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertContains(response, "janedoe@example.org")
+        self.assertContains(response, "peterpickles@example.org")
+        self.assertContains(response, "petrapickles@example.org")
 
     def test_get_show_club_by_officer_user(self):
         self.client.login(username=self.officer_user.email, password='Password123')
@@ -77,6 +86,9 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_officer.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertContains(response, "janedoe@example.org")
+        self.assertContains(response, "peterpickles@example.org")
+        self.assertContains(response, "petrapickles@example.org")
 
     def test_get_show_club_by_owner_user(self):
         self.client.login(username=self.owner_user.email, password='Password123')
@@ -84,6 +96,9 @@ class ShowUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_club/for_owner.html',)
         self.assertContains(response, "KCL-Chess-Society")
+        self.assertContains(response, "janedoe@example.org")
+        self.assertContains(response, "peterpickles@example.org")
+        self.assertContains(response, "petrapickles@example.org")
 
 
     def test_get_show_user_redirects_when_not_logged_in(self):
