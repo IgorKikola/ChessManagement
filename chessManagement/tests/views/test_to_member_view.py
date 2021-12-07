@@ -15,7 +15,6 @@ class ToMemberTest(TestCase):
         self.applicant_user = User.objects.get(username='johndoe@example.org')
         self.officer_user = User.objects.get(username='janedoe@example.org')
         self.owner_user = User.objects.get(username='peterpickles@example.org')
-        self.user_not_in_club = User.objects.get(username='petrapickles@example.org')
         self.club = Club.objects.get(name='KCL-Chess-Society')
 
 
@@ -50,6 +49,7 @@ class ToMemberTest(TestCase):
         self.assertTemplateUsed(response, 'applicant_list.html')
         self.assertEqual(self.club.numberOfMembers(),3)
         self.assertTrue(user.isMemberOf(self.club))
+        self.assertFalse(user.isApplicantIn(self.club))
 
     def test_change_applicant_user_to_member_by_officer(self):
         user = self.applicant_user
@@ -63,6 +63,7 @@ class ToMemberTest(TestCase):
         self.assertTemplateUsed(response, 'applicant_list.html')
         self.assertEqual(self.club.numberOfMembers(),3)
         self.assertTrue(user.isMemberOf(self.club))
+        self.assertFalse(user.isApplicantIn(self.club))
 
     def test_change_officer_user_to_member_by_owner(self):
         user = self.officer_user
@@ -76,3 +77,4 @@ class ToMemberTest(TestCase):
         self.assertTemplateUsed(response, 'show_member/for_owner.html')
         self.assertEqual(self.club.numberOfMembers(),2)
         self.assertTrue(user.isMemberOf(self.club))
+        self.assertFalse(user.isOfficerOf(self.club))
