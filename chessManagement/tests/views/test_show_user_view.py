@@ -86,8 +86,8 @@ class ShowUserTest(TestCase):
     #     response = self.client.get(self.url)
     #     self.assertEqual(response.status_code, 200)
     #     self.assertTemplateUsed(response, 'show_member/for_officer.html')
-    #     self.assertContains(response, "Petra Pickles")
-    #     self.assertContains(response, "petrapickles@example.org")
+    #     self.assertContains(response, "Jane Doe")
+    #     self.assertContains(response, "janedoe@example.org")
 
     def test_member_get_show_user_which_is_in_the_club_and_with_valid_id(self):
         self.client.login(username=self.target_user.email, password='Password123')
