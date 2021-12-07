@@ -160,13 +160,16 @@ def applicant_list(request, club_pk):
     try:
         club = Club.objects.get(pk=club_pk)
         allUsers = club.users()
+        session_user_in_club = club.getUserInClub(request.user)
     except ObjectDoesNotExist:
-        return redirect('club_list')
+        return redirect('show_club', club_pk)
     else:
+        if session_user_in_club.user_level == 0 or session_user_in_club.user_level == 1:
+            return redirect('show_club', club_pk)
         users = list(allUsers)
         for user in allUsers:
             if not user.isApplicantIn(club):
-                users.remove(user)
+                users.remove('show_club', club_pk)
         return render(request, 'applicant_list.html', {'users': users, 'club': club})
 
 @login_required
