@@ -21,25 +21,25 @@ class ApplicantListTest(TestCase):
 
 
         """This should probably be in a fixture, but it works for now."""
-        user_in_club = UserInClub.objects.create(
+        applicant_user_in_club = UserInClub.objects.create(
             user=self.applicant_user,
             club=self.club,
             user_level=0
         )
 
-        applicant_user_in_club = UserInClub.objects.create(
+        member_user_in_club = UserInClub.objects.create(
             user=self.member_user,
             club=self.club,
             user_level=1
         )
 
-        target_user_in_club = UserInClub.objects.create(
+        officer_user_in_club = UserInClub.objects.create(
             user=self.officer_user,
             club=self.club,
             user_level=2
         )
 
-        officer_user_in_club = UserInClub.objects.create(
+        owner_user_in_club = UserInClub.objects.create(
             user=self.owner_user,
             club=self.club,
             user_level=3
