@@ -293,7 +293,7 @@ def leave_club(request, club_pk):
     except ObjectDoesNotExist:
         return redirect('show_club', club_pk)
     else:
-        if not request.user.isOwnerOf(club):
+        if request.user.isMemberOf(club) or request.user.isOfficerOf(club):
             userInClub.delete()
         return redirect('show_club', club_pk)
 
