@@ -27,7 +27,7 @@ class ClubModelTestCase(TestCase):
             user_level=3
         )
 
-    def test_valid_user(self):
+    def test_valid_club(self):
         self._assert_club_is_valid()
 
     # def test_name_need_be_unique(self):
