@@ -220,13 +220,15 @@ def to_member(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        previous_rank = userInClub.user_level
-        userInClub.user_level=1
-        userInClub.save(update_fields=["user_level"])
-        if previous_rank == 2:
-            return redirect('show_user', club_pk, user_id)
-        else:
-            return redirect('applicants', club_pk)
+        if request.user.isOfficerOf(club) or request.user.isOwnerOf(club):
+            previous_rank = userInClub.user_level
+            userInClub.user_level=1
+            userInClub.save(update_fields=["user_level"])
+            if previous_rank == 2:
+                return redirect('show_user', club_pk, user_id)
+            else:
+                return redirect('applicants', club_pk)
+        return redirect('show_club', club_pk)
 
 @login_required
 def to_officer(request, user_id, club_pk):
@@ -237,10 +239,12 @@ def to_officer(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        if userInClub.user_level==1:
-            userInClub.user_level=2
-        userInClub.save(update_fields=["user_level"])
-        return redirect('show_user', club_pk, user_id)
+        if request.user.isOwnerOf(club):
+            if userInClub.user_level==1:
+                userInClub.user_level=2
+            userInClub.save(update_fields=["user_level"])
+            return redirect('show_user', club_pk, user_id)
+        return redirect('show_club', club_pk)
 
 @login_required
 def transfer_ownership(request, user_id, club_pk):
@@ -251,14 +255,15 @@ def transfer_ownership(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        owner = request.user
-        ownerInClub = club.getUserInClub(owner)
-        if userInClub.user_level==2:
-            userInClub.user_level=3
-            ownerInClub.user_level=2
-            userInClub.save(update_fields=["user_level"])
-            ownerInClub.save(update_fields=["user_level"])
-        return redirect('show_user', club_pk, user_id)
+        if request.user.isOwnerOf(club):
+            ownerInClub = club.getUserInClub(request.user)
+            if userInClub.user_level==2:
+                userInClub.user_level=3
+                ownerInClub.user_level=2
+                userInClub.save(update_fields=["user_level"])
+                ownerInClub.save(update_fields=["user_level"])
+            return redirect('show_user', club_pk, user_id)
+        return redirect('show_club', club_pk)
 
 @login_required
 def change_club_details(request, club_pk):
