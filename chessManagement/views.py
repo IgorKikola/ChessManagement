@@ -320,6 +320,8 @@ def remove_user(request, user_id, club_pk):
     else:
         user = request.user
         user_to_remove_rank = userInClub.user_level
+        if (user.isOfficerOf(club) and user_to_remove_rank == 2) or (user == user_to_remove) or (user_to_remove_rank == 3):
+            return redirect('show_club', club_pk)
         if user.isOfficerOf(club) or user.isOwnerOf(club):
             userInClub.delete()
             if user_to_remove_rank == 0:
