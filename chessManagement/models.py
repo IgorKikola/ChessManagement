@@ -113,7 +113,7 @@ class User(AbstractUser):
 
 class Club(models.Model):
 
-    name = models.CharField(max_length=50, blank=False, primary_key=True)
+    name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
     location = models.CharField(max_length=50, blank=False)
     description = models.CharField(max_length=520, blank=True)
 
