@@ -153,7 +153,7 @@ class changeClubDetails(forms.Form):
     location = forms.CharField(
         label=("Location"),
         strip=False,
-        required=False
+        required=True
     )
     description = forms.CharField(
         label=("New description: "),

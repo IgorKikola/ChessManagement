@@ -1,0 +1,11 @@
+[
+  {
+   "model": "chessManagement.club",
+   "pk": "Another-Club",
+   "fields": {
+     "name": "Another-Club",
+     "location": "London",
+     "description": "The official Another Club."
+    }
+  }
+ ]

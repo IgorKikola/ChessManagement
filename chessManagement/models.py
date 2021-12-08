@@ -114,7 +114,7 @@ class User(AbstractUser):
 
 class Club(models.Model):
 
-    name = models.CharField(max_length=50, blank=False, primary_key=True)
+    name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
     location = models.CharField(max_length=50, blank=False)
     description = models.CharField(max_length=520, blank=True)
 
@@ -125,6 +125,11 @@ class Club(models.Model):
     def applicants(self):
         user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
+
+    def numberOfApplicants(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
+        allUsers = User.objects.filter(id__in=user_ids)
+        return allUsers.count()
 
     def members(self):
         user_ids = UserInClub.objects.filter(club=self,user_level__in=[1,2,3]).values_list('user', flat=True)

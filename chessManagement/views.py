@@ -9,6 +9,7 @@ from .models import User, Club, UserInClub, Tournament, UserInTournament
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, \
     createTournamentForm
 from .helpers import login_prohibited
+from django.contrib import messages
 
 @login_prohibited
 def home(request):
@@ -154,7 +155,9 @@ def change_password(request):
             user.set_password(form.cleaned_data.get('new_password'))
             user.save()
             login(request, user)
+            messages.add_message(request, messages.SUCCESS, "Password changed!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Passwords did not match!")
     password = changePassword()
     return render(request, 'change_password.html', {'form': password, 'user' :user})
 
@@ -175,7 +178,9 @@ def change_profile(request):
             user.personal_statement = form.cleaned_data.get('personal_statement')
             user.experience = form.cleaned_data.get('experience')
             user.save()
+            messages.add_message(request, messages.SUCCESS, "Profile information changed!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something was invalid!")
     profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience ,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
     return render(request, 'change_profile.html', {'form': profile, 'user' :user})
 
@@ -186,11 +191,12 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.add_message(request, messages.SUCCESS, "Successfully signed up!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something wasn't right!")
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
-
 
 def log_out(request):
     logout(request)
@@ -206,7 +212,9 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                messages.add_message(request, messages.SUCCESS, "Logged in!")
                 return redirect('profile')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
@@ -224,7 +232,9 @@ def create_club(request):
         form = createClubForm(request.POST)
         if form.is_valid():
             club = form.save(request.user)
+            messages.add_message(request, messages.SUCCESS, "Successfully created club!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something wasn't right!")
     else:
         form = createClubForm()
     return render(request,'create_club.html',{'form':form})
@@ -297,7 +307,13 @@ def applicant_list(request, club_pk):
         allUsers = club.users()
     except ObjectDoesNotExist:
         return redirect('club_list')
+    try:
+        session_user_in_club = club.getUserInClub(request.user)
+    except ObjectDoesNotExist:
+        return redirect('show_club', club_pk)
     else:
+        if session_user_in_club.user_level == 0 or session_user_in_club.user_level == 1:
+            return redirect('show_club', club_pk)
         users = list(allUsers)
         for user in allUsers:
             if not user.isApplicantIn(club):
@@ -309,12 +325,15 @@ def show_user(request, user_id, club_pk):
     session_user = request.user
     try:
         club = Club.objects.get(pk=club_pk)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    try:
         shown_user_in_club = club.getUserInClub(user_id)
         session_user_in_club = club.getUserInClub(session_user)
     except ObjectDoesNotExist:
-        return redirect('club_list')
+        return redirect('show_club', club_pk)
     else:
-        if shown_user_in_club == None or session_user_in_club.isApplicant():
+        if session_user_in_club.isApplicant():
             return redirect('show_club', club_pk)
         elif shown_user_in_club.isApplicant() and session_user_in_club.isOfficer():
             return render(request, 'show_applicant.html', {'user': session_user, 'shown_user': shown_user_in_club.user, 'club': club, 'user_rank': "Applicant"})
@@ -346,13 +365,15 @@ def to_member(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        previous_rank = userInClub.user_level
-        userInClub.user_level=1
-        userInClub.save(update_fields=["user_level"])
-        if previous_rank == 2:
-            return redirect('show_user', club_pk, user_id)
-        else:
-            return redirect('applicants', club_pk)
+        if request.user.isOfficerOf(club) or request.user.isOwnerOf(club):
+            previous_rank = userInClub.user_level
+            userInClub.user_level=1
+            userInClub.save(update_fields=["user_level"])
+            if previous_rank == 2:
+                return redirect('show_user', club_pk, user_id)
+            else:
+                return redirect('applicants', club_pk)
+        return redirect('show_club', club_pk)
 
 @login_required
 def to_officer(request, user_id, club_pk):
@@ -363,10 +384,12 @@ def to_officer(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        if userInClub.user_level==1:
-            userInClub.user_level=2
-        userInClub.save(update_fields=["user_level"])
-        return redirect('show_user', club_pk, user_id)
+        if request.user.isOwnerOf(club):
+            if userInClub.user_level==1:
+                userInClub.user_level=2
+            userInClub.save(update_fields=["user_level"])
+            return redirect('show_user', club_pk, user_id)
+        return redirect('show_club', club_pk)
 
 @login_required
 def transfer_ownership(request, user_id, club_pk):
@@ -377,14 +400,15 @@ def transfer_ownership(request, user_id, club_pk):
     except ObjectDoesNotExist:
         return redirect('club_list')
     else:
-        owner = request.user
-        ownerInClub = club.getUserInClub(owner)
-        if userInClub.user_level==2:
-            userInClub.user_level=3
-            ownerInClub.user_level=2
-            userInClub.save(update_fields=["user_level"])
-            ownerInClub.save(update_fields=["user_level"])
-        return redirect('show_user', club_pk, user_id)
+        if request.user.isOwnerOf(club):
+            ownerInClub = club.getUserInClub(request.user)
+            if userInClub.user_level==2:
+                userInClub.user_level=3
+                ownerInClub.user_level=2
+                userInClub.save(update_fields=["user_level"])
+                ownerInClub.save(update_fields=["user_level"])
+            return redirect('show_user', club_pk, user_id)
+        return redirect('show_club', club_pk)
 
 @login_required
 def change_club_details(request, club_pk):
@@ -407,13 +431,15 @@ def change_club_details(request, club_pk):
 def leave_club(request, club_pk):
     try:
         club = Club.objects.get(pk=club_pk)
-        user = request.user
-        userInClub = club.getUserInClub(user)
     except ObjectDoesNotExist:
         return redirect('club_list')
+    try:
+        userInClub = club.getUserInClub(request.user)
+    except ObjectDoesNotExist:
+        return redirect('show_club', club_pk)
     else:
-        userInClub.delete()
-        usersInClub = club.members
+        if not request.user.isOwnerOf(club):
+            userInClub.delete()
         return redirect('show_club', club_pk)
 
 @login_required
@@ -439,6 +465,8 @@ def remove_user(request, user_id, club_pk):
     else:
         user = request.user
         user_to_remove_rank = userInClub.user_level
+        if (user.isOfficerOf(club) and user_to_remove_rank == 2) or (user == user_to_remove) or (user_to_remove_rank == 3):
+            return redirect('show_club', club_pk)
         if user.isOfficerOf(club) or user.isOwnerOf(club):
             userInClub.delete()
             if user_to_remove_rank == 0:
