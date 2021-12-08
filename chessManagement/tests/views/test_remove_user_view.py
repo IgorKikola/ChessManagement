@@ -54,7 +54,7 @@ class ToMemberTest(TestCase):
         response_url = reverse('applicants', kwargs={'club_pk': self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'applicant_list.html')
-        self.assertNotContains(response,"janedoe@example.org")
+        self.assertNotContains(response,"johndoe@example.org")
 
     def test_officer_can_remove_applicant(self):
         user = self.applicant_user
@@ -65,7 +65,7 @@ class ToMemberTest(TestCase):
         response_url = reverse('applicants', kwargs={'club_pk': self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'applicant_list.html')
-        self.assertNotContains(response,"janedoe@example.org")
+        self.assertNotContains(response,"johndoe@example.org")
 
     def test_member_cannot_remove_applicant(self):
         user = self.applicant_user
@@ -76,7 +76,6 @@ class ToMemberTest(TestCase):
         response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'show_club/for_member.html')
-        self.assertContains(response,"janedoe@example.org")
 
     def test_applicant_cannot_remove_applicant(self):
         user = self.applicant_user
@@ -87,7 +86,6 @@ class ToMemberTest(TestCase):
         response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-        self.assertContains(response,"janedoe@example.org")
 
     def test_user_not_in_club_cannot_remove_applicant(self):
         user = self.applicant_user
@@ -98,7 +96,6 @@ class ToMemberTest(TestCase):
         response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-        self.assertContains(response,"janedoe@example.org")
 
     def test_owner_can_remove_member_user(self):
         user = self.member_user
@@ -165,7 +162,7 @@ class ToMemberTest(TestCase):
         self.assertEqual(self.club.numberOfMembers(),3)
         self.assertContains(response,"janedoe@example.org")
 
-    # def test_officer_cannot_remove_officer_user(self):
+    # def test_officer_cannot_remove_officer_user_or_himself(self):
     #     user = self.officer_user
     #     self.client.login(username=self.officer_user.email, password='Password123')
     #     self.assertEqual(self.club.numberOfMembers(),3)
@@ -176,4 +173,43 @@ class ToMemberTest(TestCase):
     #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
     #     self.assertTemplateUsed(response, 'show_club/for_officer.html')
     #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     self.assertContains(response,"janedoe@example.org")
+    #     self.assertContains(response,"peterpickles@example.org")
+
+    def test_owner_can_remove_officer(self):
+        user = self.officer_user
+        self.client.login(username=self.owner_user.email, password='Password123')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('remove_user', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+        self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/remove/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_owner.html')
+        self.assertEqual(self.club.numberOfMembers(),2)
+        self.assertNotContains(response,"peterpickles@example.org")
+
+    # def test_officer_cannot_remove_owner(self):
+    #     user = self.owner_user
+    #     self.client.login(username=self.officer_user.email, password='Password123')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     url = reverse('remove_user', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+    #     self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/remove/')
+    #     response = self.client.post(url, follow=True)
+    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, 'show_club/for_officer.html')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     self.assertContains(response,"petrapickles@example.org")
+
+    # def test_owner_cannot_remove_himself(self):
+    #     user = self.owner_user
+    #     self.client.login(username=self.owner_user.email, password='Password123')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     url = reverse('remove_user', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+    #     self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/remove/')
+    #     response = self.client.post(url, follow=True)
+    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, 'show_club/for_owner.html')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     self.assertContains(response,"petrapickles@example.org")
