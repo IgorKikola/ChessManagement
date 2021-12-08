@@ -12,14 +12,20 @@ class ToMemberTest(TestCase):
     ]
 
     def setUp(self):
-        self.member_user = User.objects.get(username='johndoe@example.org')
-        self.officer_user = User.objects.get(username='janedoe@example.org')
-        self.owner_user = User.objects.get(username='peterpickles@example.org')
-        self.user_not_in_club = User.objects.get(username='petrapickles@example.org')
+        self.applicant_user = User.objects.get(username='johndoe@example.org')
+        self.member_user = User.objects.get(username='janedoe@example.org')
+        self.officer_user = User.objects.get(username='peterpickles@example.org')
+        self.owner_user = User.objects.get(username='petrapickles@example.org')
+        self.user_not_in_club = User.objects.get(username='charliec@example.org')
         self.club = Club.objects.get(name='KCL-Chess-Society')
 
 
         """This should probably be in a fixture, but it works for now."""
+        UserInClub.objects.create(
+            user=self.applicant_user,
+            club=self.club,
+            user_level=0
+        )
 
         UserInClub.objects.create(
             user=self.member_user,
@@ -87,3 +93,15 @@ class ToMemberTest(TestCase):
     #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
     #     self.assertTemplateUsed(response, 'show_club/for_owner.html')
     #     self.assertEqual(self.club.numberOfMembers(),3)
+
+    # def test_applicant_user_not_in_club_cannot_leave_club(self):
+    #     self.client.login(username=self.applicant_user.email, password='Password123')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
+    #     self.assertEqual(url,f'/club/{self.club.pk}/leave/')
+    #     response = self.client.post(url, follow=True)
+    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+    #     self.assertEqual(self.club.numberOfMembers(),3)
+    #     self.assertTrue(self.applicant_user.isApplicantIn(self.club))
