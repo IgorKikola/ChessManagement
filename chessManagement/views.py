@@ -286,13 +286,15 @@ def change_club_details(request, club_pk):
 def leave_club(request, club_pk):
     try:
         club = Club.objects.get(pk=club_pk)
-        user = request.user
-        userInClub = club.getUserInClub(user)
     except ObjectDoesNotExist:
         return redirect('club_list')
+    try:
+        userInClub = club.getUserInClub(request.user)
+    except ObjectDoesNotExist:
+        return redirect('show_club', club_pk)
     else:
-        userInClub.delete()
-        usersInClub = club.members
+        if not request.user.isOwnerOf(club):
+            userInClub.delete()
         return redirect('show_club', club_pk)
 
 @login_required
