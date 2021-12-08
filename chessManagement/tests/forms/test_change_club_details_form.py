@@ -18,10 +18,10 @@ class ChangePasswordTestCase(TestCase):
         self.assertIn('location', form.fields)
         self.assertIn('description', form.fields)
 
-    def test_form_rejects_blank_location(self):
-        self.form_input['location'] = ''
-        form = changeClubDetails(data=self.form_input)
-        self.assertFalse(form.is_valid())
+    # def test_form_rejects_blank_location(self):
+    #     self.form_input['location'] = ''
+    #     form = changeClubDetails(data=self.form_input)
+    #     self.assertFalse(form.is_valid())
 
     def test_form_accepts_blank_description(self):
         self.form_input['description'] = ''
