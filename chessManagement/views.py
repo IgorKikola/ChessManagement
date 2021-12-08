@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from .models import User, Club, UserInClub
 from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails
 from .helpers import login_prohibited
+from django.contrib import messages
 
 @login_prohibited
 def home(request):
@@ -19,7 +20,9 @@ def change_password(request):
             user.set_password(form.cleaned_data.get('new_password'))
             user.save()
             login(request, user)
+            messages.add_message(request, messages.SUCCESS, "Password changed!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Passwords did not match!")
     password = changePassword()
     return render(request, 'change_password.html', {'form': password, 'user' :user})
 
@@ -40,7 +43,9 @@ def change_profile(request):
             user.personal_statement = form.cleaned_data.get('personal_statement')
             user.experience = form.cleaned_data.get('experience')
             user.save()
+            messages.add_message(request, messages.SUCCESS, "Profile information changed!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something was invalid!")
     profile = changeProfile(initial={'first_name': user.first_name,'last_name': user.last_name,'experience': user.experience ,'email': user.email,'bio': user.bio, 'personal_statement': user.personal_statement})
     return render(request, 'change_profile.html', {'form': profile, 'user' :user})
 
@@ -51,7 +56,9 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.add_message(request, messages.SUCCESS, "Successfully signed up!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something wasn't right!")
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
@@ -70,7 +77,9 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                messages.add_message(request, messages.SUCCESS, "Logged in!")
                 return redirect('profile')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form})
 
@@ -88,7 +97,9 @@ def create_club(request):
         form = createClubForm(request.POST)
         if form.is_valid():
             club = form.save(request.user)
+            messages.add_message(request, messages.SUCCESS, "Successfully created club!")
             return redirect('profile')
+        messages.add_message(request, messages.ERROR, "Something wasn't right!")
     else:
         form = createClubForm()
     return render(request,'create_club.html',{'form':form})
