@@ -1,7 +1,7 @@
 [
   {
    "model": "chessManagement.club",
-   "pk": "KCL Chess Society",
+   "pk": "KCL-Chess-Society",
    "fields": {
      "name": "KCL-Chess-Society",
      "location": "London",

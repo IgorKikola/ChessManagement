@@ -56,7 +56,6 @@ def sign_up(request):
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
 
-
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -172,7 +171,7 @@ def applicant_list(request, club_pk):
         users = list(allUsers)
         for user in allUsers:
             if not user.isApplicantIn(club):
-                users.remove('show_club', club_pk)
+                users.remove(user)
         return render(request, 'applicant_list.html', {'users': users, 'club': club})
 
 @login_required
