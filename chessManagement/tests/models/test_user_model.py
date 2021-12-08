@@ -6,10 +6,14 @@ from chessManagement.models import User
 class UserModelTestCase(TestCase):
     """Unit tests for the User model."""
 
-    fixtures = ['chessManagement/tests/fixtures/default_user.json']
+    fixtures = [
+        'chessManagement/tests/fixtures/default_user.json',
+        'chessManagement/tests/fixtures/other_users.json',
+    ]
 
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
+        self.second_user = User.objects.get(username='janedoe@example.org')
 
     def test_valid_user(self):
         self._assert_user_is_valid()
@@ -19,8 +23,7 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_first_name_need_not_be_unique(self):
-        second_user = self._create_second_user()
-        self.user.first_name = second_user.first_name
+        self.user.first_name = self.second_user.first_name
         self._assert_user_is_valid()
 
     def test_first_name_may_contain_50_characters(self):
@@ -37,8 +40,7 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_last_name_need_not_be_unique(self):
-        second_user = self._create_second_user()
-        self.user.last_name = second_user.last_name
+        self.user.last_name = self.second_user.last_name
         self._assert_user_is_valid()
 
     def test_last_name_may_contain_50_characters(self):
@@ -55,8 +57,7 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_email_must_be_unique(self):
-        second_user = self._create_second_user()
-        self.user.email = second_user.email
+        self.user.email = self.second_user.email
         self._assert_user_is_invalid()
 
     def test_email_must_contain_username(self):
@@ -85,8 +86,7 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_bio_need_not_be_unique(self):
-        second_user = self._create_second_user()
-        self.user.bio = second_user.bio
+        self.user.bio = self.second_user.bio
         self._assert_user_is_valid()
 
     def test_bio_may_contain_520_characters(self):
@@ -106,15 +106,3 @@ class UserModelTestCase(TestCase):
     def _assert_user_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
-
-    def _create_second_user(self):
-        user = User.objects.create_user(
-            first_name='Jane',
-            last_name='Doe',
-            email='janedoe@example.org',
-            experience = 'Beginner',
-            password='Password123',
-            personal_statement = 'Hi i also want to apply for a membership',
-            bio="This is Jane's profile."
-        )
-        return user
