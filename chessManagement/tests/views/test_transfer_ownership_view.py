@@ -45,3 +45,19 @@ class ToMemberTest(TestCase):
     #     self.assertTrue(user.isOwnerOf(self.club))
     #     self.assertTrue(self.owner_user.isOfficerOf(self.club))
     #     self.assertFalse(self.owner_user.isOwnerOf(self.club))
+
+    # def test_cannot_transfer_ownership_to_officer_by_officer(self):
+    #     user = self.officer_user
+    #     self.client.login(username=self.officer_user.email, password='Password123')
+    #     self.assertEqual(self.club.numberOfMembers(),2)
+    #     url = reverse('transfer_ownership', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+    #     self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/transfer_ownership/')
+    #     response = self.client.post(url, follow=True)
+    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, 'show_club/for_officer.html')
+    #     self.assertEqual(self.club.numberOfMembers(),2)
+    #     self.assertTrue(user.isOfficerOf(self.club))
+    #     self.assertFalse(user.isOwnerOf(self.club))
+    #     self.assertFalse(self.owner_user.isOfficerOf(self.club))
+    #     self.assertTrue(self.owner_user.isOwnerOf(self.club))
