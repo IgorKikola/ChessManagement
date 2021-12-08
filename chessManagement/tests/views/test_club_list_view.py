@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import authenticate,login
 from chessManagement.models import User, Club, UserInClub
 from chessManagement.tests.helpers import reverse_with_next
-from chessManagement.forms import createClubForm
 
 class ClubListTest(TestCase):
 

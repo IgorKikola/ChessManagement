@@ -1,10 +1,10 @@
-"""Unit tests for the User model."""
+"""Unit tests for the UserInClub model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from chessManagement.models import User, Club, UserInClub
 
-class ClubModelTestCase(TestCase):
-    """Unit tests for the User model."""
+class UserInClubModelTestCase(TestCase):
+    """Unit tests for the UserInClub model."""
 
     fixtures = [
         'chessManagement/tests/fixtures/default_user.json',
