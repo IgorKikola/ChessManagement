@@ -180,12 +180,15 @@ def show_user(request, user_id, club_pk):
     session_user = request.user
     try:
         club = Club.objects.get(pk=club_pk)
+    except ObjectDoesNotExist:
+        return redirect('club_list')
+    try:
         shown_user_in_club = club.getUserInClub(user_id)
         session_user_in_club = club.getUserInClub(session_user)
     except ObjectDoesNotExist:
-        return redirect('club_list')
+        return redirect('show_club', club_pk)
     else:
-        if shown_user_in_club == None or session_user_in_club.isApplicant():
+        if session_user_in_club.isApplicant():
             return redirect('show_club', club_pk)
         elif shown_user_in_club.isApplicant() and session_user_in_club.isOfficer():
             return render(request, 'show_applicant.html', {'user': session_user, 'shown_user': shown_user_in_club.user, 'club': club, 'user_rank': "Applicant"})
