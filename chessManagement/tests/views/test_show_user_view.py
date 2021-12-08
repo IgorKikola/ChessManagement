@@ -50,20 +50,20 @@ class ShowUserTest(TestCase):
     def test_show_user_url(self):
         self.assertEqual(self.url,f'/club/{self.club.pk}/user/{self.target_user.id}/')
 
-    # def test_get_show_user_which_is_not_in_the_club_and_with_valid_id(self):
-    #     self.client.login(username=self.user_not_in_club.email, password='Password123')
-    #     response = self.client.get(self.url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-    #
-    # def test_get_show_user_with_invalid_id(self):
-    #     self.client.login(username=self.user.email, password='Password123')
-    #     url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': self.user.id+9999})
-    #     response = self.client.get(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_owner.html')
+    def test_get_show_user_which_is_not_in_the_club_and_with_valid_id(self):
+        self.client.login(username=self.user_not_in_club.email, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+
+    def test_get_show_user_with_invalid_id(self):
+        self.client.login(username=self.user.email, password='Password123')
+        url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': self.user.id+9999})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_owner.html')
 
     def test_get_show_user_with_own_id(self):
         self.client.login(username=self.user.email, password='Password123')
@@ -81,13 +81,13 @@ class ShowUserTest(TestCase):
         self.assertContains(response, "Jane Doe")
         self.assertContains(response, "janedoe@example.org")
 
-    # def test_officer_get_show_user_which_is_in_the_club_and_with_valid_id(self):
-    #     self.client.login(username=self.officer_user.email, password='Password123')
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'show_member/for_officer.html')
-    #     self.assertContains(response, "Jane Doe")
-    #     self.assertContains(response, "janedoe@example.org")
+    def test_officer_get_show_user_which_is_in_the_club_and_with_valid_id(self):
+        self.client.login(username=self.officer_user.email, password='Password123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'show_member/for_officer.html')
+        self.assertContains(response, "Jane Doe")
+        self.assertContains(response, "janedoe@example.org")
 
     def test_member_get_show_user_which_is_in_the_club_and_with_valid_id(self):
         self.client.login(username=self.target_user.email, password='Password123')

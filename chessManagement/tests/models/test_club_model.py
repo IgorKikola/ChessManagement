@@ -1,5 +1,6 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from chessManagement.models import User, Club, UserInClub
 
@@ -30,9 +31,13 @@ class ClubModelTestCase(TestCase):
     def test_valid_club(self):
         self._assert_club_is_valid()
 
-    # def test_name_need_be_unique(self):
-    #     self.club.name = self.second_club.name
-    #     self._assert_club_is_invalid()
+    def test_name_need_be_unique(self):
+        with self.assertRaises(IntegrityError):
+            invalid_club = Club.objects.create(
+                name=self.club.name,
+                location="",
+                description=""
+            )
 
     def test_name_may_contain_50_characters(self):
         self.club.name = 'x' * 50

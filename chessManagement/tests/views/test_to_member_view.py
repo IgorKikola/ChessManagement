@@ -87,30 +87,30 @@ class ToMemberTest(TestCase):
         self.assertTrue(user.isMemberOf(self.club))
         self.assertFalse(user.isOfficerOf(self.club))
 
-    # def test_cannot_change_officer_user_to_member_by_applicant(self):
-    #     user = self.officer_user
-    #     self.client.login(username=self.applicant_user.email, password='Password123')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     url = reverse('to_member', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
-    #     self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/to_member/')
-    #     response = self.client.post(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     self.assertFalse(user.isMemberOf(self.club))
-    #     self.assertTrue(user.isOfficerOf(self.club))
-    #
-    # def test_cannot_change_applicant_user_to_member_by_applicant(self):
-    #     user = self.applicant_user
-    #     self.client.login(username=self.applicant_user.email, password='Password123')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     url = reverse('to_member', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
-    #     self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/to_member/')
-    #     response = self.client.post(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     self.assertFalse(user.isMemberOf(self.club))
-    #     self.assertTrue(user.isApplicantIn(self.club))
+    def test_cannot_change_officer_user_to_member_by_applicant(self):
+        user = self.officer_user
+        self.client.login(username=self.applicant_user.email, password='Password123')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('to_member', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+        self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/to_member/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        self.assertFalse(user.isMemberOf(self.club))
+        self.assertTrue(user.isOfficerOf(self.club))
+
+    def test_cannot_change_applicant_user_to_member_by_applicant(self):
+        user = self.applicant_user
+        self.client.login(username=self.applicant_user.email, password='Password123')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('to_member', kwargs={'club_pk': self.club.pk, 'user_id': user.id})
+        self.assertEqual(url,f'/club/{self.club.pk}/user/{user.id}/to_member/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        self.assertFalse(user.isMemberOf(self.club))
+        self.assertTrue(user.isApplicantIn(self.club))

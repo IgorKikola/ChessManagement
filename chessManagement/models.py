@@ -125,6 +125,11 @@ class Club(models.Model):
         user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)
 
+    def numberOfApplicants(self):
+        user_ids = UserInClub.objects.filter(club=self,user_level=0).values_list('user', flat=True)
+        allUsers = User.objects.filter(id__in=user_ids)
+        return allUsers.count()
+
     def members(self):
         user_ids = UserInClub.objects.filter(club=self,user_level__in=[1,2,3]).values_list('user', flat=True)
         return User.objects.filter(id__in=user_ids)

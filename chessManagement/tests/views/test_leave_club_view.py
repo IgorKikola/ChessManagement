@@ -45,6 +45,20 @@ class ToMemberTest(TestCase):
             user_level=3
         )
 
+    def test_applicant_user_can_leave_club(self):
+        self.client.login(username=self.applicant_user.email, password='Password123')
+        self.assertEqual(self.club.numberOfApplicants(),1)
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
+        self.assertEqual(url,f'/club/{self.club.pk}/leave/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+        self.assertEqual(self.club.numberOfApplicants(),0)
+        self.assertEqual(self.club.numberOfMembers(),3)
+        self.assertFalse(self.applicant_user.isApplicantIn(self.club))
+
     def test_member_user_can_leave_club(self):
         self.client.login(username=self.member_user.email, password='Password123')
         self.assertEqual(self.club.numberOfMembers(),3)
@@ -71,37 +85,25 @@ class ToMemberTest(TestCase):
         self.assertFalse(self.officer_user.isMemberOf(self.club))
         self.assertFalse(self.officer_user.isOfficerOf(self.club))
 
-    # def test_user_not_in_club_cannot_leave_club(self):
-    #     self.client.login(username=self.user_not_in_club.email, password='Password123')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertEqual(url,f'/club/{self.club.pk}/leave/')
-    #     response = self.client.post(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #
-    #
-    # def test_owner_user_cannot_leave_club(self):
-    #     self.client.login(username=self.owner_user.email, password='Password123')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertEqual(url,f'/club/{self.club.pk}/leave/')
-    #     response = self.client.post(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_owner.html')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
+    def test_user_not_in_club_cannot_leave_club(self):
+        self.client.login(username=self.user_not_in_club.email, password='Password123')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
+        self.assertEqual(url,f'/club/{self.club.pk}/leave/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
+        self.assertEqual(self.club.numberOfMembers(),3)
 
-    # def test_applicant_user_not_in_club_cannot_leave_club(self):
-    #     self.client.login(username=self.applicant_user.email, password='Password123')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertEqual(url,f'/club/{self.club.pk}/leave/')
-    #     response = self.client.post(url, follow=True)
-    #     response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_club/for_applicant.html')
-    #     self.assertEqual(self.club.numberOfMembers(),3)
-    #     self.assertTrue(self.applicant_user.isApplicantIn(self.club))
+
+    def test_owner_user_cannot_leave_club(self):
+        self.client.login(username=self.owner_user.email, password='Password123')
+        self.assertEqual(self.club.numberOfMembers(),3)
+        url = reverse('leave_club', kwargs={'club_pk': self.club.pk})
+        self.assertEqual(url,f'/club/{self.club.pk}/leave/')
+        response = self.client.post(url, follow=True)
+        response_url = reverse('show_club', kwargs={'club_pk': self.club.pk})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'show_club/for_owner.html')
+        self.assertEqual(self.club.numberOfMembers(),3)
