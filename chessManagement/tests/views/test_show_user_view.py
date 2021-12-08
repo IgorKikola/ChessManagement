@@ -38,17 +38,17 @@ class ShowUserTest(TestCase):
     def test_get_show_user_which_is_not_in_the_club_and_with_valid_id(self):
         self.client.login(username=self.user_not_in_club.email, password='Password123')
         response = self.client.get(self.url, follow=True)
-        response_url = reverse('club_list')
+        response_url = reverse('show_club', kwargs={'club_pk':self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'club_list/all.html')
+        self.assertTemplateUsed(response, 'show_club/for_applicant.html')
 
     def test_get_show_user_with_invalid_id(self):
         self.client.login(username=self.user.email, password='Password123')
         url = reverse('show_user', kwargs={'club_pk': self.club.pk, 'user_id': self.user.id+9999})
         response = self.client.get(url, follow=True)
-        response_url = reverse('club_list')
+        response_url = reverse('show_club', kwargs={'club_pk':self.club.pk})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'club_list/all.html')
+        self.assertTemplateUsed(response, 'show_club/for_owner.html')
 
     """Should write tests for test_get_show_user_with_own_id"""
     """Need to create Club and UserInClub in these tests"""
