@@ -472,3 +472,28 @@ def remove_user(request, user_id, club_pk):
             if user_to_remove_rank == 0:
                 return redirect('applicants', club_pk)
         return redirect('show_club', club_pk)
+
+@login_required
+def create_match_schedule(request, tournament_pk):
+    try:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        if tournament.finished == True:
+            check_group_stages()
+        else:
+            messages.add_message(request, messages.ERROR, "The deadline has not passed yet!")
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+@login_required
+def check_group_stages(request, tournament_pk):
+    try:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        number_of_players = tournament.numberOfMembers()
+        if number_of_players <= 16:
+            elimination_stage()
+        elif number_of_players >16 and number_of_players <=32:
+            small_group_stage()
+        elif number_of_players >32 and number_of_players<=96:
+            large_group_stage()
+    except ObjectDoesNotExist:
+        return redirect('profile')

@@ -181,7 +181,7 @@ class createTournamentForm(forms.ModelForm):
             self.add_error('deadline',"Deadline should be later than today.")
 
     def save(self,user,club):
-        """Create a new club."""
+        """Create a new tournament."""
 
         super().save(commit=False)
         tournament = Tournament.objects.create(
