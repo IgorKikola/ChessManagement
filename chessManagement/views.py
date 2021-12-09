@@ -122,6 +122,7 @@ def show_tournament(request,club_pk,tournament_pk):
     applied = False
     try:
         tournament = Tournament.objects.get(pk=tournament_pk)
+        print(tournament.deadline)
         if tournament.deadline < datetime.date.today():
             expired = True
         account = UserInTournament.objects.filter(tournament=tournament, user=request.user)
