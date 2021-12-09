@@ -12,11 +12,14 @@ def login_prohibited(view_function):
     return modified_view_function
 
 def valid_club_required(view_function):
-    def modified_view_function(request, club_pk, *args):
+    def modified_view_function(request, club_pk, user_id=None):
         try:
             club = Club.objects.get(pk=club_pk)
         except ObjectDoesNotExist:
             return redirect('club_list')
         else:
-            return view_function(request, club_pk, *args)
+            if user_id:
+                return view_function(request, club_pk, user_id)
+            else:
+                return view_function(request, club_pk)
     return modified_view_function
