@@ -7,16 +7,21 @@ from chessManagement.models import User, Club, UserInClub
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
-    USER_COUNT = 50
-    CLUB_COUNT = 4
+    USER_COUNT = 25
+    CLUB_COUNT = 5
 
     def __init__(self):
         super().__init__()
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
+        """Include Example Users"""
+        if (User.objects.filter(username='jeb@example.org').count())==0:
+            self._create_examples()
+            print('-----Include Example Users------')
+
+        """Seed User"""
         user_count = 0
-        club_count = 0
         while user_count < Command.USER_COUNT:
             print(f'Seeding user {user_count}',  end='\r')
             try:
@@ -24,7 +29,10 @@ class Command(BaseCommand):
             except (IntegrityError):
                 continue
             user_count += 1
+        print('-----User seeding complete------')
 
+        """Seed Club"""
+        club_count = 0
         while club_count < Command.CLUB_COUNT:
             print(f'Seeding club {club_count}',  end='\r')
             try:
@@ -32,13 +40,21 @@ class Command(BaseCommand):
             except (IntegrityError):
                 continue
             club_count += 1
+        print('-----Club seeding complete------')
+
+        """Seed UserInClub"""
+        userInClub_count = 0
+        clubs = Club.objects.all()
+        for club in clubs:
             users = User.objects.all()
             for user in users:
+                print(f'Seeding user In Club {userInClub_count}',  end='\r')
                 try:
                     self._create_userInClub(user, club)
                 except (IntegrityError):
                     continue
-        print('User, club, and userInClub seeding complete')
+                userInClub_count += 1
+        print('-----UserInClub seeding complete------')
 
     def _create_user(self):
         first_name = self.faker.first_name()
@@ -64,8 +80,8 @@ class Command(BaseCommand):
         return email
 
     def _create_club(self):
-        name = self.faker.random_elements(elements=('Kerbal Chess Club', 'AA Chess Club', 'BB Chess Club', 'CC Chess Club'), length=1, unique=True)[0]
         location = self.faker.city()
+        name = self._club_name(location)
         description = self.faker.text(max_nb_chars=520)
         club = Club.objects.create(
             name=name,
@@ -73,6 +89,10 @@ class Command(BaseCommand):
             description=description
         )
         return club
+
+    def _club_name(self, location):
+        name = f'{location} Chess Club'
+        return name
 
     def _create_userInClub(self, user, club):
         owner_id = UserInClub.objects.filter(club=club,user_level__in=[3]).values_list('user', flat=True)
@@ -89,3 +109,64 @@ class Command(BaseCommand):
                 club=club,
                 user_level=user_level
             )
+
+    def _create_examples(self):
+        bio = self.faker.text(max_nb_chars=520)
+        personal_statement = self.faker.text(max_nb_chars=500)
+        experience = self.faker.random_choices(elements=('Beginner', 'Intermediate', 'Master'), length=1)[0]
+        Jebediah = User.objects.create_user(
+            first_name='Jebediah',
+            last_name='Kerman',
+            email='jeb@example.org',
+            username='jeb@example.org',
+            password=Command.PASSWORD,
+            bio=bio,
+            personal_statement=personal_statement,
+            experience=experience
+        )
+        Valentina = User.objects.create_user(
+            first_name='Valentina',
+            last_name='Kerman',
+            email='val@example.org',
+            username='val@example.org',
+            password=Command.PASSWORD,
+            bio=bio,
+            personal_statement=personal_statement,
+            experience=experience
+        )
+        Billie = User.objects.create_user(
+            first_name='Billie',
+            last_name='Kerman',
+            email='billie@example.org',
+            username='billie@example.org',
+            password=Command.PASSWORD,
+            bio=bio,
+            personal_statement=personal_statement,
+            experience=experience
+        )
+
+        location = self.faker.city()
+        description = self.faker.text(max_nb_chars=520)
+        club = Club.objects.create(
+            name='Kerbal Chess Club',
+            location=location,
+            description=description
+        )
+
+        UserInClub.objects.create(
+            user=Billie,
+            club=club,
+            user_level=3
+        )
+
+        UserInClub.objects.create(
+            user=Valentina,
+            club=club,
+            user_level=2
+        )
+
+        UserInClub.objects.create(
+            user=Jebediah,
+            club=club,
+            user_level=1
+        )
