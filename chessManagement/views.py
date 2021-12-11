@@ -34,7 +34,7 @@ def tournament_list(request,club_pk):
     tournament = Tournament.objects.all().filter(club=club)
     return render(request, 'tournament_list.html', {'tournaments': tournament})
 
-@login_required#
+@login_required
 def officer_list(request,tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     officers = UserInClub.objects.all().filter(club=tournament.club,user_level=2)
@@ -46,7 +46,7 @@ def officer_list(request,tournament_pk):
             non_co_organisers.append(officer)
     return render(request, 'tournament_users/officer_list.html', {'officers': non_co_organisers,'tournament_pk':tournament_pk,'request_user':request_user})
 
-@login_required#
+@login_required
 def co_organiser_list(request,tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     co_organisers = UserInTournament.objects.filter(tournament=tournament,is_co_organiser=True)
@@ -84,13 +84,13 @@ def remove_co_organiser(request, tournament_pk,user_id):
     except ObjectDoesNotExist:
         return redirect(co_organiser_list,tournament_pk)
 
-@login_required#
+@login_required
 def sign_up_tournament(request, tournament_pk):
     try:
         user = request.user
         tournament = Tournament.objects.get(pk=tournament_pk)
         players = UserInTournament.objects.filter(tournament=tournament,is_organiser=False).count()
-        if players <= tournament.max_players:
+        if players <= tournament.max_players and datetime.date.today() <= tournament.deadline:
             accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
             if len(accounts) == 0:
                 new_applicant = UserInTournament.objects.create(
@@ -104,14 +104,15 @@ def sign_up_tournament(request, tournament_pk):
     except ObjectDoesNotExist:
         return redirect('profile')
 
-@login_required#
+@login_required
 def cancel_sign_up_tournament(request, tournament_pk):
     try:
         user = request.user
         tournament = Tournament.objects.get(pk=tournament_pk)
-        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
-        if len(accounts) != 0:
-            UserInTournament.objects.get(tournament=tournament,user=user).delete()
+        if datetime.date.today() <= tournament.deadline:
+            accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+            if len(accounts) != 0:
+                UserInTournament.objects.get(tournament=tournament,user=user).delete()
         return redirect('show_tournament', tournament.club.pk, tournament.pk)
     except ObjectDoesNotExist:
         return redirect('profile')

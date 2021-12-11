@@ -5,7 +5,7 @@ from chessManagement.models import User, Club, UserInClub, Tournament, UserInTou
 from chessManagement.tests.helpers import reverse_with_next
 from chessManagement.forms import createClubForm
 
-class TournamentListTest(TestCase):
+class OfficerListTest(TestCase):
 
     fixtures = [
         'chessManagement/tests/fixtures/default_user.json',
@@ -24,7 +24,7 @@ class TournamentListTest(TestCase):
             description="this is johns tournament",
             organiser=self.user,
             max_players=56,
-            deadline='2021-12-27',
+            deadline='2022-12-27',
             finished=False
         )
         UserInTournament.objects.create(
