@@ -34,7 +34,7 @@ def tournament_list(request,club_pk):
     tournament = Tournament.objects.all().filter(club=club)
     return render(request, 'tournament_list.html', {'tournaments': tournament})
 
-@login_required
+@login_required#
 def officer_list(request,tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     officers = UserInClub.objects.all().filter(club=tournament.club,user_level=2)
@@ -46,14 +46,14 @@ def officer_list(request,tournament_pk):
             non_co_organisers.append(officer)
     return render(request, 'tournament_users/officer_list.html', {'officers': non_co_organisers,'tournament_pk':tournament_pk,'request_user':request_user})
 
-@login_required
+@login_required#
 def co_organiser_list(request,tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     co_organisers = UserInTournament.objects.filter(tournament=tournament,is_co_organiser=True)
     request_user = UserInTournament.objects.get(user=request.user,tournament=tournament)
     return render(request, 'tournament_users/co_organiser_list.html', {'co_organisers': co_organisers,'tournament_pk':tournament_pk,'request_user':request_user})
 
-@login_required
+@login_required#
 def allow_co_organiser(request, tournament_pk,user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -72,7 +72,7 @@ def allow_co_organiser(request, tournament_pk,user_id):
     except ObjectDoesNotExist:
         return redirect(officer_list,tournament_pk)
 
-@login_required
+@login_required#
 def remove_co_organiser(request, tournament_pk,user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -84,7 +84,7 @@ def remove_co_organiser(request, tournament_pk,user_id):
     except ObjectDoesNotExist:
         return redirect(co_organiser_list,tournament_pk)
 
-@login_required
+@login_required#
 def sign_up_tournament(request, tournament_pk):
     try:
         user = request.user
@@ -104,7 +104,7 @@ def sign_up_tournament(request, tournament_pk):
     except ObjectDoesNotExist:
         return redirect('profile')
 
-@login_required
+@login_required#
 def cancel_sign_up_tournament(request, tournament_pk):
     try:
         user = request.user
