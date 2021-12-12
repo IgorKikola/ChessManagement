@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
@@ -112,6 +114,27 @@ class User(AbstractUser):
     def isOwnerOf(self, club):
         return UserInClub.objects.filter(user=self, club=club, user_level=3).count() == 1
 
+    def isInClub(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level__in=[1,2,3]).count() == 1
+
+    def isInTournament(self, tournament):
+        return UserInTournament.objects.filter(tournament=tournament, user=self).count() == 1
+
+    def isOrganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_organiser
+        else:
+            return False
+
+    def isCoorganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_co_organiser
+        else:
+            return False
+
+
 class Club(models.Model):
 
     name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
@@ -223,6 +246,15 @@ class Tournament(models.Model):
         allUsers = User.objects.filter(id__in=user_ids)
         return allUsers.count()
 
+    def isExpired(self):
+        return self.deadline < datetime.date.today()
+
+    def organiser(self):
+        return UserInTournament.objects.filter(tournament=self,is_organiser=True).first().user
+
+    def co_organisers(self):
+        user_ids = UserInTournament.objects.filter(tournament=self,is_co_organiser=True).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
 
 class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Club
+from .models import Club, Tournament, User, UserInClub
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -12,14 +12,67 @@ def login_prohibited(view_function):
     return modified_view_function
 
 def valid_club_required(view_function):
-    def modified_view_function(request, club_pk, user_id=None):
+    def modified_view_function(request, club_pk):
         try:
             club = Club.objects.get(pk=club_pk)
         except ObjectDoesNotExist:
             return redirect('club_list')
         else:
-            if user_id:
-                return view_function(request, club_pk, user_id)
+            return view_function(request, club_pk)
+    return modified_view_function
+
+def valid_club_and_user_required(view_function):
+    def modified_view_function(request, club_pk, user_id):
+        try:
+            club = Club.objects.get(pk=club_pk)
+        except ObjectDoesNotExist:
+            return redirect('club_list')
+        else:
+            try:
+                user = club.getUserInClub(user_id)
+            except ObjectDoesNotExist:
+                return redirect('show_club', club_pk)
             else:
-                return view_function(request, club_pk)
+                return view_function(request, club_pk, user_id)
+    return modified_view_function
+
+def tournament_must_belong_to_club(view_function):
+    def modified_view_function(request, club_pk, tournament_pk):
+        try:
+            club = Club.objects.get(pk=club_pk)
+        except ObjectDoesNotExist:
+            return redirect('club_list')
+        else:
+            try:
+                tournament = Tournament.objects.get(pk=tournament_pk)
+            except ObjectDoesNotExist:
+                return redirect('show_club', club_pk)
+            else:
+                if tournament.club == club:
+                    return view_function(request, club_pk, tournament_pk)
+                else:
+                    return redirect('show_club', club_pk)
+    return modified_view_function
+
+def tournament_and_user_must_belong_to_club(view_function):
+    def modified_view_function(request, club_pk, tournament_pk, user_id):
+        try:
+            club = Club.objects.get(pk=club_pk)
+        except ObjectDoesNotExist:
+            return redirect('club_list')
+        else:
+            try:
+                tournament = Tournament.objects.get(pk=tournament_pk)
+            except ObjectDoesNotExist:
+                return redirect('show_club', club_pk)
+            else:
+                if tournament.club == club:
+                    try:
+                        user = club.getUserInClub(user_id)
+                    except ObjectDoesNotExist:
+                        return redirect('show_tournament', club_pk, tournament_pk)
+                    else:
+                        return view_function(request, club_pk, tournament_pk, user_id)
+                else:
+                    return redirect('show_club', club_pk)
     return modified_view_function
