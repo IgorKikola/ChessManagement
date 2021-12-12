@@ -113,9 +113,9 @@ def cancel_sign_up_tournament(request, club_pk, tournament_pk):
     user = request.user
     tournament = Tournament.objects.get(pk=tournament_pk)
     if not user.isOrganiserOf(tournament) and not user.isCoorganiserOf(tournament):
-    accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
-    if len(accounts) != 0:
-        UserInTournament.objects.get(tournament=tournament,user=user).delete()
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) != 0:
+            UserInTournament.objects.get(tournament=tournament,user=user).delete()
     return redirect('show_tournament', club_pk, tournament_pk)
 
 @tournament_must_belong_to_club
