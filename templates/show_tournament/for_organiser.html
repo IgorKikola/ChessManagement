@@ -33,6 +33,13 @@
           <a href="{% url 'co_organiser_list' tournament.pk %}" class="btn btn-primary">Co-Organiser list</a>
         </div>
       </div>
+      <div class="card m-2">
+      <div class="card-body">
+          <h5 class="card-title">Schedule of Matches</h5>
+          <p class="card-text">Schedule of Matches</p>
+          <a href="{% url 'scheduled_matches' tournament.pk %}" class="btn btn-primary">Schedule of Matches</a>
+        </div>
+      </div>      
     </div>
   </div>
 </div>

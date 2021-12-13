@@ -243,5 +243,3 @@ class Game(models.Model):
     player2 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_2')
     finished = models.BooleanField()
     winner = models.CharField(blank=True, max_length=8,null=True, choices=WINNER_CHOICES, default=None)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(blank=True, null=True)

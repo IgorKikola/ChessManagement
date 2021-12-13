@@ -473,14 +473,16 @@ def remove_user(request, user_id, club_pk):
                 return redirect('applicants', club_pk)
         return redirect('show_club', club_pk)
 
+
 @login_required
-def create_match_schedule(request, tournament_pk):
+def scheduled_matches(request, tournament_pk):
     try:
         tournament = Tournament.objects.get(pk=tournament_pk)
         if tournament.finished == True:
-            check_group_stages()
+            return render(request, 'scheduled_matches.html', {'tournament': tournament})
         else:
             messages.add_message(request, messages.ERROR, "The deadline has not passed yet!")
+            return render(request, 'profile.html', {'tournament': tournament})
     except ObjectDoesNotExist:
         return redirect('profile')
 
@@ -497,3 +499,68 @@ def check_group_stages(request, tournament_pk):
             large_group_stage()
     except ObjectDoesNotExist:
         return redirect('profile')
+
+@login_required
+def elimination_stage(request, tournament_pk):
+    try:
+        pairs = dict()
+        pointer = 0;
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        user_ids = tournament.users()
+        for pointer in range(user_ids.size()):
+            pairs[user_ids[pointer]] = user_ids[pointer+1]
+
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+@login_required
+def small_group_stages(request, tournament_pk):
+    try:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        number_of_players = tournament.numberOfMembers()
+
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+@login_required
+def large_group_stage(request, tournament_pk):
+    try:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        number_of_players = tournament.numberOfMembers()
+
+    except ObjectDoesNotExist:
+        return redirect('profile')
+
+# def simulate_draw(teams):
+#     """Return the list of games."""
+#     if len(teams) % 2 == 0:
+#         return simulate_even_draw(teams)
+#     else:
+#         return simulate_odd_draw(teams)
+#
+# def simulate_even_draw(teams):
+#     """Return the list of games."""
+#     matches = []
+#     half_len = int(len(teams)/2)
+#     arr1 = [i+1 for i in range(half_len)]
+#     arr2 = [i+1 for i in range(half_len, len(teams))][::-1]
+#     for i in range(len(teams)-1):
+#         arr1.insert(1, arr2.pop(0))
+#         arr2.append(arr1.pop())
+#         for gm in zip(arr1, arr2):
+#             matches.append((teams[gm[0]-1], teams[gm[1]-1]))
+#     return render(request, 'scheduled_matches.html', {'matches': maches})
+#
+# def simulate_odd_draw(teams):
+#     """Return the list of games."""
+#     matches = []
+#     half_len = int((len(teams)+1)/2)
+#     arr1 = [i+1 for i in range(half_len)]
+#     arr2 = [i+1 for i in range(half_len, len(teams)+1)][::-1]
+#     for i in range(len(teams)):
+#         arr1.insert(1, arr2.pop(0))
+#         arr2.append(arr1.pop())
+#         for gm in zip(arr1, arr2):
+#             if len(teams)+1 not in gm:
+#                 matches.append((teams[gm[0]-1], teams[gm[1]-1]))
+#     return render(request, 'scheduled_matches.html', {'matches': maches})

@@ -29,6 +29,7 @@ urlpatterns = [
     path('create_tournament/<str:club_pk>/',views.create_tournament, name='create_tournament'),
     path('tournament_list/<str:club_pk>/',views.tournament_list, name='tournament_list'),
     path('tournament_apply/<str:tournament_pk>/',views.sign_up_tournament, name='sign_up_tournament'),
+    path('tournament/scheduled_matches/<str:tournament_pk>/',views.scheduled_matches, name='scheduled_matches'),    
     path('tournament/officer_list/<str:tournament_pk>/',views.officer_list, name='officer_list'),
     path('tournament/co_organiser_list/<str:tournament_pk>/',views.co_organiser_list, name='co_organiser_list'),
     path('tournament/officer_list/allow_co_organiser/<str:tournament_pk>/<int:user_id>/',views.allow_co_organiser, name='allow_co_organiser'),
