@@ -249,7 +249,7 @@ class Tournament(models.Model):
     def isExpired(self):
         return self.deadline < datetime.date.today()
 
-    def organiser(self):
+    def getOrganiser(self):
         return UserInTournament.objects.filter(tournament=self,is_organiser=True).first().user
 
     def co_organisers(self):

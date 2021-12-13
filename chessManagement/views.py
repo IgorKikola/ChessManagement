@@ -54,7 +54,8 @@ def co_organiser_list(request, club_pk, tournament_pk):
     club = Club.objects.get(pk=club_pk)
     tournament = Tournament.objects.get(pk=tournament_pk)
     if user.isOrganiserOf(tournament) or user.isCoorganiserOf(tournament):
-        officers = club.officers().exclude(id=tournament.organiser().id)
+        participants = tournament.users()
+        officers = club.officers().exclude(id=tournament.getOrganiser().id).difference(participants)
         co_organisers = tournament.co_organisers()
         non_co_organisers = officers.difference(co_organisers)
         request_user = UserInTournament.objects.get(user=request.user,tournament=tournament)

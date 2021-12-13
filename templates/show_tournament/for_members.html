@@ -16,13 +16,13 @@
               <a class="btn disabled">Withdraw</a>
             {% else %}
               <p><b class="card-text" style="">The application deadline has passed!</b></p>
-              <a href='{% url 'sign_up_tournament' club.pk tournament.pk %}' class="btn disabled" >Sign up</a>
+              <a class="btn disabled">Sign up</a>
             {% endif %}
           {% else %}
             {% if applied %}
               <p class="card-text">You have applied to this tournament!</p>
               <p class="card-text">If you've changed your mind, you can withdraw:</p>
-              <a class="btn disabled">Withdraw</a>
+              <a href='{% url 'cancel_sign_up_tournament' club.pk tournament.pk %}' class="btn btn-primary">Withdraw</a>
             {% else %}
               <p class="card-text">Here is information about this tournament.</p>
               <p class="card-text">If you want to join, apply here:</p>
