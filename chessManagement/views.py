@@ -38,6 +38,7 @@ def tournament_list(request, club_pk):
     club = Club.objects.get(pk=club_pk)
     tournament = Tournament.objects.all().filter(club=club)
     if user.isInClub(club):
+        userInClub = club.getUserInClub(user)
         user_rank = userInClub.user_level
         if user_rank > 0:
             return render(request, 'tournament_list.html', {'club': club, 'tournaments': tournament, 'user_rank': user_rank})
@@ -64,9 +65,9 @@ def co_organiser_list(request, club_pk, tournament_pk):
 @tournament_and_user_must_belong_to_club
 @login_required
 def allow_co_organiser(request, club_pk, tournament_pk, user_id):
+    tournament = Tournament.objects.get(pk=tournament_pk)
     if request.user.isOrganiserOf(tournament):
         user = User.objects.get(id=user_id)
-        tournament = Tournament.objects.get(pk=tournament_pk)
         accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
         if len(accounts) == 0:
             new_applicant = UserInTournament.objects.create(
@@ -81,9 +82,9 @@ def allow_co_organiser(request, club_pk, tournament_pk, user_id):
 @tournament_and_user_must_belong_to_club
 @login_required
 def remove_co_organiser(request, club_pk, tournament_pk, user_id):
+    tournament = Tournament.objects.get(pk=tournament_pk)
     if request.user.isOrganiserOf(tournament):
         user = User.objects.get(id=user_id)
-        tournament = Tournament.objects.get(pk=tournament_pk)
         accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
         if len(accounts) != 0:
             UserInTournament.objects.get(tournament=tournament,user=user,is_co_organiser=True).delete()
