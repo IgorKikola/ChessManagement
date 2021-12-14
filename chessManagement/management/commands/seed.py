@@ -120,7 +120,7 @@ class Command(BaseCommand):
             )
 
     def _create_tournaments(self):
-        tournament_count = 0
+        tournament_count = 2
         for club in self.clubs:
             user_ids = self.usersInClubs.filter(club=club,user_level__in=[2,3]).values_list('user', flat=True)
             organisers = User.objects.filter(id__in=user_ids)
@@ -182,8 +182,6 @@ class Command(BaseCommand):
                 )
 
     def _create_samples(self):
-        if (User.objects.filter(username='jeb@example.org').count())!=0:
-            return
         bio = self.faker.text(max_nb_chars=520)
         personal_statement = self.faker.text(max_nb_chars=500)
         experience = self.faker.random_choices(elements=('Beginner', 'Intermediate', 'Master'), length=1)[0]
