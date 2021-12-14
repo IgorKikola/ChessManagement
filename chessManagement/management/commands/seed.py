@@ -1,3 +1,4 @@
+import datetime
 from typing import OrderedDict
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
@@ -12,7 +13,7 @@ class Command(BaseCommand):
     USER_COUNT = 100
     CLUB_COUNT = 5
     USER_IN_CLUB_PROBABILITY = 0.8
-    ORGANISER_CREATE_TOURNAMENT_PROBABILITY = 0.15
+    ORGANISER_CREATE_TOURNAMENT_PROBABILITY = 0.1
     USER_IN_TOURNAMENT_PROBABILITY = 0.99
 
     def __init__(self):
@@ -30,6 +31,7 @@ class Command(BaseCommand):
         self._create_tournaments()
         self.tournaments = Tournament.objects.all()
         self._create_usersInTournaments()
+        self._delete_Jeb_in_sample_tournament_one()
 
     def create_users(self):
         user_count = 3
@@ -171,7 +173,7 @@ class Command(BaseCommand):
     
     def _create_userInTournament(self, user, tournament):
         if (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
-            is_co_organiser = self.faker.random_elements(elements=OrderedDict([("True", 0.1), ("False", 0.9), ]), length=1)[0]
+            is_co_organiser = self.faker.random_elements(elements=OrderedDict([("True", 0.05), ("False", 0.95), ]), length=1)[0]
             UserInTournament.objects.create(
                     user=user,
                     tournament=tournament,
@@ -217,11 +219,11 @@ class Command(BaseCommand):
         )
 
         location = self.faker.city()
-        description = self.faker.text(max_nb_chars=520)
+        club_description = self.faker.text(max_nb_chars=520)
         club = Club.objects.create(
             name='Kerbal Chess Club',
             location=location,
-            description=description
+            description=club_description
         )
 
         UserInClub.objects.create(
@@ -241,7 +243,52 @@ class Command(BaseCommand):
             club=club,
             user_level=1
         )
+
+        tournament_description = self.faker.text(max_nb_chars=520)
+        max_players = self.faker.random_int(min=2, max=96)
+        tournament_before_deadline = Tournament.objects.create(
+                name="Valentina Tournament One",
+                club=club,
+                description=tournament_description,
+                organiser=Valentina,
+                max_players=max_players,
+                deadline=datetime.datetime.now() + datetime.timedelta(days=1),
+                finished=False
+        )
+
+        UserInTournament.objects.create(
+                user=Valentina,
+                tournament=tournament_before_deadline,
+                is_organiser=True,
+                is_co_organiser=False
+        )
+
+        tournament_passed_deadline = Tournament.objects.create(
+                name="Valentina Tournament Two",
+                club=club,
+                description=tournament_description,
+                organiser=Valentina,
+                max_players=max_players,
+                deadline=self.faker.date_this_month(before_today=True, after_today=False),
+                finished=True
+        )
+
+        UserInTournament.objects.create(
+                user=Valentina,
+                tournament=tournament_passed_deadline,
+                is_organiser=True,
+                is_co_organiser=False
+        )
+
         print("Sample creating complete.      ")
+
+    def _delete_Jeb_in_sample_tournament_one(self):
+        club = Club.objects.get(name = 'Kerbal Chess Club')
+        organiser = User.objects.get(username = 'val@example.org')
+        tournament = Tournament.objects.get(name="Valentina Tournament One", club=club, organiser=organiser)
+        if not (User.objects.get(username = 'jeb@example.org') == None):
+            jeb = User.objects.get(username = 'jeb@example.org')
+            UserInTournament.objects.get(user=jeb, tournament=tournament).delete()
 
     def _email(self, first_name, last_name):
         email = f'{first_name}.{last_name}@example.org'
