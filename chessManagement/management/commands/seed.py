@@ -1,16 +1,19 @@
+from typing import OrderedDict
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from faker import Faker
 from faker.providers import BaseProvider
-from faker.providers import address
-from chessManagement.models import User, Club, UserInClub
+from faker.providers import address, date_time
+from chessManagement.models import Tournament, User, Club, UserInClub, UserInTournament
 from random import randint, random
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
     USER_COUNT = 100
-    CLUB_COUNT = 10
-    INCLUB_PROBABILITY = 0.5
+    CLUB_COUNT = 5
+    USER_IN_CLUB_PROBABILITY = 0.8
+    ORGANISER_CREATE_TOURNAMENT_PROBABILITY = 0.15
+    USER_IN_TOURNAMENT_PROBABILITY = 0.99
 
     def __init__(self):
         super().__init__()
@@ -21,7 +24,12 @@ class Command(BaseCommand):
         self.create_users()
         self.users = User.objects.all()
         self._create_clubs()
+        self.clubs = Club.objects.all()
         self._create_usersInClubs()
+        self.usersInClubs = UserInClub.objects.all()
+        self._create_tournaments()
+        self.tournaments = Tournament.objects.all()
+        self._create_usersInTournaments()
 
     def create_users(self):
         user_count = 3
@@ -76,12 +84,11 @@ class Command(BaseCommand):
 
     def _create_usersInClubs(self):
         userInClub_count = 3
-        clubs = Club.objects.all()
-        for club in clubs:
+        for club in self.clubs:
+            print(f"Seeding userInClub {userInClub_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
             self._create_owner_userInClub(club)
-            users = User.objects.all()
-            for user in users:
-                print(f"Seeding userInClub {userInClub_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
+            userInClub_count += 1
+            for user in self.users:
                 try:
                     self._create_userInClub(user, club)
                 except:
@@ -102,13 +109,75 @@ class Command(BaseCommand):
         return self.users[index]
 
     def _create_userInClub(self, user, club):
-        if random() < self.INCLUB_PROBABILITY:
+        if random() < self.USER_IN_CLUB_PROBABILITY:
             user_level = self.faker.random_int(min=0, max=2)
             UserInClub.objects.create(
                 user=user,
                 club=club,
                 user_level=user_level
             )
+
+    def _create_tournaments(self):
+        tournament_count = 0
+        for club in self.clubs:
+            user_ids = self.usersInClubs.filter(club=club,user_level__in=[2,3]).values_list('user', flat=True)
+            organisers = User.objects.filter(id__in=user_ids)
+            for organiser in organisers:
+                print(f"Seeding tournament {tournament_count}", end='\r')
+                try:
+                    self._create_tournament(club, organiser)
+                except:
+                    continue
+                tournament_count += 1
+        print("Tournament seeding complete.      ")
+
+    def _create_tournament(self, club, organiser):
+        if random() < self.ORGANISER_CREATE_TOURNAMENT_PROBABILITY:
+            name = f'{organiser.first_name} Tournament'
+            description = self.faker.text(max_nb_chars=520)
+            max_players = self.faker.random_int(min=2, max=96)
+            deadline = self.faker.date_this_month(before_today=True, after_today=True)
+            finished = self.faker.random_choices(elements=('True', 'False'), length=1)[0]
+            tournament = Tournament.objects.create(
+                name=name,
+                club=club,
+                description=description,
+                organiser=organiser,
+                max_players=max_players,
+                deadline=deadline,
+                finished=finished
+            )
+            UserInTournament.objects.create(
+                user=organiser,
+                tournament=tournament,
+                is_organiser=True,
+                is_co_organiser=False
+            )
+
+    def _create_usersInTournaments(self):
+        userInTournaments_count = 0
+        for tournament in self.tournaments:
+            user_ids = self.usersInClubs.filter(club=tournament.club,user_level__in=[1,2,3]).values_list('user', flat=True)
+            users = User.objects.filter(id__in=user_ids)
+            for user in users:
+                print(f"Seeding userInTournament {userInTournaments_count}", end='\r')
+                if not user == tournament.organiser:
+                    try:
+                        self._create_userInTournament(user, tournament)
+                    except:
+                        continue
+                    userInTournaments_count += 1
+        print("UserInTournaments seeding complete.      ")
+    
+    def _create_userInTournament(self, user, tournament):
+        if (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
+            is_co_organiser = self.faker.random_elements(elements=OrderedDict([("True", 0.1), ("False", 0.9), ]), length=1)[0]
+            UserInTournament.objects.create(
+                    user=user,
+                    tournament=tournament,
+                    is_organiser=False,
+                    is_co_organiser=is_co_organiser
+                )
 
     def _create_samples(self):
         if (User.objects.filter(username='jeb@example.org').count())!=0:
