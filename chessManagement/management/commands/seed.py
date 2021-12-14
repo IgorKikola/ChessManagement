@@ -4,57 +4,35 @@ from faker import Faker
 from faker.providers import BaseProvider
 from faker.providers import address
 from chessManagement.models import User, Club, UserInClub
+from random import randint, random
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
-    USER_COUNT = 25
-    CLUB_COUNT = 5
+    USER_COUNT = 100
+    CLUB_COUNT = 10
+    INCLUB_PROBABILITY = 0.5
 
     def __init__(self):
         super().__init__()
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
-        """Include Example Users"""
-        if (User.objects.filter(username='jeb@example.org').count())==0:
-            self._create_examples()
-            print('-----Include Example Users------')
+        self._create_samples()
+        self.create_users()
+        self.users = User.objects.all()
+        self._create_clubs()
+        self._create_usersInClubs()
 
-        """Seed User"""
-        user_count = 0
-        while user_count < Command.USER_COUNT:
-            print(f'Seeding user {user_count}',  end='\r')
+    def create_users(self):
+        user_count = 3
+        while user_count < self.USER_COUNT:
+            print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
             try:
                 user = self._create_user()
-            except (IntegrityError):
+            except:
                 continue
             user_count += 1
-        print('-----User seeding complete------')
-
-        """Seed Club"""
-        club_count = 0
-        while club_count < Command.CLUB_COUNT:
-            print(f'Seeding club {club_count}',  end='\r')
-            try:
-                club = self._create_club()
-            except (IntegrityError):
-                continue
-            club_count += 1
-        print('-----Club seeding complete------')
-
-        """Seed UserInClub"""
-        userInClub_count = 0
-        clubs = Club.objects.all()
-        for club in clubs:
-            users = User.objects.all()
-            for user in users:
-                print(f'Seeding user In Club {userInClub_count}',  end='\r')
-                try:
-                    self._create_userInClub(user, club)
-                except (IntegrityError):
-                    continue
-                userInClub_count += 1
-        print('-----UserInClub seeding complete------')
+        print("User seeding complete.      ")
 
     def _create_user(self):
         first_name = self.faker.first_name()
@@ -75,9 +53,16 @@ class Command(BaseCommand):
             experience=experience
         )
 
-    def _email(self, first_name, last_name):
-        email = f'{first_name}.{last_name}@example.org'
-        return email
+    def _create_clubs(self):
+        club_count = 1
+        while club_count < self.CLUB_COUNT:
+            print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
+            try:
+                club = self._create_club()
+            except:
+                continue
+            club_count += 1
+        print("Club seeding complete.      ")
 
     def _create_club(self):
         location = self.faker.city()
@@ -88,21 +73,36 @@ class Command(BaseCommand):
             location=location,
             description=description
         )
-        return club
 
-    def _club_name(self, location):
-        name = f'{location} Chess Club'
-        return name
+    def _create_usersInClubs(self):
+        userInClub_count = 3
+        clubs = Club.objects.all()
+        for club in clubs:
+            self._create_owner_userInClub(club)
+            users = User.objects.all()
+            for user in users:
+                print(f"Seeding userInClub {userInClub_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
+                try:
+                    self._create_userInClub(user, club)
+                except:
+                    continue
+                userInClub_count += 1
+        print("UserInClub seeding complete.      ")
+
+    def _create_owner_userInClub(self, club):
+        user = self.get_random_user()
+        UserInClub.objects.create(
+            user=user,
+            club=club,
+            user_level=3
+        )
+
+    def get_random_user(self):
+        index = randint(0,self.users.count()-1)
+        return self.users[index]
 
     def _create_userInClub(self, user, club):
-        owner_id = UserInClub.objects.filter(club=club,user_level__in=[3]).values_list('user', flat=True)
-        if User.objects.filter(id__in=owner_id).count()==0:
-            UserInClub.objects.create(
-                user=user,
-                club=club,
-                user_level=3
-            )
-        else:
+        if random() < self.INCLUB_PROBABILITY:
             user_level = self.faker.random_int(min=0, max=2)
             UserInClub.objects.create(
                 user=user,
@@ -110,7 +110,9 @@ class Command(BaseCommand):
                 user_level=user_level
             )
 
-    def _create_examples(self):
+    def _create_samples(self):
+        if (User.objects.filter(username='jeb@example.org').count())!=0:
+            return
         bio = self.faker.text(max_nb_chars=520)
         personal_statement = self.faker.text(max_nb_chars=500)
         experience = self.faker.random_choices(elements=('Beginner', 'Intermediate', 'Master'), length=1)[0]
@@ -170,3 +172,12 @@ class Command(BaseCommand):
             club=club,
             user_level=1
         )
+        print("Sample creating complete.      ")
+
+    def _email(self, first_name, last_name):
+        email = f'{first_name}.{last_name}@example.org'
+        return email
+    
+    def _club_name(self, location):
+        name = f'{location} Chess Club'
+        return name
