@@ -14,6 +14,13 @@
       </div>
       <div class="card m-2">
         <div class="card-body">
+          <h5 class="card-title">Tournaments</h5>
+          <p class="card-text">Officers of this club can host tournaments that any member can join.</p>
+          <a href="{% url 'tournament_list' club.pk %}" class="btn btn-primary">Check it out</a>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
           <h5 class="card-title">Applicant List</h5>
           <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
           <a href="{% url 'applicants' club.pk %}" class="btn btn-primary">Go and Check</a>
@@ -24,20 +31,6 @@
           <h5 class="card-title">Leave Club</h5>
           <p class="card-text">If you don't like this club, you can leave it. If you want to rejoin, you will have to apply again.</p>
           <a href="{% url 'leave_club' club.pk %}" class="btn btn-primary">Leave</a>
-        </div>
-      </div>
-        <div class="card m-2">
-        <div class="card-body">
-          <h5 class="card-title">create tournament</h5>
-          <p class="card-text">create tournament</p>
-          <a href="{% url 'create_tournament' club.pk %}" class="btn btn-primary">Create a tournament</a>
-        </div>
-      </div>
-                <div class="card m-2">
-        <div class="card-body">
-          <h5 class="card-title">tournament list</h5>
-          <p class="card-text">tournament list</p>
-          <a href="{% url 'tournament_list' club.pk %}" class="btn btn-primary">tournament list</a>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
@@ -112,6 +114,27 @@ class User(AbstractUser):
     def isOwnerOf(self, club):
         return UserInClub.objects.filter(user=self, club=club, user_level=3).count() == 1
 
+    def isInClub(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level__in=[1,2,3]).count() == 1
+
+    def isInTournament(self, tournament):
+        return UserInTournament.objects.filter(tournament=tournament, user=self).count() == 1
+
+    def isOrganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_organiser
+        else:
+            return False
+
+    def isCoorganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_co_organiser
+        else:
+            return False
+
+
 class Club(models.Model):
 
     name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
@@ -223,6 +246,18 @@ class Tournament(models.Model):
         allUsers = User.objects.filter(id__in=user_ids)
         return allUsers.count()
 
+    def isExpired(self):
+        return self.deadline < datetime.date.today()
+
+    def getOrganiser(self):
+        return UserInTournament.objects.filter(tournament=self,is_organiser=True).first().user
+
+    def co_organisers(self):
+        user_ids = UserInTournament.objects.filter(tournament=self,is_co_organiser=True).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def games(self):
+        return Game.objects.filter(tournament=self, finished=False)
 
 class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
@@ -241,5 +276,12 @@ class Game(models.Model):
     )
     player1 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_1')
     player2 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_2')
-    finished = models.BooleanField()
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+    finished = models.BooleanField(default=False)
     winner = models.CharField(blank=True, max_length=8,null=True, choices=WINNER_CHOICES, default=None)
+
+    def getPlayer1(self):
+        return User.objects.get(pk=player1)
+
+    def getPlayer2(self):
+        return User.objects.get(pk=player2)
