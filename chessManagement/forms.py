@@ -3,7 +3,7 @@ import datetime
 
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, UserInClub, Tournament, UserInTournament
+from .models import User, Club, UserInClub, Tournament, UserInTournament, Game
 
 
 class LogInForm(forms.Form):
@@ -66,6 +66,7 @@ class changePassword(forms.ModelForm):
 
         model = User
         fields = []
+
     new_password = forms.CharField(
         label='New Password',
         widget=forms.PasswordInput(),
@@ -75,10 +76,12 @@ class changePassword(forms.ModelForm):
                     'character and a number'
         )]
     )
+
     new_password_confirmation = forms.CharField(
         label='New Password Confirmation',
         widget=forms.PasswordInput()
     )
+
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
@@ -87,6 +90,7 @@ class changePassword(forms.ModelForm):
         new_password_confirmation = self.cleaned_data.get('new_password_confirmation')
         if new_password != new_password_confirmation:
             self.add_error('new_password_confirmation', 'Confirmation does not match password.')
+
 
 class changeProfile(forms.Form):
     """Form enabling unregistered users to change their profile."""
@@ -148,6 +152,7 @@ class createClubForm(forms.ModelForm):
         )
         return club
 
+
 class changeClubDetails(forms.Form):
     """Form enabling club owners to change club details."""
     location = forms.CharField(
@@ -161,6 +166,7 @@ class changeClubDetails(forms.Form):
         widget=forms.Textarea(),
         required=False
     )
+
 
 class createTournamentForm(forms.ModelForm):
 
@@ -199,3 +205,11 @@ class createTournamentForm(forms.ModelForm):
             is_organiser=True
         )
         return club
+
+
+class decideGameOutcome(forms.Form):
+    """ Form for deciding the winner of a match """
+    winner = forms.ChoiceField(
+        required=False,
+        choices=Game.WINNER_CHOICES
+    )
