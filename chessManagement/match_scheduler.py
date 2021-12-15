@@ -50,12 +50,6 @@ def assign_to_elimination_groups(players, group_size):
     return groups
 
 
-def schedule(groups):
-    matches = []
-    for group in groups:
-        matches.extend(schedule_matches_within_group(group))
-    return matches
-
 def schedule_matches_within_group(group):
     if len(group) % 2 == 0:
         return schedule_even_draw(group)
