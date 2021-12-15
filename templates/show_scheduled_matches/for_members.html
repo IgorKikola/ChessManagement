@@ -20,15 +20,47 @@
         <tbody>
           {% for game in tournament.current_stage.games %}
             <tr>
-              <td>
-                <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
-                <h5>{{ game.player1.full_name }}</h5>
-              </td>
-              <td><h3>VS</h3></td>
-              <td>
-                <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
-                <h5>{{ game.player2.full_name }}</h5>
-              </td>
+              {% if game.winner == "1" %}
+                <td class="table-success">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-danger">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% elif game.winner == "2" %}
+                <td class="table-danger">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-success">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% elif game.winner == "0" %}
+                <td class="table-secondary">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-secondary">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% else %}
+                <td>
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td>
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% endif %}
             </tr>
           {% endfor %}
         </tbody>

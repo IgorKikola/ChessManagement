@@ -53,17 +53,16 @@
                   <h5>{{ game.player2.full_name }}</h5>
                 </td>
               {% else %}
-              <td>
-                <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
-                <h5>{{ game.player1.full_name }}</h5>
-              </td>
-              <td class="align-middle"><h3>VS</h3></td>
-              <td>
-                <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
-                <h5>{{ game.player2.full_name }}</h5>
-              </td>
+                <td>
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td>
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
               {% endif %}
-
               <td class="align-middle">
                 <a href="{% url 'decide_game_outcome' club.pk tournament.pk game.pk %}" class="btn btn-primary">Enter Game Outcome</a>
               </td>
