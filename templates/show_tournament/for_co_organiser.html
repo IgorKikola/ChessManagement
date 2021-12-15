@@ -19,6 +19,13 @@
           <a href="{% url 'co_organiser_list' club.pk tournament.pk %}" class="btn btn-primary">Co-Organiser list</a>
         </div>
       </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Schedule of Matches</h5>
+          <p class="card-text">As a co-organiser, you can request the system to schedule matches and enter the results of matches.</p>
+          <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Show Matches</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

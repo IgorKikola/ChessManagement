@@ -22,8 +22,8 @@
       <div class="card m-2">
         <div class="card-body">
           <h5 class="card-title">Schedule of Matches</h5>
-          <p class="card-text">Schedule of Matches</p>
-          <a href="{% url 'scheduled_matches' club.pk tournament.pk %}" class="btn btn-primary">Schedule of Matches</a>
+          <p class="card-text">As the organiser, you can request the system to schedule matches and enter the results of matches.</p>
+          <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Show Matches</a>
         </div>
       </div>
     </div>

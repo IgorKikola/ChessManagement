@@ -1,0 +1,32 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row align-items-center">
+      <h1>Enter Game Outcome</h1>
+      <p></p>
+      <div class="col-2">
+        <h2>Player 1</h2>
+        <img src="{{ game.player1.gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+        <h3>{{ game.player1.full_name }}</h3>
+      </div>
+      <div class="col-2">
+        <h1>VS</h1>
+      </div>
+      <div class="col-2">
+        <h2>Player 2</h2>
+        <img src="{{ game.player2.gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+        <h3>{{ game.player2.full_name }}</h3>
+      </div>
+  </div>
+  <p></p>
+  <div class="row">
+    <div class="col-6">
+      <form action="{% url 'decide_game_outcome' club.pk tournament.pk game.pk %}" method="post">
+        {% csrf_token %}
+        <h2>{% include 'partials/bootstrap_form.html' with form=form %}</h2>
+        <input type="submit" value="Enter" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

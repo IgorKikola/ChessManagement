@@ -32,6 +32,15 @@
           {% endif %}
         </div>
       </div>
+      {% if applied %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Schedule of Matches</h5>
+            <p class="card-text">Schedule of Matches</p>
+            <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Schedule of Matches</a>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>

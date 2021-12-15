@@ -5,10 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from .models import User, Club, UserInClub, Tournament, UserInTournament, Game
-from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, createTournamentForm
-from .helpers import login_prohibited, valid_club_required, valid_club_and_user_required, tournament_must_belong_to_club, tournament_and_user_must_belong_to_club
-from .match_scheduler import schedule
+from .models import User, Club, UserInClub, Tournament, UserInTournament, Game, Stage, Group
+from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, createTournamentForm, decideGameOutcome
+from .helpers import login_prohibited, valid_club_required, valid_club_and_user_required, tournament_must_belong_to_club, tournament_and_user_must_belong_to_club, tournament_and_game_must_belong_to_club
+from .match_scheduler import assign_to_groups, schedule_matches_within_group
 from django.contrib import messages
 
 @login_prohibited
@@ -459,20 +459,77 @@ def remove_user(request, club_pk, user_id):
 @login_required
 def show_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
-    return render(request, 'scheduled_matches.html', {'tournament': tournament})
+    club = Club.objects.get(pk=club_pk)
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        template = 'show_scheduled_matches/for_organisers.html'
+    else:
+        template = 'show_scheduled_matches/members.html'
+    return render(request, template, {'club': club, 'tournament': tournament})
+
+
+@tournament_and_game_must_belong_to_club
+@login_required
+def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    club = Club.objects.get(pk=club_pk)
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        game = Game.objects.get(pk=game_pk)
+        if request.method == 'POST':
+            form = decideGameOutcome(request.POST)
+            if form.is_valid():
+                game.setWinner(form.cleaned_data.get('winner'))
+                game.setFinished()
+                game.save()
+                return redirect('show_matches', club_pk, tournament_pk)
+        form = decideGameOutcome()
+        return render(request, 'decide_game_outcome.html', {'form': form, 'club': club, 'tournament': tournament, 'game': game})
+    else:
+        return redirect('show_matches', club_pk, tournament_pk)
+
 
 @tournament_must_belong_to_club
 @login_required
-def schedule_matches(request, club_pk, tournament_pk):
+def next_stage(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     if request.user.isOrganiserOf(tournament):
-        players = tournament.users()
-        matches = schedule(players)
-        for match in matches:
-            Game.objects.create(
-                player1 = match[0],
-                player2 = match[1],
-                tournament = tournament,
-                finished = False,
-            )
-    return redirect('scheduled_matches', club_pk, tournament_pk)
+        current_stage = tournament.current_stage
+        if current_stage is None:
+            players = tournament.users()
+        else:
+            if not current_stage.gamesAreFinished():
+                return redirect('show_matches', club_pk, tournament_pk)
+            elif len(current_stage.games()) is 1:
+                return redirect('show_matches', club_pk, tournament_pk)
+            else:
+                players = current_stage.getWinners()
+
+        groups = assign_to_groups(players)
+        if len(groups[0]) > 2: # elimination stages have groups of at least 3 players
+            type = 0 # elimination
+        else:
+            type = 1 # single
+        new_stage = Stage.objects.create(
+            tournament_in=tournament,
+            type=type
+        )
+        tournament.current_stage = new_stage
+        tournament.save()
+
+        for group in groups:
+            new_group = Group.objects.create(stage=new_stage)
+            for player in group:
+                playerInTournament = tournament.getUserInTournament(player)
+                playerInTournament.setGroup(new_group)
+                playerInTournament.save()
+
+            matches = schedule_matches_within_group(group)
+            for match in matches:
+                Game.objects.create(
+                    player1 = match[0],
+                    player2 = match[1],
+                    tournament = tournament,
+                    group = new_group,
+                    finished = False,
+                )
+
+    return redirect('show_matches', club_pk, tournament_pk)
