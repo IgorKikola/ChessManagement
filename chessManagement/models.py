@@ -237,7 +237,7 @@ class Tournament(models.Model):
     max_players = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(96)])
     deadline = models.DateField()
     finished = models.BooleanField()
-    current_stage = models.ForeignKey(Stage, blank=True)
+    current_stage = models.ForeignKey('Stage', blank=True, null=True, on_delete=models.SET_NULL)
 
     def users(self):
         user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False,is_co_organiser=False).values_list('user', flat=True)
@@ -261,19 +261,27 @@ class Tournament(models.Model):
     def games(self):
         return Game.objects.filter(tournament=self, finished=False)
 
+    def getUserInTournament(self, user):
+        return UserInTournament.objects.get(tournament=self, user=user)
+
 
 class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
     is_organiser = models.BooleanField()
     is_co_organiser = models.BooleanField(default=False)
-    group = models.ForeignKey(Group, blank=True)
+    group = models.ForeignKey('Group', blank=True, null=True, on_delete=models.SET_NULL)
+
+    def setGroup(self, group):
+        self.group = group
 
 
 class Game(models.Model):
+    DRAW = 0
     PLAYER1 = 1
     PLAYER2 = 2
     WINNER_CHOICES = (
+        (DRAW, "Draw"),
         (PLAYER1, "Player 1"),
         (PLAYER2, "Player 2"),
     )
@@ -282,18 +290,18 @@ class Game(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
     finished = models.BooleanField(default=False)
     winner = models.CharField(blank=True, max_length=8,null=True, choices=WINNER_CHOICES, default=None)
-    group = models.ForeignKey(Group, blank=True)
+    group = models.ForeignKey('Group', blank=True, null=True, on_delete=models.SET_NULL)
 
     def getPlayer1(self):
-        return User.objects.get(pk=player1)
+        return self.player1
 
     def getPlayer2(self):
-        return User.objects.get(pk=player2)
+        return self.player2
 
     def getWinner(self):
-        if self.winner is PLAYER1:
+        if self.winner == "1":
             return self.getPlayer1()
-        elif self.winner is PLAYER2:
+        elif self.winner == "2":
             return self.getPlayer2()
         else:
             return None
@@ -301,17 +309,22 @@ class Game(models.Model):
     def isFinished(self):
         return self.finished
 
+    def setWinner(self, winner):
+        self.winner = winner
+
+    def setFinished(self):
+        self.finished = True
 
 class Stage(models.Model):
     ELIMINATION = 0
     SINGLE = 1
     STAGE_TYPE_CHOICES = (
         (ELIMINATION, "Elimination"),
-        (PLAYER2, "Single"),
+        (SINGLE, "Single"),
     )
 
     type = models.IntegerField(blank=False, choices=STAGE_TYPE_CHOICES)
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+    tournament_in = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
 
     def groups(self):
         return Group.objects.filter(stage=self)
@@ -321,6 +334,23 @@ class Stage(models.Model):
 
     def typeIsElimination(self):
         return (self.type is 0)
+
+    def gamesAreFinished(self):
+        for group in self.groups():
+            if not group.gamesAreFinished():
+                return False
+        return True
+
+    def getWinners(self):
+        winners = []
+        for group in self.groups():
+            winners.extend(group.winners())
+        return winners
+
+    def games(self):
+        groups = self.groups()
+        return Game.objects.filter(group__in=groups)
+
 
 class Group(models.Model):
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, blank=False)
@@ -371,7 +401,7 @@ def getPlayerWithMostPoints(players_and_points_dictionary):
     winner = None
     max = 0
     for player in players_and_points_dictionary.keys():
-        if points[player] > max:
+        if players_and_points_dictionary.get(player) > max:
             winner = player
-            max = points[player]
+            max = players_and_points_dictionary.get(player)
     return winner
