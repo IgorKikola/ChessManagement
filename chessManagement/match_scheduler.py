@@ -1,51 +1,34 @@
 """ Schedules games in tournaments """
 
-
-def schedule(players):
-    matches = []
+def assign_to_groups(players):
+    groups = []
     number_of_players = len(players)
     if number_of_players > 16: # group stage
         if number_of_players > 32:
-            groups = assign_to_groups(players, 6)
+            groups = assign_to_elimination_groups(players, 6)
         else:
-            groups = assign_to_groups(players, 4)
-        for group in groups:
-            matches.extend(schedule_within_group(group))
+            groups = assign_to_elimination_groups(players, 4)
     else: # main bracket
         if number_of_players in [2,4,8,16]:
-            match_all(players)
+            groups = assign_to_pairs(players)
         else: # elimination stage is needed
             if number_of_players > 6:
-                groups = assign_to_groups(players, 4)
+                groups = assign_to_elimination_groups(players, 4)
             else:
-                groups = assign_to_groups(players, 6)
-            for group in groups:
-                matches.extend(schedule_within_group(group))
-    return matches
+                groups = assign_to_elimination_groups(players, 6)
+    return groups
 
-
-def reorder(list):
-    new_list = []
-    i = 0
-    l = len(list)
-    while i < int(l/2):
-        new_list.append(list[i])
-        i = i + 1
-        new_list.append(list[l-i])
-    return new_list
-
-
-def match_all(players):
-    matches = []
+def assign_to_pairs(players):
+    pairs = []
     i = 0
     l = len(players)
     if l % 2 == 0:
         while i < l:
-            matches.append((players[i], players[i + 1]))
+            pairs.append((players[i], players[i + 1]))
             i = i + 2
-    return matches
+    return pairs
 
-def assign_to_groups(players, group_size):
+def assign_to_elimination_groups(players, group_size):
     number_of_players = len(players)
     number_of_groups = int(number_of_players / group_size)
     groups = []
@@ -67,14 +50,19 @@ def assign_to_groups(players, group_size):
     return groups
 
 
-def schedule_within_group(group):
+def schedule(groups):
+    matches = []
+    for group in groups:
+        matches.extend(schedule_matches_within_group(group))
+    return matches
+
+def schedule_matches_within_group(group):
     if len(group) % 2 == 0:
         return schedule_even_draw(group)
     else:
         return schedule_odd_draw(group)
 
 def schedule_even_draw(group):
-    """Return the list of games."""
     matches = []
     half_len = int(len(group)/2)
     arr1 = [i+1 for i in range(half_len)]
@@ -87,7 +75,6 @@ def schedule_even_draw(group):
     return matches
 
 def schedule_odd_draw(group):
-    """Return the list of games."""
     matches = []
     half_len = int((len(group)+1)/2)
     arr1 = [i+1 for i in range(half_len)]
@@ -99,3 +86,14 @@ def schedule_odd_draw(group):
             if len(group)+1 not in gm:
                 matches.append((group[gm[0]-1], group[gm[1]-1]))
     return matches
+
+
+def reorder(list):
+    new_list = []
+    i = 0
+    l = len(list)
+    while i < int(l/2):
+        new_list.append(list[i])
+        i = i + 1
+        new_list.append(list[l-i])
+    return new_list
