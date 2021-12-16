@@ -330,6 +330,12 @@ class Stage(models.Model):
     def groups(self):
         return Group.objects.filter(stage=self)
 
+    def players(self):
+        players = []
+        for group in self.groups():
+            players.extend(group.players())
+        return players
+
     def getType(self):
         return self.type
 

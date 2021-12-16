@@ -446,17 +446,6 @@ def remove_user(request, club_pk, user_id):
         return redirect('show_club', club_pk)
 
 
-# @tournament_must_belong_to_club
-# @login_required
-# def scheduled_matches(request, club_pk, tournament_pk):
-#     tournament = Tournament.objects.get(pk=tournament_pk)
-#     return redirect('check')
-#     if tournament.finished == True:
-#         return render(request, 'scheduled_matches.html', {'tournament': tournament})
-#     else:
-#         messages.add_message(request, messages.ERROR, "The deadline has not passed yet!")
-#         return render(request, 'profile.html', {'tournament': tournament})
-
 @tournament_must_belong_to_club
 @login_required
 def show_matches(request, club_pk, tournament_pk):
@@ -493,7 +482,7 @@ def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
 @login_required
 def next_stage(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
-    if request.user.isOrganiserOf(tournament):
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         current_stage = tournament.current_stage
         if current_stage is None:
             players = tournament.users()
