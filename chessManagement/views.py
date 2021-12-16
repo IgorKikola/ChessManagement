@@ -450,13 +450,18 @@ def show_matches(request, club_pk, tournament_pk):
     club = Club.objects.get(pk=club_pk)
     current_stage = tournament.current_stage
     stage_length = len(current_stage.games())
+    winners = current_stage.getWinners()
+    for winner in winners:
+        if request.user == winner:
+            isWinner = True
+            break
     if stage_length == 1:
         tournament.setFinished()
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         template = 'show_scheduled_matches/for_organisers.html'
     else:
         template = 'show_scheduled_matches/for_members.html'
-    return render(request, template, {'club': club, 'tournament': tournament})
+    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner})
 
 @tournament_must_belong_to_club
 @login_required
