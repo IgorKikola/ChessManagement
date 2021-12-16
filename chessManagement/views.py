@@ -498,7 +498,7 @@ def next_stage(request, club_pk, tournament_pk):
         else:
             if not current_stage.gamesAreFinished():
                 return redirect('show_matches', club_pk, tournament_pk)
-            elif len(current_stage.games()) is 1:
+            elif len(current_stage.games()) == 1:
                 return redirect('show_matches', club_pk, tournament_pk)
             else:
                 players = current_stage.getWinners()

@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from .match_scheduler import reorder
 
 
 class CustomUserManager(BaseUserManager):
@@ -333,7 +334,7 @@ class Stage(models.Model):
         return self.type
 
     def typeIsElimination(self):
-        return (self.type is 0)
+        return (self.type == 0)
 
     def gamesAreFinished(self):
         for group in self.groups():
@@ -345,6 +346,8 @@ class Stage(models.Model):
         winners = []
         for group in self.groups():
             winners.extend(group.winners())
+        if self.typeIsElimination():
+            winners = reorder(winners)
         return winners
 
     def games(self):
