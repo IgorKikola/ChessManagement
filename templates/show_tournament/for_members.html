@@ -1,0 +1,48 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/tournament_profile.html' %}
+    </div>
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+          {% if expired %}
+            {% if applied %}
+              <p class="card-text" style="">The application deadline has passed!</p>
+              <p><b class="card-text" style="">You cannot withdraw anymore</b></p>
+              <a class="btn disabled">Withdraw</a>
+            {% else %}
+              <p><b class="card-text" style="">The application deadline has passed!</b></p>
+              <a class="btn disabled">Sign up</a>
+            {% endif %}
+          {% else %}
+            {% if applied %}
+              <p class="card-text">You have applied to this tournament!</p>
+              <p class="card-text">If you've changed your mind, you can withdraw:</p>
+              <a href='{% url 'cancel_sign_up_tournament' club.pk tournament.pk %}' class="btn btn-primary">Withdraw</a>
+            {% else %}
+              <p class="card-text">Here is information about this tournament.</p>
+              <p class="card-text">If you want to join, apply here:</p>
+              <p><b class="card-text">{{ tournament.deadline|timeuntil }} until the deadline to sign-up</b></p>
+              <a href='{% url 'sign_up_tournament' club.pk tournament.pk %}' class="btn btn-primary" >Sign up</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      {% if applied %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Schedule of Matches</h5>
+            <p class="card-text">Schedule of Matches</p>
+            <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Schedule of Matches</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      <h1>Tournaments</h1>
+      <table class="table">
+        <tr>
+          <th>
+            Organiser gravatar
+          </th>
+          <th>
+            Tournament name
+          </th>
+          <th>
+            Organiser name
+          </th>
+          <th>
+            Deadline for sign up
+          </th>
+        </tr>
+        {% for tournament in tournaments %}
+          <tr>
+            <td>
+              <img src="{{ tournament.organiser.mini_gravatar }}" alt="Gravatar of {{ tournament.name }}" class="rounded-circle" >
+            </td>
+            <td><a href="{% url 'show_tournament' tournament.club.pk tournament.pk  %}">{{ tournament.name }}</a></td>
+            <td>{{ tournament.organiser.full_name }}</td>
+            <td>{{ tournament.deadline }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="col-4">
+      {% if user_rank > 1 %}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Create Tournament</h5>
+            <p class="card-text">As an officer of this club, you can host a tournament on your own.</p>
+            <a href="{% url 'create_tournament' club.pk %}" class="btn btn-primary">Create</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

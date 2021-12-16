@@ -1,0 +1,107 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      <h1>Schedule of matches</h1>
+      <table class="table text-center">
+        <thead>
+          <tr>
+            <th>
+              <h2>Player 1</h2>
+            </th>
+            <th>
+            </th>
+            <th>
+              <h2>Player 2</h2>
+            </th>
+            <th>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in tournament.current_stage.games %}
+            <tr>
+              {% if game.winner == "1" %}
+                <td class="table-success">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-danger">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% elif game.winner == "2" %}
+                <td class="table-danger">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-success">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% elif game.winner == "0" %}
+                <td class="table-secondary">
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td class="table-secondary">
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% else %}
+                <td>
+                  <img src="{{ game.player1.mini_gravatar }}" alt="Gravatar of {{ game.player1.username }}" class="rounded-circle" >
+                  <h5>{{ game.player1.full_name }}</h5>
+                </td>
+                <td class="align-middle"><h3>VS</h3></td>
+                <td>
+                  <img src="{{ game.player2.mini_gravatar }}" alt="Gravatar of {{ game.player2.username }}" class="rounded-circle" >
+                  <h5>{{ game.player2.full_name }}</h5>
+                </td>
+              {% endif %}
+              <td class="align-middle">
+                <a href="{% url 'decide_game_outcome' club.pk tournament.pk game.pk %}" class="btn btn-primary">Enter Game Outcome</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if tournament.isExpired %}
+      {% if stage_length > 1 %}
+      <div class="col-4">
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Schedule next stage</h5>
+            <p class="card-text">If all game outcomes have been entered into the system, you request the system to schedule the games for the next stage of the tournament.</p>
+            <a href="{% url 'schedule_matches' club.pk tournament.pk %}" class="btn btn-primary">Schedule</a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-4">
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">Finish tournament</h5>
+            <p class="card-text">If the final score has been entered into the system, you request the system to finish the tournament and declare the winner.</p>
+            <a href="{% url 'finish_matches' club.pk tournament.pk %}" class="btn btn-primary">Finish</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% else %}
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+          <p class="card-text">Please wait untill the deadline has passed to schedule any rounds.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

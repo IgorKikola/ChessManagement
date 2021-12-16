@@ -1,0 +1,102 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Organiser:</h1>
+        <table class="table">
+          <tr>
+            <th>
+              Gravatar
+            </th>
+            <th>
+              Name
+            </th>
+            <th>
+              Bio
+            </th>
+          </tr>
+            <tr>
+              <td>
+                <img src="{{ tournament.organiser.mini_gravatar }}" alt="Gravatar of {{ tournament.co_organiser.full_name }}" class="rounded-circle" >
+              </td>
+              <td><a href="{% url 'show_user' club.pk tournament.organiser.id %}">{{ tournament.organiser.full_name }}</a></td>
+              <td>{{ tournament.organiser.bio }}</td>
+            </tr>
+        </table>
+    </div>
+  </div>
+  <p></p>
+  <div class="row">
+    <div class="col-12">
+      <h1>Co-organisers:</h1>
+      <table class="table ">
+        <tr>
+          <th>
+            Gravatar
+          </th>
+          <th>
+            Name
+          </th>
+          <th>
+            Bio
+          </th>
+          <th>
+            Remove
+          </th>
+        </tr>
+        {% for co_organiser in co_organisers %}
+          <tr>
+            <td>
+              <img src="{{ co_organiser.mini_gravatar }}" alt="Gravatar of {{ co_organiser.full_name }}" class="rounded-circle" >
+            </td>
+            <td><a href="{% url 'show_user' club.pk co_organiser.id %}">{{ co_organiser.full_name }}</a></td>
+            <td>{{ co_organiser.user.bio }}</td>
+            {% if request_user.is_organiser %}
+              <td><a href="{% url 'remove_co_organiser' club.pk tournament.pk co_organiser.id %}" class="btn btn-primary">Remove</a></td>
+            {% else %}
+              <td><input id=button type="button" class="btn btn-primary" disabled=true value="Remove"></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  <p></p>
+  <div class="row">
+    <div class="col-12">
+      <h1>Non-organiser officers:</h1>
+      <table class="table ">
+        <tr>
+          <th>
+            Gravatar
+          </th>
+          <th>
+            Name
+          </th>
+          <th>
+            Bio
+          </th>
+          <th>
+            Allow
+          </th>
+        </tr>
+        {% for officer in officers %}
+          <tr>
+            <td>
+              <img src="{{ officer.mini_gravatar }}" alt="Gravatar of {{ officer.full_name }}" class="rounded-circle" >
+            </td>
+            <td><a href="{% url 'show_user' club.pk officer.id %}">{{ officer.full_name }}</a></td>
+            <td>{{ officer.bio }}</td>
+            {% if request_user.is_organiser %}
+              <td><a href="{% url 'allow_co_organiser' club.pk tournament.pk officer.id %}" class="btn btn-primary">Allow</a></td>
+            {% else %}
+              <td><input id=button type="button" class="btn btn-primary" disabled=true value="Allow"></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

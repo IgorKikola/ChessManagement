@@ -1,15 +1,152 @@
+import datetime
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from .models import User, Club, UserInClub
-from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails
-from .helpers import login_prohibited
+from .models import User, Club, UserInClub, Tournament, UserInTournament, Game, Stage, Group
+from .forms import SignUpForm, LogInForm, changePassword, changeProfile, createClubForm, changeClubDetails, createTournamentForm, decideGameOutcome
+from .helpers import login_prohibited, valid_club_required, valid_club_and_user_required, tournament_must_belong_to_club, tournament_and_user_must_belong_to_club, tournament_and_game_must_belong_to_club
+from .match_scheduler import assign_to_groups, schedule_matches_within_group
 from django.contrib import messages
 
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
+
+@valid_club_required
+@login_required
+def create_tournament(request, club_pk):
+    user = request.user
+    club = Club.objects.get(pk=club_pk)
+    if user.isOfficerOf(club) or user.isOwnerOf(club):
+        if request.method == 'POST':
+            form = createTournamentForm(request.POST)
+            if form.is_valid():
+                tournament = form.save(request.user,club)
+                return redirect('tournament_list', club_pk)
+        else:
+            form = createTournamentForm()
+        return render(request,'create_tournament.html',{'form':form,'club_pk':club_pk})
+    else:
+        return redirect('show_club', club_pk)
+
+@valid_club_required
+@login_required
+def tournament_list(request, club_pk):
+    user = request.user
+    club = Club.objects.get(pk=club_pk)
+    tournament = Tournament.objects.all().filter(club=club)
+    if user.isInClub(club):
+        userInClub = club.getUserInClub(user)
+        user_rank = userInClub.user_level
+        if user_rank > 0:
+            return render(request, 'tournament_list.html', {'club': club, 'tournaments': tournament, 'user_rank': user_rank})
+        else:
+            return redirect('show_club', club_pk)
+    else:
+        return redurect('show_club', club_pk)
+
+@tournament_must_belong_to_club
+@login_required
+def co_organiser_list(request, club_pk, tournament_pk):
+    user = request.user
+    club = Club.objects.get(pk=club_pk)
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    if user.isOrganiserOf(tournament) or user.isCoorganiserOf(tournament):
+        participants = tournament.users()
+        officers = club.officers().exclude(id=tournament.getOrganiser().id).difference(participants)
+        co_organisers = tournament.co_organisers()
+        non_co_organisers = officers.difference(co_organisers)
+        request_user = UserInTournament.objects.get(user=request.user,tournament=tournament)
+        return render(request, 'co_organiser_list.html', {'club': club, 'co_organisers': co_organisers, 'officers': non_co_organisers, 'tournament':tournament,'request_user':request_user})
+    else:
+        return redirect('show_tournament', club_pk, tournament_pk)
+
+@tournament_and_user_must_belong_to_club
+@login_required
+def allow_co_organiser(request, club_pk, tournament_pk, user_id):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    if request.user.isOrganiserOf(tournament):
+        user = User.objects.get(id=user_id)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInTournament.objects.create(
+                user=user,
+                tournament=tournament,
+                is_organiser=False,
+                is_co_organiser=True
+            )
+            new_applicant.save()
+    return redirect('co_organiser_list', club_pk, tournament_pk)
+
+@tournament_and_user_must_belong_to_club
+@login_required
+def remove_co_organiser(request, club_pk, tournament_pk, user_id):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    if request.user.isOrganiserOf(tournament):
+        user = User.objects.get(id=user_id)
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) != 0:
+            UserInTournament.objects.get(tournament=tournament,user=user,is_co_organiser=True).delete()
+    return redirect('co_organiser_list', club_pk, tournament_pk)
+
+@tournament_must_belong_to_club
+@login_required
+def sign_up_tournament(request, club_pk, tournament_pk):
+    user = request.user
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    players = UserInTournament.objects.filter(tournament=tournament,is_organiser=False).count()
+    if players <= tournament.max_players:
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) == 0:
+            new_applicant = UserInTournament.objects.create(
+                user=user,
+                tournament=tournament,
+                is_organiser=False,
+                is_co_organiser=False
+            )
+            new_applicant.save()
+    return redirect('show_tournament', club_pk, tournament_pk)
+
+@tournament_must_belong_to_club
+@login_required
+def cancel_sign_up_tournament(request, club_pk, tournament_pk):
+    user = request.user
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    if not user.isOrganiserOf(tournament) and not user.isCoorganiserOf(tournament):
+        accounts = UserInTournament.objects.filter(tournament=tournament, user=user)
+        if len(accounts) != 0:
+            UserInTournament.objects.get(tournament=tournament,user=user).delete()
+    return redirect('show_tournament', club_pk, tournament_pk)
+
+@tournament_must_belong_to_club
+@login_required
+def show_tournament(request, club_pk, tournament_pk):
+    user = request.user
+    club = Club.objects.get(pk=club_pk)
+    if not user.isInClub(club):
+        return redirect('show_club', club_pk)
+    else:
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        expired = tournament.isExpired()
+        applied = user.isInTournament(tournament)
+        usersIntournament = tournament.users()
+
+        templates = {
+            0: 'show_tournament/for_members.html',
+            1: 'show_tournament/for_co_organiser.html',
+            2: 'show_tournament/for_organiser.html',
+        }
+        if user.isCoorganiserOf(tournament):
+            template = templates[1]
+        elif user.isOrganiserOf(tournament):
+            template = templates[2]
+        else:
+            template = templates[0]
+
+        return render(request, template, {'club': club, 'tournament': tournament, 'users': usersIntournament, 'applied':applied, 'expired': expired})
 
 @login_required
 def change_password(request):
@@ -121,77 +258,60 @@ def clubs_joined_list(request):
     clubs = user.clubsIn()
     return render(request, 'club_list/joined.html', {'clubs': clubs})
 
+@valid_club_required
 @login_required
 def show_club(request, club_pk):
     applied = False
-    try:
-        club = Club.objects.get(pk=club_pk)
-        account = UserInClub.objects.filter(club=club, user=request.user)
-        if len(account) != 0:
-            applied = True
-    except ObjectDoesNotExist:
-        return redirect('club_list')
+    club = Club.objects.get(pk=club_pk)
+    account = UserInClub.objects.filter(club=club, user=request.user)
+    if len(account) != 0:
+        applied = True
+    usersInClub = club.members
+
+    templates = {
+        0: 'show_club/for_applicant.html',
+        1: 'show_club/for_member.html',
+        2: 'show_club/for_officer.html',
+        3: 'show_club/for_owner.html',
+    }
+    if applied:
+        template = templates[account.first().user_level]
     else:
-        usersInClub = club.members
+        template = templates[0]
 
-        templates = {
-            0: 'show_club/for_applicant.html',
-            1: 'show_club/for_member.html',
-            2: 'show_club/for_officer.html',
-            3: 'show_club/for_owner.html',
-        }
-        if applied:
-            template = templates[account.first().user_level]
-        else:
-            template = templates[0]
+    return render(request, template, {'club': club, 'users': usersInClub, 'applied': applied})
 
-        return render(request, template, {'club': club, 'users': usersInClub, 'applied': applied})
-
+@valid_club_required
 @login_required
 def apply_Club(request, club_pk):
-    try:
-        user = request.user
-        club = Club.objects.get(pk=club_pk)
-        accounts = UserInClub.objects.filter(club=club, user=user)
-        if len(accounts) == 0:
-            new_applicant = UserInClub.objects.create(
-                user=user,
-                club=club,
-                user_level=0
-            )
-            new_applicant.save()
-        return redirect('show_club', club_pk)
-    except ObjectDoesNotExist:
-        return redirect('profile')
+    user = request.user
+    club = Club.objects.get(pk=club_pk)
+    accounts = UserInClub.objects.filter(club=club, user=user)
+    if len(accounts) == 0:
+        new_applicant = UserInClub.objects.create(
+            user=user,
+            club=club,
+            user_level=0
+        )
+        new_applicant.save()
+    return redirect('show_club', club_pk)
 
-
+@valid_club_required
 @login_required
 def applicant_list(request, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-        allUsers = club.users()
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    try:
-        session_user_in_club = club.getUserInClub(request.user)
-    except ObjectDoesNotExist:
-        return redirect('show_club', club_pk)
+    club = Club.objects.get(pk=club_pk)
+    applicants = club.applicants()
+    user = request.user
+    if user.isOfficerOf(club) or user.isOwnerOf(club):
+        return render(request, 'applicant_list.html', {'users': applicants, 'club': club})
     else:
-        if session_user_in_club.user_level == 0 or session_user_in_club.user_level == 1:
-            return redirect('show_club', club_pk)
-        users = list(allUsers)
-        for user in allUsers:
-            if not user.isApplicantIn(club):
-                users.remove(user)
-        return render(request, 'applicant_list.html', {'users': users, 'club': club})
+        return redirect('show_club', club_pk)
 
+@valid_club_and_user_required
 @login_required
-def show_user(request, user_id, club_pk):
+def show_user(request, club_pk, user_id):
     session_user = request.user
-    try:
-        club = Club.objects.get(pk=club_pk)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
+    club = Club.objects.get(pk=club_pk)
     try:
         shown_user_in_club = club.getUserInClub(user_id)
         session_user_in_club = club.getUserInClub(session_user)
@@ -221,60 +341,52 @@ def show_user(request, user_id, club_pk):
         else:
             return redirect('show_club', club_pk)
 
+@valid_club_and_user_required
 @login_required
-def to_member(request, user_id, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-        user = User.objects.get(id=user_id)
-        userInClub = club.getUserInClub(user)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    else:
-        if request.user.isOfficerOf(club) or request.user.isOwnerOf(club):
-            previous_rank = userInClub.user_level
-            userInClub.user_level=1
-            userInClub.save(update_fields=["user_level"])
-            if previous_rank == 2:
-                return redirect('show_user', club_pk, user_id)
-            else:
-                return redirect('applicants', club_pk)
-        return redirect('show_club', club_pk)
-
-@login_required
-def to_officer(request, user_id, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-        user = User.objects.get(id=user_id)
-        userInClub = club.getUserInClub(user)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    else:
-        if request.user.isOwnerOf(club):
-            if userInClub.user_level==1:
-                userInClub.user_level=2
-            userInClub.save(update_fields=["user_level"])
+def to_member(request, club_pk, user_id):
+    club = Club.objects.get(pk=club_pk)
+    user = User.objects.get(id=user_id)
+    userInClub = club.getUserInClub(user)
+    if request.user.isOfficerOf(club) or request.user.isOwnerOf(club):
+        previous_rank = userInClub.user_level
+        userInClub.user_level=1
+        userInClub.save(update_fields=["user_level"])
+        if previous_rank == 2:
             return redirect('show_user', club_pk, user_id)
-        return redirect('show_club', club_pk)
+        else:
+            return redirect('applicants', club_pk)
+    return redirect('show_club', club_pk)
 
+@valid_club_and_user_required
 @login_required
-def transfer_ownership(request, user_id, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-        user = User.objects.get(id=user_id)
-        userInClub = club.getUserInClub(user)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
-    else:
-        if request.user.isOwnerOf(club):
-            ownerInClub = club.getUserInClub(request.user)
-            if userInClub.user_level==2:
-                userInClub.user_level=3
-                ownerInClub.user_level=2
-                userInClub.save(update_fields=["user_level"])
-                ownerInClub.save(update_fields=["user_level"])
-            return redirect('show_user', club_pk, user_id)
-        return redirect('show_club', club_pk)
+def to_officer(request, club_pk, user_id):
+    club = Club.objects.get(pk=club_pk)
+    user = User.objects.get(id=user_id)
+    userInClub = club.getUserInClub(user)
+    if request.user.isOwnerOf(club):
+        if userInClub.user_level==1:
+            userInClub.user_level=2
+        userInClub.save(update_fields=["user_level"])
+        return redirect('show_user', club_pk, user_id)
+    return redirect('show_club', club_pk)
 
+@valid_club_and_user_required
+@login_required
+def transfer_ownership(request, club_pk, user_id):
+    club = Club.objects.get(pk=club_pk)
+    user = User.objects.get(id=user_id)
+    userInClub = club.getUserInClub(user)
+    if request.user.isOwnerOf(club):
+        ownerInClub = club.getUserInClub(request.user)
+        if userInClub.user_level==2:
+            userInClub.user_level=3
+            ownerInClub.user_level=2
+            userInClub.save(update_fields=["user_level"])
+            ownerInClub.save(update_fields=["user_level"])
+        return redirect('show_user', club_pk, user_id)
+    return redirect('show_club', club_pk)
+
+@valid_club_required
 @login_required
 def change_club_details(request, club_pk):
     club = Club.objects.get(pk=club_pk)
@@ -292,12 +404,10 @@ def change_club_details(request, club_pk):
         return render(request, 'change_club_details.html', {'form': clubDetails, 'club': club})
 
 
+@valid_club_required
 @login_required
 def leave_club(request, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
+    club = Club.objects.get(pk=club_pk)
     try:
         userInClub = club.getUserInClub(request.user)
     except ObjectDoesNotExist:
@@ -307,33 +417,120 @@ def leave_club(request, club_pk):
             userInClub.delete()
         return redirect('show_club', club_pk)
 
+@valid_club_required
 @login_required
 def delete_club(request, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-    except ObjectDoesNotExist:
+    club = Club.objects.get(pk=club_pk)
+    if request.user.isOwnerOf(club):
+        club.delete()
         return redirect('club_list')
+    return redirect('show_club', club_pk)
+
+@valid_club_and_user_required
+@login_required
+def remove_user(request, club_pk, user_id):
+    club = Club.objects.get(pk=club_pk)
+    user_to_remove = User.objects.get(id=user_id)
+    userInClub = club.getUserInClub(user_to_remove)
+    user = request.user
+    user_to_remove_rank = userInClub.user_level
+    if (user.isOfficerOf(club) and user_to_remove_rank == 2) or (user == user_to_remove) or (user_to_remove_rank == 3):
+        return redirect('show_club', club_pk)
+    elif user.isOfficerOf(club) or user.isOwnerOf(club):
+        userInClub.delete()
+        if user_to_remove_rank == 0:
+            return redirect('applicants', club_pk)
     else:
-        if request.user.isOwnerOf(club):
-            club.delete()
-            return redirect('club_list')
         return redirect('show_club', club_pk)
 
+@tournament_must_belong_to_club
 @login_required
-def remove_user(request, user_id, club_pk):
-    try:
-        club = Club.objects.get(pk=club_pk)
-        user_to_remove = User.objects.get(id=user_id)
-        userInClub = club.getUserInClub(user_to_remove)
-    except ObjectDoesNotExist:
-        return redirect('club_list')
+def show_matches(request, club_pk, tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    club = Club.objects.get(pk=club_pk)
+    current_stage = tournament.current_stage
+    stage_length = len(current_stage.games())
+    if stage_length == 1:
+        tournament.setFinished()
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        template = 'show_scheduled_matches/for_organisers.html'
     else:
-        user = request.user
-        user_to_remove_rank = userInClub.user_level
-        if (user.isOfficerOf(club) and user_to_remove_rank == 2) or (user == user_to_remove) or (user_to_remove_rank == 3):
-            return redirect('show_club', club_pk)
-        if user.isOfficerOf(club) or user.isOwnerOf(club):
-            userInClub.delete()
-            if user_to_remove_rank == 0:
-                return redirect('applicants', club_pk)
-        return redirect('show_club', club_pk)
+        template = 'show_scheduled_matches/for_members.html'
+    return render(request, template, {'club': club, 'tournament': tournament})
+
+@tournament_must_belong_to_club
+@login_required
+def finish_matches(request, club_pk, tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    club = Club.objects.get(pk=club_pk)
+    tournament.setFinished()
+    tournament.save()
+    return redirect('show_tournament', club_pk, tournament_pk)
+
+@tournament_and_game_must_belong_to_club
+@login_required
+def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    club = Club.objects.get(pk=club_pk)
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        game = Game.objects.get(pk=game_pk)
+        if request.method == 'POST':
+            form = decideGameOutcome(request.POST)
+            if form.is_valid():
+                game.setWinner(form.cleaned_data.get('winner'))
+                game.setFinished()
+                game.save()
+                return redirect('show_matches', club_pk, tournament_pk)
+        form = decideGameOutcome()
+        return render(request, 'decide_game_outcome.html', {'form': form, 'club': club, 'tournament': tournament, 'game': game})
+    else:
+        return redirect('show_matches', club_pk, tournament_pk)
+
+
+@tournament_must_belong_to_club
+@login_required
+def next_stage(request, club_pk, tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    if request.user.isOrganiserOf(tournament):
+        current_stage = tournament.current_stage
+        if current_stage is None:
+            players = tournament.users()
+        else:
+            if not current_stage.gamesAreFinished():
+                return redirect('show_matches', club_pk, tournament_pk)
+            elif len(current_stage.games()) == 1:
+                tournament.setFinished()
+                return redirect('show_matches', club_pk, tournament_pk)
+            else:
+                players = current_stage.getWinners()
+
+        groups = assign_to_groups(players)
+        if len(groups[0]) > 2: # elimination stages have groups of at least 3 players
+            type = 0 # elimination
+        else:
+            type = 1 # single
+        new_stage = Stage.objects.create(
+            tournament_in=tournament,
+            type=type
+        )
+        tournament.current_stage = new_stage
+        tournament.save()
+
+        for group in groups:
+            new_group = Group.objects.create(stage=new_stage)
+            for player in group:
+                playerInTournament = tournament.getUserInTournament(player)
+                playerInTournament.setGroup(new_group)
+                playerInTournament.save()
+
+            matches = schedule_matches_within_group(group)
+            for match in matches:
+                Game.objects.create(
+                    player1 = match[0],
+                    player2 = match[1],
+                    tournament = tournament,
+                    group = new_group,
+                    finished = False,
+                )
+
+    return redirect('show_matches', club_pk, tournament_pk)

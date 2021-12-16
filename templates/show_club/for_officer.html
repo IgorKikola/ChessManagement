@@ -14,6 +14,13 @@
       </div>
       <div class="card m-2">
         <div class="card-body">
+          <h5 class="card-title">Tournaments</h5>
+          <p class="card-text">Officers of this club can host tournaments that any member can join.</p>
+          <a href="{% url 'tournament_list' club.pk %}" class="btn btn-primary">Check it out</a>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
           <h5 class="card-title">Applicant List</h5>
           <p class="card-text">As an officer, you are able to approve applications to grant memberships.</p>
           <a href="{% url 'applicants' club.pk %}" class="btn btn-primary">Go and Check</a>

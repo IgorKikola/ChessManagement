@@ -41,4 +41,16 @@ urlpatterns = [
     path('club/<str:club_pk>/user/<int:user_id>/to_officer/', views.to_officer, name='to_officer'),
     path('club/<str:club_pk>/user/<int:user_id>/transfer_ownership/', views.transfer_ownership, name='transfer_ownership'),
     path('club/<str:club_pk>/user/<int:user_id>/remove/', views.remove_user, name='remove_user'),
+    path('club/<str:club_pk>/create_tournament', views.create_tournament, name='create_tournament'),
+    path('club/<str:club_pk>/tournaments/', views.tournament_list, name='tournament_list'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/', views.show_tournament, name='show_tournament'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/apply/', views.sign_up_tournament, name='sign_up_tournament'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/cancel/', views.cancel_sign_up_tournament, name='cancel_sign_up_tournament'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/co-organisers/', views.co_organiser_list, name='co_organiser_list'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/co-organisers/allow/<int:user_id>/', views.allow_co_organiser, name='allow_co_organiser'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/co-organisers/remove/<int:user_id>/', views.remove_co_organiser, name='remove_co_organiser'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/', views.show_matches, name='show_matches'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/finish', views.finish_matches, name='finish_matches'),    
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/schedule', views.next_stage, name='schedule_matches'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/match/<str:game_pk>', views.decide_game_outcome, name='decide_game_outcome')
 ]

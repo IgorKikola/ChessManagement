@@ -1,8 +1,12 @@
+import datetime
+
 from django.contrib.auth.base_user import BaseUserManager
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from .match_scheduler import reorder
 
 
 class CustomUserManager(BaseUserManager):
@@ -111,6 +115,27 @@ class User(AbstractUser):
     def isOwnerOf(self, club):
         return UserInClub.objects.filter(user=self, club=club, user_level=3).count() == 1
 
+    def isInClub(self, club):
+        return UserInClub.objects.filter(user=self, club=club, user_level__in=[1,2,3]).count() == 1
+
+    def isInTournament(self, tournament):
+        return UserInTournament.objects.filter(tournament=tournament, user=self).count() == 1
+
+    def isOrganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_organiser
+        else:
+            return False
+
+    def isCoorganiserOf(self, tournament):
+        userInTournament = UserInTournament.objects.filter(tournament=tournament, user=self)
+        if userInTournament:
+            return userInTournament.first().is_co_organiser
+        else:
+            return False
+
+
 class Club(models.Model):
 
     name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
@@ -203,3 +228,185 @@ class UserInClub(models.Model):
 
     def isOwner(self):
         return self.user_level == 3
+
+
+class Tournament(models.Model):
+    name = models.CharField(max_length=120)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
+    description = models.CharField(max_length=520, blank=True)
+    organiser = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+    max_players = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(96)])
+    deadline = models.DateField()
+    finished = models.BooleanField()
+    current_stage = models.ForeignKey('Stage', blank=True, null=True, on_delete=models.SET_NULL)
+
+    def users(self):
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False,is_co_organiser=False).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def numberOfMembers(self):
+        user_ids = UserInTournament.objects.filter(tournament=self,is_organiser=False,is_co_organiser=False).values_list('user', flat=True)
+        allUsers = User.objects.filter(id__in=user_ids)
+        return allUsers.count()
+
+    def isExpired(self):
+        return self.deadline < datetime.date.today()
+
+    def getOrganiser(self):
+        return UserInTournament.objects.filter(tournament=self,is_organiser=True).first().user
+
+    def co_organisers(self):
+        user_ids = UserInTournament.objects.filter(tournament=self,is_co_organiser=True).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def games(self):
+        return Game.objects.filter(tournament=self, finished=False)
+
+    def getUserInTournament(self, user):
+        return UserInTournament.objects.get(tournament=self, user=user)
+
+    def setFinished(self):
+        self.finished = True
+
+class UserInTournament(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+    is_organiser = models.BooleanField()
+    is_co_organiser = models.BooleanField(default=False)
+    group = models.ForeignKey('Group', blank=True, null=True, on_delete=models.SET_NULL)
+
+    def setGroup(self, group):
+        self.group = group
+
+
+class Game(models.Model):
+    DRAW = 0
+    PLAYER1 = 1
+    PLAYER2 = 2
+    WINNER_CHOICES = (
+        (DRAW, "Draw"),
+        (PLAYER1, "Player 1"),
+        (PLAYER2, "Player 2"),
+    )
+    player1 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_1')
+    player2 = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,related_name='set_2')
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+    finished = models.BooleanField(default=False)
+    winner = models.CharField(blank=True, max_length=8,null=True, choices=WINNER_CHOICES, default=None)
+    group = models.ForeignKey('Group', blank=True, null=True, on_delete=models.SET_NULL)
+
+    def getPlayer1(self):
+        return self.player1
+
+    def getPlayer2(self):
+        return self.player2
+
+    def getWinner(self):
+        if self.winner == "1":
+            return self.getPlayer1()
+        elif self.winner == "2":
+            return self.getPlayer2()
+        else:
+            return None
+
+    def isFinished(self):
+        return self.finished
+
+    def setWinner(self, winner):
+        self.winner = winner
+
+    def setFinished(self):
+        self.finished = True
+
+class Stage(models.Model):
+    ELIMINATION = 0
+    SINGLE = 1
+    STAGE_TYPE_CHOICES = (
+        (ELIMINATION, "Elimination"),
+        (SINGLE, "Single"),
+    )
+
+    type = models.IntegerField(blank=False, choices=STAGE_TYPE_CHOICES)
+    tournament_in = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
+
+    def groups(self):
+        return Group.objects.filter(stage=self)
+
+    def getType(self):
+        return self.type
+
+    def typeIsElimination(self):
+        return (self.type == 0)
+
+    def gamesAreFinished(self):
+        for group in self.groups():
+            if not group.gamesAreFinished():
+                return False
+        return True
+
+    def getWinners(self):
+        winners = []
+        for group in self.groups():
+            winners.extend(group.winners())
+        if self.typeIsElimination():
+            winners = reorder(winners)
+        return winners
+
+    def games(self):
+        groups = self.groups()
+        return Game.objects.filter(group__in=groups)
+
+
+class Group(models.Model):
+    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, blank=False)
+
+    def players(self):
+        user_ids = UserInTournament.objects.filter(group=self).values_list('user', flat=True)
+        return User.objects.filter(id__in=user_ids)
+
+    def numberOfPlayers(self):
+        return self.players().count()
+
+    def games(self):
+        return Game.objects.filter(group=self)
+
+    def gamesAreFinished(self):
+        games = self.games()
+        for game in games:
+            if not game.isFinished():
+                return False
+        return True
+
+    def winners(self):
+        winners = []
+        games = self.games()
+        players = self.players()
+        points = {}
+        for game in games:
+            winner = game.getWinner()
+            if winner is None:
+                player1 = game.getPlayer1()
+                player1_points = points.get(player1, 0) + 0.5
+                points.update({player1: player1_points})
+                player2 = game.getPlayer2()
+                player2_points = points.get(player2, 0) + 0.5
+                points.update({player2: player2_points})
+            else:
+                winner_points = points.get(winner, 0) + 1
+                points.update({winner: winner_points})
+        first_winner = getPlayerWithMostPoints(points)
+        winners.append(first_winner)
+        if self.stage.typeIsElimination():
+            points.pop(first_winner)
+            second_winner = getPlayerWithMostPoints(points)
+            winners.append(second_winner)
+        return winners
+
+def getPlayerWithMostPoints(players_and_points_dictionary):
+    winner = None
+    max = 0
+    for player in players_and_points_dictionary.keys():
+        if players_and_points_dictionary.get(player) > max:
+            winner = player
+            max = players_and_points_dictionary.get(player)
+    return winner

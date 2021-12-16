@@ -1,7 +1,9 @@
 """Forms for the microblogs app."""
+import datetime
+
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, UserInClub
+from .models import User, Club, UserInClub, Tournament, UserInTournament, Game
 
 
 class LogInForm(forms.Form):
@@ -64,6 +66,7 @@ class changePassword(forms.ModelForm):
 
         model = User
         fields = []
+
     new_password = forms.CharField(
         label='New Password',
         widget=forms.PasswordInput(),
@@ -73,10 +76,12 @@ class changePassword(forms.ModelForm):
                     'character and a number'
         )]
     )
+
     new_password_confirmation = forms.CharField(
         label='New Password Confirmation',
         widget=forms.PasswordInput()
     )
+
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
@@ -85,6 +90,7 @@ class changePassword(forms.ModelForm):
         new_password_confirmation = self.cleaned_data.get('new_password_confirmation')
         if new_password != new_password_confirmation:
             self.add_error('new_password_confirmation', 'Confirmation does not match password.')
+
 
 class changeProfile(forms.Form):
     """Form enabling unregistered users to change their profile."""
@@ -146,6 +152,7 @@ class createClubForm(forms.ModelForm):
         )
         return club
 
+
 class changeClubDetails(forms.Form):
     """Form enabling club owners to change club details."""
     location = forms.CharField(
@@ -158,4 +165,51 @@ class changeClubDetails(forms.Form):
         strip=False,
         widget=forms.Textarea(),
         required=False
+    )
+
+
+class createTournamentForm(forms.ModelForm):
+
+    class Meta:
+        """Form options."""
+
+        class DateInput(forms.DateInput):
+            input_type = 'date'
+
+        model = Tournament
+        fields = ['name','description','deadline','max_players']
+        widgets = { 'description': forms.Textarea(),'deadline':DateInput()}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        deadline = cleaned_data.get("deadline")
+        if deadline < datetime.date.today():
+            self.add_error('deadline',"Deadline should be later than today.")
+
+    def save(self,user,club):
+        """Create a new tournament."""
+
+        super().save(commit=False)
+        tournament = Tournament.objects.create(
+            name=self.cleaned_data.get('name'),
+            club=club,
+            description=self.cleaned_data.get('description'),
+            deadline=self.cleaned_data.get('deadline'),
+            max_players=self.cleaned_data.get('max_players'),
+            finished=False,
+            organiser=user
+        )
+        UserInTournament.objects.create(
+            user=user,
+            tournament=tournament,
+            is_organiser=True
+        )
+        return club
+
+
+class decideGameOutcome(forms.Form):
+    """ Form for deciding the winner of a match """
+    winner = forms.ChoiceField(
+        required=False,
+        choices=Game.WINNER_CHOICES
     )

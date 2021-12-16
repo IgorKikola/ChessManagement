@@ -1,0 +1,33 @@
+{% extends 'base_content.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      {% include 'partials/tournament_profile.html' %}
+    </div>
+    <div class="col-4">
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-text">You are the organiser of this tournament.</h5>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Co-Organiser list</h5>
+          <p class="card-text">As the organiser of this tournament, you can choose other officers of the club to become co-organisers.</p>
+          <a href="{% url 'co_organiser_list' club.pk tournament.pk %}" class="btn btn-primary">Co-Organiser list</a>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <h5 class="card-title">Schedule of Matches</h5>
+          <p class="card-text">As the organiser, you can request the system to schedule matches and enter the results of matches.</p>
+          <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Show Matches</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
