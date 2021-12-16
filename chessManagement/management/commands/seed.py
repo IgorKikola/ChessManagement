@@ -31,7 +31,6 @@ class Command(BaseCommand):
         self._create_tournaments()
         self.tournaments = Tournament.objects.all()
         self._create_usersInTournaments()
-        self._delete_Jeb_in_sample_tournament_one()
 
     def create_users(self):
         user_count = 3
@@ -135,7 +134,7 @@ class Command(BaseCommand):
 
     def _create_tournament(self, club, organiser):
         if random() < self.ORGANISER_CREATE_TOURNAMENT_PROBABILITY:
-            name = f'{organiser.first_name} Tournament'
+            name = f'{organiser.first_name} {organiser.last_name} Tournament'
             description = self.faker.text(max_nb_chars=520)
             max_players = self.faker.random_int(min=2, max=96)
             deadline = self.faker.date_this_month(before_today=True, after_today=True)
@@ -162,6 +161,8 @@ class Command(BaseCommand):
             user_ids = self.usersInClubs.filter(club=tournament.club,user_level__in=[1,2,3]).values_list('user', flat=True)
             users = User.objects.filter(id__in=user_ids)
             for user in users:
+                if (user.username == 'jeb@example.org') and (tournament.name == 'Valentina Tournament Before Deadline'):
+                    continue
                 print(f"Seeding userInTournament {userInTournaments_count}", end='\r')
                 if not user == tournament.organiser:
                     try:
@@ -172,7 +173,7 @@ class Command(BaseCommand):
         print("UserInTournaments seeding complete.      ")
     
     def _create_userInTournament(self, user, tournament):
-        if (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
+        if (user.username == 'jeb@example.org' and tournament.name=="Valentina Tournament Before Deadline") or (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
             is_co_organiser = self.faker.random_elements(elements=OrderedDict([("True", 0.05), ("False", 0.95), ]), length=1)[0]
             UserInTournament.objects.create(
                     user=user,
@@ -245,7 +246,7 @@ class Command(BaseCommand):
         tournament_description = self.faker.text(max_nb_chars=520)
         max_players = self.faker.random_int(min=2, max=96)
         tournament_before_deadline = Tournament.objects.create(
-                name="Valentina Tournament One",
+                name="Valentina Tournament Before Deadline",
                 club=club,
                 description=tournament_description,
                 organiser=Valentina,
@@ -262,7 +263,7 @@ class Command(BaseCommand):
         )
 
         tournament_passed_deadline = Tournament.objects.create(
-                name="Valentina Tournament Two",
+                name="Valentina Tournament After Deadline",
                 club=club,
                 description=tournament_description,
                 organiser=Valentina,
@@ -277,16 +278,7 @@ class Command(BaseCommand):
                 is_organiser=True,
                 is_co_organiser=False
         )
-
         print("Sample creating complete.      ")
-
-    def _delete_Jeb_in_sample_tournament_one(self):
-        club = Club.objects.get(name = 'Kerbal Chess Club')
-        organiser = User.objects.get(username = 'val@example.org')
-        tournament = Tournament.objects.get(name="Valentina Tournament One", club=club, organiser=organiser)
-        if not (User.objects.get(username = 'jeb@example.org') == None):
-            jeb = User.objects.get(username = 'jeb@example.org')
-            UserInTournament.objects.get(user=jeb, tournament=tournament).delete()
 
     def _email(self, first_name, last_name):
         email = f'{first_name}.{last_name}@example.org'
