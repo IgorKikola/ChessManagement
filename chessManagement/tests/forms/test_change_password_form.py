@@ -1,11 +1,10 @@
-"""Unit tests of the log in form."""
+"""Unit tests of the password form."""
 from django import forms
 from django.test import TestCase
 from chessManagement.forms import changePassword
 
 
 class ChangeProfileTestCase(TestCase):
-    """Unit tests of the log in form."""
     def setUp(self):
         self.form_input = {'new_password': "Password123", 'new_password_confirmation': 'Password123'}
 

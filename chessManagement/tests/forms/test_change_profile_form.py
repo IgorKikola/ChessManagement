@@ -1,12 +1,10 @@
-
-"""Unit tests of the log in form."""
+"""Unit tests of the change profile form."""
 from django import forms
 from django.test import TestCase
 from chessManagement.forms import changeProfile
 
 
 class ChangePasswordTestCase(TestCase):
-    """Unit tests of the log in form."""
     def setUp(self):
         self.form_input = {
             'first_name': 'John',
@@ -54,4 +52,3 @@ class ChangePasswordTestCase(TestCase):
         self.form_input['personal_statement'] = ' '
         form = changeProfile(data=self.form_input)
         self.assertTrue(form.is_valid())
-
