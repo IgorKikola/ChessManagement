@@ -463,7 +463,7 @@ def show_matches(request, club_pk, tournament_pk):
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         template = 'show_scheduled_matches/for_organisers.html'
     else:
-        template = 'show_scheduled_matches/members.html'
+        template = 'show_scheduled_matches/for_members.html'
     return render(request, template, {'club': club, 'tournament': tournament})
 
 
