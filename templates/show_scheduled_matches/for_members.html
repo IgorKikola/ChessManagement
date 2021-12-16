@@ -4,6 +4,40 @@
   <div class="row">
     <div class="col-12">
       <h1>Schedule of matches</h1>
+      {% if tournament.isExpired %}
+        {% if isWinner %}
+          {% if stage_length > 1 %}
+            <div class="card text-center m-2">
+              <div class="card-body text-primary">
+                <h5 class="card-title">Congratulations!</h5>
+                <p class="card-text">You have won this game. Please prepare for the next game. Good Luck!</p>
+              </div>
+            </div>
+          {% else %}
+            <div class="card text-center m-2">
+              <div class="card-body text-primary">
+                <h5 class="card-title">Congratulations!</h5>
+                <p class="card-text">You are the winner of the tournament!</p>
+                <a href="{% url 'finish_matches' club.pk tournament.pk %}" class="btn btn-primary">Finish</a>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="card text-center m-2">
+            <div class="card-body text-primary">
+              <h5 class="card-title">Sorry!</h5>
+              <p class="card-text">You have lost this game. Thank you for your participation.</p>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+      <div class="card text-center m-2">
+        <div class="card-body text-primary">
+          <h5 class="card-title">The game does not start yet</h5>
+          <p class="card-text">Please prepare for the next game. Good Luck!</p>
+        </div>
+      </div>
+    {% endif %}
       <table class="table text-center">
         <thead>
           <tr>
@@ -66,47 +100,6 @@
         </tbody>
       </table>
     </div>
-    {% if tournament.isExpired %}
-      {% if isWinner %}
-        {% if stage_length > 1 %}
-          <div class="col-4">
-            <div class="card m-2">
-              <div class="card-body">
-                <h5 class="card-title">Congratulations!</h5>
-                <p class="card-text">You have won this game. Please prepare for the next game. Good Luck!</p>
-              </div>
-            </div>
-          </div>
-        {% else %}
-          <div class="col-4">
-            <div class="card m-2">
-              <div class="card-body">
-                <h5 class="card-title">Congratulations!</h5>
-                <p class="card-text">You are the winner of the tournament!</p>
-                <a href="{% url 'finish_matches' club.pk tournament.pk %}" class="btn btn-primary">Finish</a>
-              </div>
-            </div>
-          </div>
-      {% else %}
-        <div class="col-4">
-          <div class="card m-2">
-            <div class="card-body">
-              <h5 class="card-title">Sorry!</h5>
-              <p class="card-text">You have lost this game. Thank you for your participation.</p>
-            </div>
-          </div>
-        </div>
-    {% else %}
-    <div class="col-4">
-      <div class="card m-2">
-        <div class="card-body">
-          <h5 class="card-title">The game does not start yet</h5>
-          <p class="card-text">Please prepare for the next game. Good Luck!</p>
-          <a href="{% url 'finish_matches' club.pk tournament.pk %}" class="btn btn-primary">Finish</a>
-        </div>
-      </div>
-    </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}

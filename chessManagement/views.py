@@ -451,6 +451,7 @@ def show_matches(request, club_pk, tournament_pk):
     current_stage = tournament.current_stage
     stage_length = len(current_stage.games())
     winners = current_stage.getWinners()
+    isWinner = False
     for winner in winners:
         if request.user == winner:
             isWinner = True
