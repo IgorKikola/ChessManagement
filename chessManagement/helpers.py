@@ -31,9 +31,10 @@ def valid_club_and_user_required(view_function):
             try:
                 user = club.getUserInClub(user_id)
             except ObjectDoesNotExist:
+
                 return redirect('show_club', club_pk)
             else:
-                return view_function(request, club_pk, user_id)
+                return view_function(request,club_pk,user_id)
     return modified_view_function
 
 def tournament_must_belong_to_club(view_function):

@@ -46,7 +46,7 @@ def tournament_list(request, club_pk):
         else:
             return redirect('show_club', club_pk)
     else:
-        return redurect('show_club', club_pk)
+        return redirect('show_club', club_pk)
 
 @tournament_must_belong_to_club
 @login_required
@@ -440,6 +440,8 @@ def remove_user(request, club_pk, user_id):
         userInClub.delete()
         if user_to_remove_rank == 0:
             return redirect('applicants', club_pk)
+        else:
+            return redirect('show_club', club_pk)
     else:
         return redirect('show_club', club_pk)
 

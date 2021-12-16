@@ -231,12 +231,12 @@ class UserInClub(models.Model):
 
 
 class Tournament(models.Model):
-    name = models.CharField(max_length=120)
+    name = models.CharField(max_length=120,blank=False)
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank=False)
     description = models.CharField(max_length=520, blank=True)
     organiser = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     max_players = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(96)])
-    deadline = models.DateField()
+    deadline = models.DateField(verbose_name="Deadline",null=True,blank=False)
     finished = models.BooleanField()
     current_stage = models.ForeignKey('Stage', blank=True, null=True, on_delete=models.SET_NULL)
 
