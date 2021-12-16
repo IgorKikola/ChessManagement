@@ -183,8 +183,11 @@ class createTournamentForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         deadline = cleaned_data.get("deadline")
-        if deadline < datetime.date.today():
-            self.add_error('deadline',"Deadline should be later than today.")
+        if deadline is None:
+            self.add_error('deadline', "Deadline should not me empty.")
+        else:
+            if deadline < datetime.date.today():
+                self.add_error('deadline',"Deadline should be later than today.")
 
     def save(self,user,club):
         """Create a new tournament."""
