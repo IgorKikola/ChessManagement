@@ -440,6 +440,8 @@ def remove_user(request, club_pk, user_id):
         userInClub.delete()
         if user_to_remove_rank == 0:
             return redirect('applicants', club_pk)
+        else:
+            return redirect('show_club', club_pk)
     else:
         return redirect('show_club', club_pk)
 
