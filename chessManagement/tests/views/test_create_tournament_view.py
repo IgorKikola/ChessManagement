@@ -4,7 +4,7 @@ import datetime
 from django.test import TestCase
 from django.urls import reverse
 from chessManagement.forms import createClubForm, createTournamentForm
-from chessManagement.models import User, Club, Tournament
+from chessManagement.models import User, Club, Tournament, UserInClub
 
 
 class CreateTournamentViewTestCase(TestCase):
@@ -25,10 +25,15 @@ class CreateTournamentViewTestCase(TestCase):
             'max_players': 56,
             'description':'The official KCL Chess Society tournament.'
         }
+        UserInClub.objects.create(
+            user=self.user,
+            user_level=3,
+            club=self.club
+        )
         self.url = reverse('create_tournament', kwargs={'club_pk': self.club.pk})
 
     def test_get_create_tournament_url(self):
-        self.assertEqual(self.url,f'/create_tournament/{self.club.pk}/')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/create_tournament/')
 
     def test_get_create_tournament(self):
         self.client.login(username='johndoe@example.org', password='Password123')
@@ -59,7 +64,7 @@ class CreateTournamentViewTestCase(TestCase):
         after_count = Tournament.objects.count()
         self.assertEqual(after_count, before_count+1)
         tournament = Tournament.objects.get(name='My Tournament')
-        self.assertTemplateUsed(response, 'profile.html')
+        self.assertTemplateUsed(response, 'tournament_list.html')
         self.assertEqual(tournament.name, 'My Tournament')
         self.assertEqual(tournament.description, 'The official KCL Chess Society tournament.')
         self.assertEqual(tournament.deadline,datetime.date(2022, 11, 23))

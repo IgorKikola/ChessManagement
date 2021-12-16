@@ -23,17 +23,24 @@ def valid_club_required(view_function):
 
 def valid_club_and_user_required(view_function):
     def modified_view_function(request, club_pk, user_id):
+        print("0")
         try:
+            print(1)
             club = Club.objects.get(pk=club_pk)
         except ObjectDoesNotExist:
+            print(2)
             return redirect('club_list')
         else:
             try:
+                print(3)
                 user = club.getUserInClub(user_id)
             except ObjectDoesNotExist:
+                print(4)
                 return redirect('show_club', club_pk)
             else:
-                return view_function(request, club_pk, user_id)
+                print(5)
+                return view_function(request,club_pk,user_id)
+    print(6)
     return modified_view_function
 
 def tournament_must_belong_to_club(view_function):

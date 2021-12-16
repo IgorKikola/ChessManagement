@@ -38,10 +38,20 @@ class ShowTournamentViewTestCase(TestCase):
             is_organiser=True,
             is_co_organiser=False
         )
+        UserInClub.objects.create(
+            user=self.user,
+            user_level=3,
+            club=self.club
+        )
+        UserInClub.objects.create(
+            user=self.member_user,
+            user_level=1,
+            club=self.club
+        )
         self.url = reverse('show_tournament', kwargs={'club_pk': self.club.pk,'tournament_pk':self.tournament.pk})
 
     def test_get_show_tournament_url(self):
-        self.assertEqual(self.url,f'/club/{self.club.pk}/{self.tournament.pk}')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/')
 
     def test_get_show_tournament(self):
         self.client.login(username='johndoe@example.org', password='Password123')

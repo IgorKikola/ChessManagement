@@ -16,7 +16,7 @@ class SignUpTournamentViewTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
-        self.other_owner_user = User.objects.get(username='janedoe@example.org')
+        self.other_user = User.objects.get(username='janedoe@example.org')
         self.club = Club.objects.get(name='KCL-Chess-Society')
         self.tournament = Tournament.objects.create(
             name="John Tournament",
@@ -34,21 +34,21 @@ class SignUpTournamentViewTestCase(TestCase):
             is_co_organiser=False
         )
         UserInClub.objects.create(
-            user=self.other_owner_user,
+            user=self.other_user,
             user_level=1,
             club=self.club
         )
         UserInTournament.objects.create(
-            user=self.other_owner_user,
+            user=self.other_user,
             tournament=self.tournament,
             is_organiser=False,
             is_co_organiser=False
         )
 
-        self.url = reverse('cancel_sign_up_tournament', kwargs={'tournament_pk': self.tournament.pk})
+        self.url = reverse('cancel_sign_up_tournament', kwargs={'tournament_pk': self.tournament.pk,'club_pk':self.club.pk})
 
     def test_get_withdraw_tournament_url(self):
-        self.assertEqual(self.url,f'/tournament_cancel/{self.tournament.pk}/')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/cancel/')
 
     def test_successful_withdraw(self):
         self.client.login(username='janedoe@example.org', password='Password123')

@@ -16,13 +16,17 @@ class TournamentListTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='johndoe@example.org')
-        self.other_owner_user = User.objects.get(username='janedoe@example.org')
+        self.other_user = User.objects.get(username='janedoe@example.org')
         self.club = Club.objects.get(name='KCL-Chess-Society')
         self.url = reverse('tournament_list', kwargs={'club_pk': self.club.pk})
-
+        UserInClub.objects.create(
+            user=self.user,
+            user_level=3,
+            club=self.club
+        )
 
     def test_club_list_url(self):
-        self.assertEqual(self.url,f'/tournament_list/{self.club.pk}/')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournaments/')
 
     def test_get_club_list_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)

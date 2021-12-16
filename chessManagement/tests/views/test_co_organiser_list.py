@@ -33,11 +33,11 @@ class CoOrganisersTestView(TestCase):
             is_organiser=True,
             is_co_organiser=False
         )
-        self.url = reverse('co_organiser_list', kwargs={'tournament_pk': self.tournament.pk})
+        self.url = reverse('co_organiser_list', kwargs={'tournament_pk': self.tournament.pk,'club_pk':self.club.pk})
 
 
     def test_club_list_url(self):
-        self.assertEqual(self.url,f'/tournament/co_organiser_list/{self.tournament.pk}/')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/co-organisers/')
 
     def test_get_club_list_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
@@ -49,7 +49,7 @@ class CoOrganisersTestView(TestCase):
         self._create_test_co_organisers(15)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'tournament_users/co_organiser_list.html')
+        self.assertTemplateUsed(response, 'co_organiser_list.html')
         for user_id in range(15):
             officer = User.objects.get(username=f'user{user_id}@test.org')
             tournament_url = reverse('show_user', kwargs={'club_pk': self.club.pk,'user_id':officer.pk})

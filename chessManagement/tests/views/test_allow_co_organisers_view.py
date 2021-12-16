@@ -38,15 +38,15 @@ class SignUpTournamentViewTestCase(TestCase):
             user_level=1,
             club=self.club
         )
-        self.url = reverse('allow_co_organiser', kwargs={'tournament_pk': self.tournament.pk,'user_id':self.other_owner_user.pk})
+        self.url = reverse('allow_co_organiser', kwargs={'tournament_pk': self.tournament.pk,'user_id':self.other_owner_user.pk,'club_pk':self.tournament.club.pk})
 
     def test_get_withdraw_tournament_url(self):
-        self.assertEqual(self.url,f'/tournament/officer_list/allow_co_organiser/{self.tournament.pk}/{self.other_owner_user.pk}/')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/co-organisers/allow/{self.other_owner_user.pk}/')
 
     def test_successful_withdraw(self):
         self.client.login(username='johndoe@example.org', password='Password123')
         before_count = UserInTournament.objects.count()
         response = self.client.post(self.url,follow=True)
         after_count = UserInTournament.objects.count()
-        self.assertTemplateUsed(response, 'tournament_users/officer_list.html')
+        self.assertTemplateUsed(response, 'co_organiser_list.html')
         self.assertEqual(after_count, before_count+1)
