@@ -173,7 +173,7 @@ class Command(BaseCommand):
         print("UserInTournaments seeding complete.      ")
     
     def _create_userInTournament(self, user, tournament):
-        if (user.username == 'jeb@example.org' and tournament.name=="Valentina Tournament Before Deadline") or (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
+        if (user.username == 'jeb@example.org' and tournament.name == "Valentina Tournament After Deadline") or (random() < self.USER_IN_TOURNAMENT_PROBABILITY):
             is_co_organiser = self.faker.random_elements(elements=OrderedDict([("True", 0.05), ("False", 0.95), ]), length=1)[0]
             UserInTournament.objects.create(
                     user=user,
