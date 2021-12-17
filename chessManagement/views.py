@@ -457,17 +457,18 @@ def show_matches(request, club_pk, tournament_pk):
             if current_stage == None:
                 return redirect('schedule_matches', club_pk, tournament_pk)
             stage_length = len(current_stage.games())
-            winners = current_stage.getWinners()
-            if len(winners) == 1:
-                finalWinner = winners[0]
-            for winner in winners:
-                if request.user == winner:
-                    isWinner = True
-                    break
-                isWinner = False
             template = 'show_scheduled_matches/for_organisers.html'
-            
         else:
+            if not current_stage == None:
+                stage_length = len(current_stage.games())
+                winners = current_stage.getWinners()
+                if len(winners) == 1:
+                    finalWinner = winners[0]
+                for winner in winners:
+                    if request.user == winner:
+                        isWinner = True
+                        break
+                    isWinner = False
             template = 'show_scheduled_matches/for_members.html'
     else:
         if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):

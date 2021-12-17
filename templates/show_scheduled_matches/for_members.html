@@ -16,15 +16,16 @@
           {% if isWinner == None %}
             <div class="card text-white bg-secondary text-center m-2">
               <div class="card-body">
-                <h5 class="card-title">Your game's result has been come out yet.</h5>
-                <p class="card-text">You will see the result soon. Good Luck!</p>
+                <h5 class="card-title">All games' results have not been released yet.</h5>
+                <p class="card-text">You will see the results soon. Good Luck!</p>
+                <p class="card-text">The following is about the current round</p>
               </div>
             </div>
-          {% elif isWinner == True%}
+          {% elif isWinner == True %}
             <div class="card text-white bg-success text-center m-2">
               <div class="card-body">
-                <h5 class="card-title">Congratulations!</h5>
-                <p class="card-text">You have won this round!</p>
+                <h5 class="card-title">You are now the player in the tournament!</h5>
+                <p class="card-text">Please prepare your game!</p>
               </div>
             </div>
           {% else %}
