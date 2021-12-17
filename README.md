@@ -16,6 +16,8 @@ Project structure
 
 The project is called Chess Management club system. It currently consists of a single app clubs.
 
+This project is heavily borrowed from the training videos of the Clucker Application.
+
 Deployed version of the application
 The deployed version of the application can be found at this Heroku link.
 
