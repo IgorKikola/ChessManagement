@@ -451,18 +451,48 @@ def remove_user(request, club_pk, user_id):
 def show_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
-    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
-        template = 'show_scheduled_matches/for_organisers.html'
+    current_stage = tournament.current_stage
+    isWinner = None
+    finalWinner = None
+    stage_length = 2
+    if not tournament.finished:
+        if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+            if current_stage != None:
+                stage_length = len(current_stage.games())
+            template = 'show_scheduled_matches/for_organisers.html'
+        else:
+            if current_stage != None:
+                stage_length = len(current_stage.games())
+                if request.user in current_stage.players():
+                    isWinner = True
+                else:
+                    isWinner = False
+            template = 'show_scheduled_matches/for_members.html'
     else:
-        template = 'show_scheduled_matches/for_members.html'
-    return render(request, template, {'club': club, 'tournament': tournament})
+        finalWinner = current_stage.getWinners()[0]
+        if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+            template = 'show_tournament_final_result/for_organisers.html'
+        else:
+            template = 'show_tournament_final_result/for_members.html'
+    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner, 'finalWinner': finalWinner, 'stage_length': stage_length})
 
+@tournament_must_belong_to_club
+@login_required
+def finish_matches(request, club_pk, tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    club = Club.objects.get(pk=club_pk)
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        tournament.setFinished()
+        tournament.save()
+    return redirect('show_matches', club_pk, tournament_pk)
 
 @tournament_and_game_must_belong_to_club
 @login_required
 def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
+    if tournament.finished:
+         return redirect('show_matches', club_pk, tournament_pk)
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         game = Game.objects.get(pk=game_pk)
         if request.method == 'POST':

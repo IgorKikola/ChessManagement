@@ -1,0 +1,31 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Tournament Finished</h1>
+        {% if isWinner %}
+            <div class="card text-white bg-success text-center m-2">
+              <div class="card-body">
+                <h5 class="card-title">Congratulations!</h5>
+                <p class="card-text">You are the winner of the tournament!</p>
+                </div>
+            </div>
+        {% else %}
+          <div class="card text-white bg-secondary text-center m-2">
+            <div class="card-body">
+              <h5 class="card-title">Sorry!</h5>
+              <p class="card-text">You have lost this game. Thank you for your participation.</p>
+            </div>
+          </div>
+        {% endif %}
+    </div>
+    <div class="col-12 text-center">
+        <h1> Congratulations! </h1>
+        <h1> The Winner of the tournament is: </h1>
+        <img src="{{ finalWinner.gravatar }}" alt="Gravatar of {{ finalWinner.username }}" class="rounded-circle align-middle">
+        <h1>{{ finalWinner.full_name }}</h1>
+    </div>
+  </div>
+</div>
+{% endblock %}

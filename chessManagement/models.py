@@ -265,6 +265,8 @@ class Tournament(models.Model):
     def getUserInTournament(self, user):
         return UserInTournament.objects.get(tournament=self, user=user)
 
+    def setFinished(self):
+        self.finished = True
 
 class UserInTournament(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)

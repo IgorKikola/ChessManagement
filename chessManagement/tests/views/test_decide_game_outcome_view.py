@@ -61,7 +61,7 @@ class DecideGameOutcomeTestCase(TestCase):
         self.url = reverse('decide_game_outcome', kwargs={'club_pk': self.club.pk,'tournament_pk':self.tournament.pk,'game_pk': self.game.pk})
 
     def test_get_decide_game_outcome_url(self):
-        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/match/{self.game.pk}')
+        self.assertEqual(self.url,f'/club/{self.club.pk}/tournament/{self.tournament.pk}/match/{self.game.pk}/')
 
     def test_get_decide_game_outcome(self):
         self.client.login(username='johndoe@example.org', password='Password123')

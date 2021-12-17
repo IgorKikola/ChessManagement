@@ -50,6 +50,7 @@ urlpatterns = [
     path('club/<str:club_pk>/tournament/<str:tournament_pk>/co-organisers/allow/<int:user_id>/', views.allow_co_organiser, name='allow_co_organiser'),
     path('club/<str:club_pk>/tournament/<str:tournament_pk>/co-organisers/remove/<int:user_id>/', views.remove_co_organiser, name='remove_co_organiser'),
     path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/', views.show_matches, name='show_matches'),
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/finish/', views.finish_matches, name='finish_matches'),
     path('club/<str:club_pk>/tournament/<str:tournament_pk>/matches/schedule/', views.next_stage, name='schedule_matches'),
-    path('club/<str:club_pk>/tournament/<str:tournament_pk>/match/<str:game_pk>', views.decide_game_outcome, name='decide_game_outcome')
+    path('club/<str:club_pk>/tournament/<str:tournament_pk>/match/<str:game_pk>/', views.decide_game_outcome, name='decide_game_outcome')
 ]
