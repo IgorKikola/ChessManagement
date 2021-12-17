@@ -33,13 +33,23 @@
         </div>
       </div>
       {% if applied %}
-        <div class="card m-2">
-          <div class="card-body">
-            <h5 class="card-title">Schedule of Matches</h5>
-            <p class="card-text">Schedule of Matches</p>
-            <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Schedule of Matches</a>
+        {% if tournament.finished %}
+          <div class="card m-2">
+            <div class="card-body">
+              <h5 class="card-title">Schedule of Matches</h5>
+              <p class="card-text">The tournament is over!</p>
+              <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">See Winner</a>
+            </div>
           </div>
-        </div>
+        {% else %}
+          <div class="card m-2">
+            <div class="card-body">
+              <h5 class="card-title">Schedule of Matches</h5>
+              <p class="card-text">You can see the current status of the tournament.</p>
+              <a href="{% url 'show_matches' club.pk tournament.pk %}" class="btn btn-primary">Show Matches</a>
+            </div>
+          </div>
+        {% endif %}
       {% endif %}
     </div>
   </div>

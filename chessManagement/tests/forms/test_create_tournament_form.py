@@ -1,10 +1,10 @@
-"""Unit tests of the log in form."""
+"""Unit tests of the create tournament form."""
 from django import forms
 from django.test import TestCase
 from chessManagement.forms import createTournamentForm
 
-class LogInFormTestCase(TestCase):
-    """Unit tests of the log in form."""
+class CreateTournamentFormTestCase(TestCase):
+    """Unit tests of the create tournament form."""
     def setUp(self):
         self.form_input = {'name': 'My Tournament', 'description': 'my Tournament','deadline': '2022-11-23','max_players':56}
 
@@ -14,8 +14,6 @@ class LogInFormTestCase(TestCase):
         self.assertIn('description', form.fields)
         self.assertIn('deadline', form.fields)
         self.assertIn('max_players', form.fields)
-        # password_field = form.fields['password']
-        # self.assertTrue(isinstance(password_field.widget,forms.PasswordInput))
 
     def test_form_accepts_valid_input(self):
         form = createTournamentForm(data=self.form_input)

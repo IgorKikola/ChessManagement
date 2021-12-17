@@ -7,7 +7,7 @@
       {% if tournament.current_stage == None %}
         <div class="card text-white bg-secondary text-center m-2">
           <div class="card-body">
-            <h5 class="card-title">The game does not start yet</h5>
+            <h5 class="card-title">The tournament hasn't started yet</h5>
             <p class="card-text">Please prepare for the your game. Good Luck!</p>
           </div>
         </div>
@@ -24,15 +24,15 @@
           {% elif isWinner == True %}
             <div class="card text-white bg-success text-center m-2">
               <div class="card-body">
-                <h5 class="card-title">You are now the player in the tournament!</h5>
-                <p class="card-text">Please prepare your game!</p>
+                <h5 class="card-title">You are still in this stage of the tournament!</h5>
+                <p class="card-text">Please prepare for your game if it hasn't been played yet!</p>
               </div>
             </div>
           {% else %}
             <div class="card text-white bg-secondary text-center m-2">
               <div class="card-body">
                 <h5 class="card-title">Sorry!</h5>
-                <p class="card-text">You have lost this game. Thank you for your participation.</p>
+                <p class="card-text">You didn't get to this stage of the tournament. Thank you for your participation.</p>
               </div>
             </div>
           {% endif %}

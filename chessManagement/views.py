@@ -463,13 +463,11 @@ def show_matches(request, club_pk, tournament_pk):
         else:
             if current_stage != None:
                 stage_length = len(current_stage.games())
-                if request.user in current_stage.players():
-                    isWinner = True
-                else:
-                    isWinner = False
+                isWinner = request.user in current_stage.players()
             template = 'show_scheduled_matches/for_members.html'
     else:
         finalWinner = current_stage.getWinners()[0]
+        isWinner = (request.user == finalWinner)
         if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
             template = 'show_tournament_final_result/for_organisers.html'
         else:
@@ -480,7 +478,8 @@ def show_matches(request, club_pk, tournament_pk):
 @login_required
 def finish_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
-    club = Club.objects.get(pk=club_pk)
+    if not tournament.current_stage.gamesAreFinished():
+        return redirect('show_matches', club_pk, tournament_pk)
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         tournament.setFinished()
         tournament.save()
@@ -511,6 +510,10 @@ def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
 @tournament_must_belong_to_club
 @login_required
 def next_stage(request, club_pk, tournament_pk):
+    """ Schedules the matches for the next stage of the tournament """
+    """ If, in a group stage, there's more than two candidates for 'winner',
+        a random one will be selected. Such issues should be worked out by the
+        club, not the system """
     tournament = Tournament.objects.get(pk=tournament_pk)
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         current_stage = tournament.current_stage
