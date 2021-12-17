@@ -471,6 +471,7 @@ def show_matches(request, club_pk, tournament_pk):
                     isWinner = False
             template = 'show_scheduled_matches/for_members.html'
     else:
+        finalWinner = current_stage.getWinners()[0]
         if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
             template = 'show_tournament_final_result/for_organisers.html'
         else:
