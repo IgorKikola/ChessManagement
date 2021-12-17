@@ -14,21 +14,12 @@
       {% else %}
         {% if tournament.isExpired %}
           {% if isWinner %}
-            {% if stage_length > 1 %}
-              <div class="card text-white bg-success text-center m-2">
-                <div class="card-body">
-                  <h5 class="card-title">Congratulations!</h5>
-                  <p class="card-text">You have won this game. Please prepare for the next game. Good Luck!</p>
-                </div>
+            <div class="card text-white bg-success text-center m-2">
+              <div class="card-body">
+                <h5 class="card-title">Congratulations!</h5>
+                <p class="card-text">You have won this round!</p>
               </div>
-            {% else %}
-              <div class="card text-white bg-success text-center m-2">
-                <div class="card-body">
-                  <h5 class="card-title">Congratulations!</h5>
-                  <p class="card-text">You are the winner of the tournament!</p>
-                </div>
-              </div>
-            {% endif %}
+            </div>
           {% else %}
             <div class="card text-white bg-secondary text-center m-2">
               <div class="card-body">

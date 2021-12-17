@@ -449,9 +449,9 @@ def show_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
     current_stage = tournament.current_stage
-    isWinner = None
+    isWinner = False
     finalWinner = None
-    stage_length = 2
+    stage_length = 0
     if not current_stage == None:
         stage_length = len(current_stage.games())
         winners = current_stage.getWinners()
@@ -460,7 +460,7 @@ def show_matches(request, club_pk, tournament_pk):
         for winner in winners:
             if request.user == winner:
                 isWinner = True
-            isWinner = False
+                break
     if not tournament.finished:
         if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
             if current_stage == None:
