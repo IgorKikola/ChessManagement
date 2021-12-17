@@ -138,7 +138,6 @@ class Command(BaseCommand):
             description = self.faker.text(max_nb_chars=520)
             max_players = self.faker.random_int(min=2, max=96)
             deadline = self.faker.date_this_month(before_today=True, after_today=True)
-            finished = self.faker.random_choices(elements=('True', 'False'), length=1)[0]
             tournament = Tournament.objects.create(
                 name=name,
                 club=club,
@@ -146,7 +145,7 @@ class Command(BaseCommand):
                 organiser=organiser,
                 max_players=max_players,
                 deadline=deadline,
-                finished=finished
+                finished=False
             )
             UserInTournament.objects.create(
                 user=organiser,

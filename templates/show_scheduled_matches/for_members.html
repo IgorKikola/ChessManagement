@@ -5,7 +5,14 @@
     <div class="col-12">
       <h1>Schedule of matches</h1>
       {% if tournament.isExpired %}
-        {% if isWinner %}
+        {% if isWinner == None%}
+          <div class="card text-white bg-secondary text-center m-2">
+            <div class="card-body">
+              <h5 class="card-title">The game does not start yet</h5>
+              <p class="card-text">Please prepare for the your game. Good Luck!</p>
+            </div>
+          </div>
+        {% elif isWinner %}
           {% if stage_length > 1 %}
             <div class="card text-white bg-success text-center m-2">
               <div class="card-body">
@@ -31,7 +38,7 @@
         {% endif %}
       {% else %}
       <div class="card text-white bg-secondary text-center m-2">
-        <div class="card-body text-primary">
+        <div class="card-body">
           <h5 class="card-title">The game does not start yet</h5>
           <p class="card-text">Please prepare for the your game. Good Luck!</p>
         </div>
