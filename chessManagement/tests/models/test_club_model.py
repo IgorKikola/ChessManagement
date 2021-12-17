@@ -39,14 +39,6 @@ class ClubModelTestCase(TestCase):
                 description=""
             )
 
-    def test_name_may_contain_50_characters(self):
-        self.club.name = 'x' * 50
-        self._assert_club_is_valid()
-
-    def test_name_must_not_contain_more_than_50_characters(self):
-        self.club.name = 'x' * 51
-        self._assert_club_is_invalid()
-
     def test_location_can_not_be_blank(self):
         self.club.location = ''
         self._assert_club_is_invalid()

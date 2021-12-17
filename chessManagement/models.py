@@ -138,7 +138,9 @@ class User(AbstractUser):
 
 class Club(models.Model):
 
-    name = models.CharField(max_length=50, unique=True, blank=False, primary_key=True)
+    """ name field had to be changed into a TextField last minute because
+        heroku wouldn't accept a CharField primary_key..."""
+    name = models.TextField(unique=True, blank=False, primary_key=True)
     location = models.CharField(max_length=50, blank=False)
     description = models.CharField(max_length=520, blank=True)
 
