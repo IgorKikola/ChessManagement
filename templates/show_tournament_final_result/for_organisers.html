@@ -1,0 +1,22 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Tournament Finished</h1>
+        <div class="card text-white bg-success text-center m-2">
+            <div class="card-body">
+            <h5 class="card-title">Thank You!</h5>
+            <p class="card-text">You have finished tournament!</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 text-center">
+        <h1> Congratulations! </h1>
+        <h1> The Winner of the tournament is: </h1>
+        <img src="{{ finalWinner.gravatar }}" alt="Gravatar of {{ finalWinner.username }}" class="rounded-circle align-middle">
+        <h1>{{ finalWinner.full_name }}</h1>
+    </div>
+  </div>
+</div>
+{% endblock %}

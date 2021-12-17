@@ -46,7 +46,7 @@ def tournament_list(request, club_pk):
         else:
             return redirect('show_club', club_pk)
     else:
-        return redurect('show_club', club_pk)
+        return redirect('show_club', club_pk)
 
 @tournament_must_belong_to_club
 @login_required
@@ -452,17 +452,24 @@ def show_matches(request, club_pk, tournament_pk):
     stage_length = len(current_stage.games())
     winners = current_stage.getWinners()
     isWinner = False
+    finalWinner = None
+    if len(winners) == 1:
+        finalWinner = winners[0]
     for winner in winners:
         if request.user == winner:
             isWinner = True
             break
-    if stage_length == 1:
-        tournament.setFinished()
-    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
-        template = 'show_scheduled_matches/for_organisers.html'
+    if not tournament.finished:
+        if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+            template = 'show_scheduled_matches/for_organisers.html'
+        else:
+            template = 'show_scheduled_matches/for_members.html'
     else:
-        template = 'show_scheduled_matches/for_members.html'
-    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner})
+        if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+            template = 'show_tournament_final_result/for_organisers.html'
+        else:
+            template = 'show_tournament_final_result/for_members.html'
+    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner, 'finalWinner': finalWinner})
 
 @tournament_must_belong_to_club
 @login_required
@@ -471,7 +478,7 @@ def finish_matches(request, club_pk, tournament_pk):
     club = Club.objects.get(pk=club_pk)
     tournament.setFinished()
     tournament.save()
-    return redirect('show_tournament', club_pk, tournament_pk)
+    return redirect('show_matches', club_pk, tournament_pk)
 
 @tournament_and_game_must_belong_to_club
 @login_required
