@@ -145,7 +145,8 @@ class Command(BaseCommand):
                 organiser=organiser,
                 max_players=max_players,
                 deadline=deadline,
-                finished=False
+                finished=False,
+                current_stage = None,
             )
             UserInTournament.objects.create(
                 user=organiser,

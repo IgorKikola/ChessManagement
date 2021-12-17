@@ -449,23 +449,24 @@ def show_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
     current_stage = tournament.current_stage
-    isWinner = False
+    isWinner = None
     finalWinner = None
-    stage_length = 0
-    if not current_stage == None:
-        stage_length = len(current_stage.games())
-        winners = current_stage.getWinners()
-        if len(winners) == 1:
-            finalWinner = winners[0]
-        for winner in winners:
-            if request.user == winner:
-                isWinner = True
-                break
+    stage_length = 2
     if not tournament.finished:
         if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
             if current_stage == None:
                 return redirect('schedule_matches', club_pk, tournament_pk)
+            stage_length = len(current_stage.games())
+            winners = current_stage.getWinners()
+            if len(winners) == 1:
+                finalWinner = winners[0]
+            for winner in winners:
+                if request.user == winner:
+                    isWinner = True
+                    break
+                isWinner = False
             template = 'show_scheduled_matches/for_organisers.html'
+            
         else:
             template = 'show_scheduled_matches/for_members.html'
     else:

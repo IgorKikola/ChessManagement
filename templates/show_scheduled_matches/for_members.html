@@ -13,7 +13,14 @@
         </div>
       {% else %}
         {% if tournament.isExpired %}
-          {% if isWinner %}
+          {% if isWinner == None %}
+            <div class="card text-white bg-secondary text-center m-2">
+              <div class="card-body">
+                <h5 class="card-title">Your game's result has been come out yet.</h5>
+                <p class="card-text">You will see the result soon. Good Luck!</p>
+              </div>
+            </div>
+          {% elif isWinner == True%}
             <div class="card text-white bg-success text-center m-2">
               <div class="card-body">
                 <h5 class="card-title">Congratulations!</h5>
