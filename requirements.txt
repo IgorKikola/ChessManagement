@@ -9,3 +9,5 @@ sqlparse==0.4.2
 text-unidecode==1.3
 coverage==6.1.1
 libgravatar==1.0.0
+gunicorn
+django-heroku
