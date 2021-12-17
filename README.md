@@ -21,7 +21,7 @@ This project is heavily borrowed from the training videos of the Clucker Applica
 Deployed version of the application
 The deployed version of the application can be found at this Heroku link:
 
-$ https://warm-chamber-78106.herokuapp.com/
+https://warm-chamber-78106.herokuapp.com/
 
 Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment. From the root of the project:
