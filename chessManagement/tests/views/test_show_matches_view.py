@@ -54,7 +54,7 @@ class ShowMatchesViewTestCase(TestCase):
     def test_get_show_matches(self):
         self.client.login(username='johndoe@example.org', password='Password123')
         response = self.client.get(self.url)
-        #self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_scheduled_matches/for_organisers.html')
 
     def test_get_show_matches_by_member_user(self):
