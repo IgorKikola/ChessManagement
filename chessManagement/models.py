@@ -327,7 +327,6 @@ class Stage(models.Model):
     )
 
     type = models.IntegerField(blank=False, choices=STAGE_TYPE_CHOICES)
-    tournament_in = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=False)
 
     def groups(self):
         return Group.objects.filter(stage=self)

@@ -47,7 +47,7 @@ class StageAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for Stage objects."""
 
     list_display = [
-        'tournament_in', 'type'
+        'type'
     ]
 
 @admin.register(Game)

@@ -449,6 +449,8 @@ def show_matches(request, club_pk, tournament_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
     current_stage = tournament.current_stage
+    if current_stage == None:
+         return redirect('schedule_matches', club_pk, tournament_pk)
     stage_length = len(current_stage.games())
     winners = current_stage.getWinners()
     isWinner = False
@@ -469,15 +471,16 @@ def show_matches(request, club_pk, tournament_pk):
             template = 'show_tournament_final_result/for_organisers.html'
         else:
             template = 'show_tournament_final_result/for_members.html'
-    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner, 'finalWinner': finalWinner})
+    return render(request, template, {'club': club, 'tournament': tournament, 'isWinner': isWinner, 'finalWinner': finalWinner, 'stage_length': stage_length})
 
 @tournament_must_belong_to_club
 @login_required
 def finish_matches(request, club_pk, tournament_pk):
-    tournament = Tournament.objects.get(pk=tournament_pk)
-    club = Club.objects.get(pk=club_pk)
-    tournament.setFinished()
-    tournament.save()
+    if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
+        tournament = Tournament.objects.get(pk=tournament_pk)
+        club = Club.objects.get(pk=club_pk)
+        tournament.setFinished()
+        tournament.save()
     return redirect('show_matches', club_pk, tournament_pk)
 
 @tournament_and_game_must_belong_to_club
@@ -485,6 +488,8 @@ def finish_matches(request, club_pk, tournament_pk):
 def decide_game_outcome(request, club_pk, tournament_pk, game_pk):
     tournament = Tournament.objects.get(pk=tournament_pk)
     club = Club.objects.get(pk=club_pk)
+    if tournament.finished:
+         return redirect('show_matches', club_pk, tournament_pk)
     if request.user.isOrganiserOf(tournament) or request.user.isCoorganiserOf(tournament):
         game = Game.objects.get(pk=game_pk)
         if request.method == 'POST':
@@ -512,7 +517,6 @@ def next_stage(request, club_pk, tournament_pk):
             if not current_stage.gamesAreFinished():
                 return redirect('show_matches', club_pk, tournament_pk)
             elif len(current_stage.games()) == 1:
-                tournament.setFinished()
                 return redirect('show_matches', club_pk, tournament_pk)
             else:
                 players = current_stage.getWinners()
@@ -523,7 +527,6 @@ def next_stage(request, club_pk, tournament_pk):
         else:
             type = 1 # single
         new_stage = Stage.objects.create(
-            tournament_in=tournament,
             type=type
         )
         tournament.current_stage = new_stage
