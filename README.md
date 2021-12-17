@@ -19,7 +19,8 @@ The project is called Chess Management club system. It currently consists of a s
 This project is heavily borrowed from the training videos of the Clucker Application.
 
 Deployed version of the application
-The deployed version of the application can be found at this Heroku link.
+The deployed version of the application can be found at this Heroku link:
+$ https://warm-chamber-78106.herokuapp.com/
 
 Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment. From the root of the project:
